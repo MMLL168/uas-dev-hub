@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UAS R&D Hub (Debugged Edition)</title>
+    <title>UAS R&D Hub (Standard Edition)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
@@ -39,7 +39,7 @@
             transform: translateY(-2px); box-shadow: 0 0 15px rgba(56, 189, 248, 0.15); border-color: #38bdf8; background-color: rgba(30, 41, 59, 0.8);
         }
 
-        /* Hardware Specific Styles from Master Ref */
+        /* Hardware Specific Styles */
         .hw-block { border: 1px solid #334155; transition: all 0.2s ease; }
         .hw-block:hover { border-color: #38bdf8; box-shadow: 0 0 20px rgba(56, 189, 248, 0.1); transform: translateY(-2px); }
 
@@ -62,19 +62,11 @@
         .roadmap-item:last-child { border-left: 2px solid transparent; }
         .roadmap-dot { position: absolute; left: -0.55rem; top: 0; width: 1rem; height: 1rem; border-radius: 50%; background-color: #0f172a; border: 2px solid #38bdf8; }
 
-        /* Math formula style override */
-        mjx-container { color: #cbd5e1 !important; }
-        
-        /* FOC Steps */
-        .foc-step { position: relative; }
-        .foc-step::after { content: '➜'; position: absolute; right: -20px; top: 50%; transform: translateY(-50%); color: #475569; font-size: 1.2rem; }
-        .foc-step:last-child::after { display: none; }
-        @media (max-width: 768px) { .foc-step::after { right: 50%; top: auto; bottom: -25px; transform: translateX(50%) rotate(90deg); } }
-        
         /* Badges */
         .source-badge { display: inline-flex; align-items: center; padding: 0.125rem 0.5rem; border-radius: 9999px; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
         .badge-holybro { background-color: rgba(234, 88, 12, 0.1); border: 1px solid rgba(234, 88, 12, 0.3); color: #fb923c; }
         .badge-teardown { background-color: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); color: #34d399; }
+        .badge-standard { background-color: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); color: #60a5fa; }
     </style>
 </head>
 <body class="flex flex-col md:flex-row min-h-screen">
@@ -91,7 +83,7 @@
             <h1 class="text-xl font-bold text-slate-100 tracking-tight mono-font">
                 UAS<span class="text-sky-500">_Dev</span>
             </h1>
-            <p class="text-xs text-slate-500 mt-1">Debugged Edition v2.1</p>
+            <p class="text-xs text-slate-500 mt-1">Standard Edition (DS-012/018)</p>
         </div>
         <div class="flex-1 py-4 space-y-1">
             <!-- Strategic -->
@@ -101,7 +93,7 @@
 
             <!-- Hardware Deep Dive -->
             <div class="px-4 py-2 mt-4 text-xs font-bold text-slate-600 uppercase tracking-wider">Engineering Deep Dive</div>
-            <a href="#" onclick="navTo('section-pixhawk')" class="nav-item block px-6 py-3 text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-slate-200 border-l-4 border-transparent transition-colors"><i class="fa-solid fa-microchip mr-2 w-4"></i>Pixhawk 6X Master</a>
+            <a href="#" onclick="navTo('section-pixhawk')" class="nav-item block px-6 py-3 text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-slate-200 border-l-4 border-transparent transition-colors"><i class="fa-solid fa-microchip mr-2 w-4"></i>Pixhawk 6 Standards</a>
             <a href="#" onclick="navTo('section-bldc')" class="nav-item block px-6 py-3 text-sm font-medium text-sky-400 hover:bg-slate-800 hover:text-sky-200 border-l-4 border-transparent transition-colors"><i class="fa-solid fa-bolt mr-2 w-4"></i>BLDC 馬達實驗室 (Full)</a>
             <a href="#" onclick="navTo('section-hardware')" class="nav-item block px-6 py-3 text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-slate-200 border-l-4 border-transparent transition-colors"><i class="fa-solid fa-dna mr-2 w-4"></i>硬體解剖 (Anatomy)</a>
             
@@ -125,16 +117,9 @@
         <!-- 1. Roadmap -->
         <section id="section-roadmap" class="mb-16 animate-section">
             <header class="mb-8 border-b border-slate-800 pb-4">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <h2 class="text-3xl font-bold text-slate-100 mb-2">技術前瞻 (Tech Roadmap)</h2>
-                        <div class="flex items-center gap-2 text-slate-400 text-sm">
-                            <span class="source-badge badge-holybro">Official</span><span>Holybro CTO @ PX4 Summit</span>
-                        </div>
-                    </div>
-                    <div class="hidden lg:block text-right">
-                        <span class="block bg-slate-800 text-slate-400 border border-slate-700 px-3 py-1 rounded text-xs font-mono mb-1">Standard: PAB</span>
-                    </div>
+                <h2 class="text-3xl font-bold text-slate-100 mb-2">技術前瞻 (Tech Roadmap)</h2>
+                <div class="flex items-center gap-2 text-slate-400 text-sm">
+                    <span class="source-badge badge-holybro">Official</span><span>Holybro CTO</span>
                 </div>
             </header>
             <div class="grid lg:grid-cols-2 gap-8">
@@ -143,13 +128,13 @@
                     <div class="pl-2 space-y-6 border-l-2 border-slate-800 ml-2">
                         <div class="roadmap-item">
                             <div class="roadmap-dot border-orange-500"></div>
-                            <h4 class="text-base font-bold text-orange-400">FMURT7 (NXP i.MX RT1176)</h4>
-                            <p class="text-sm text-slate-400 mt-1">1GHz Dual-Core (Cortex-M7/M4). Native Ethernet.</p>
+                            <h4 class="text-base font-bold text-orange-400">FMURT7 (i.MX RT1176)</h4>
+                            <p class="text-sm text-slate-400 mt-1">1GHz Dual-Core. Native Ethernet.</p>
                         </div>
                         <div class="roadmap-item">
                             <div class="roadmap-dot border-sky-500"></div>
                             <h4 class="text-base font-bold text-sky-400">PAB Standard</h4>
-                            <p class="text-sm text-slate-400 mt-1">Pixhawk Autopilot Bus. Decouples core from carrier.</p>
+                            <p class="text-sm text-slate-400 mt-1">Pixhawk Autopilot Bus (DS-010). Modular carrier boards.</p>
                         </div>
                     </div>
                 </div>
@@ -169,17 +154,63 @@
             </div>
         </section>
 
-        <!-- 2. Pixhawk 6X Master -->
+        <!-- 2. Pixhawk 6 Standards (Updated with DS-012/018 Data) -->
         <section id="section-pixhawk" class="mb-16 hidden animate-section">
             <header class="mb-8 border-b border-slate-800 pb-4">
-                <h2 class="text-3xl font-bold text-slate-100 mb-2">Pixhawk 6X 硬體底層全解</h2>
-                <p class="text-slate-400 max-w-3xl">Architecture, Power Path, and Pin-to-Pin Specifications.</p>
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 class="text-3xl font-bold text-slate-100 mb-2">Pixhawk 6X/6C 硬體標準對照</h2>
+                        <div class="flex items-center gap-2 text-slate-400 text-sm">
+                            <span class="source-badge badge-standard">DS-012/018</span>
+                            <span>Specs Verified</span>
+                        </div>
+                    </div>
+                </div>
             </header>
 
-            <div class="grid lg:grid-cols-3 gap-6 mb-8">
-                <!-- Port Map -->
+            <div class="bg-slate-950 rounded-xl border border-slate-800 overflow-hidden mb-8">
+                <table class="w-full comp-table text-slate-300">
+                    <thead>
+                        <tr class="bg-slate-900">
+                            <th>Spec</th>
+                            <th class="text-emerald-400">Pixhawk 6X (DS-012)</th>
+                            <th class="text-sky-400">Pixhawk 6C (DS-018)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>FMU MCU</td><td>STM32H753 (480MHz, 2MB Flash, 1MB RAM)</td><td>STM32H743 (480MHz, 2MB Flash, 1MB RAM)</td></tr>
+                        <tr><td>IO MCU</td><td>STM32F103 (64KB Flash, 20KB RAM)</td><td>STM32F103 (64KB Flash, 20KB RAM)</td></tr>
+                        <tr><td>Ethernet</td><td><span class="text-emerald-400">100Base-T (Realtek RTL8201F)</span></td><td><span class="text-slate-500">None (USB OTG Only)</span></td></tr>
+                        <tr><td>Security</td><td>NXP SE050 Secure Element</td><td><span class="text-slate-500">None</span></td></tr>
+                        <tr><td>Sensor Domains</td><td>3 Isolated Domains (Triple Redundancy)</td><td>2 Domains (Dual Redundancy)</td></tr>
+                        <tr><td>Form Factor</td><td>Standard PAB (Modular)</td><td>Cost-Optimized (Compact)</td></tr>
+                        <tr><td>Dimensions</td><td>FMUM: 38.8 x 31.8 mm</td><td>Specific to 6C case</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Sensor Revisions (New) -->
+            <div class="bg-slate-900 p-6 rounded-xl border border-slate-800 mb-8">
+                <h3 class="text-lg font-bold text-slate-200 mb-4 text-sm uppercase tracking-wider"><i class="fa-solid fa-list-ol mr-2 text-amber-500"></i>6X Sensor Set Revisions (Firmware Impact)</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full comp-table text-slate-300 text-xs">
+                        <thead>
+                            <tr class="bg-slate-950"><th>Rev</th><th>IMU 1</th><th>IMU 2</th><th>IMU 3</th><th>Mag</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Rev 1</td><td>BMI088</td><td>ICM-42688-P</td><td>ICM-20649</td><td>BMM150</td></tr>
+                            <tr><td>Rev 2</td><td>ICM-20649</td><td>ICM-42688-P</td><td>ICM-20649</td><td>BMM150</td></tr>
+                            <tr><td>Rev 5</td><td>BMI088</td><td>ICM-42688-P</td><td><span class="text-sky-400">ICM-42649</span></td><td>BMM150 + RM3100</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p class="text-xs text-slate-500 mt-2 italic">* Drivers must match revision ID stored in EEPROM.</p>
+            </div>
+            
+            <!-- Port Map -->
+            <div class="grid lg:grid-cols-3 gap-6">
                 <div class="lg:col-span-2 bg-slate-950 p-6 rounded-xl border border-slate-800">
-                    <h3 class="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4">Port Map (Click for Pinout)</h3>
+                    <h3 class="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4">Port Pinout (6X Reference)</h3>
                     <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
                         <div class="port-connector bg-slate-900/50 p-3 rounded text-center" onclick="showPortDetail('power')">
                             <div class="port-label text-rose-400">POWER 1 & 2</div><i class="fa-solid fa-battery-full text-xl text-rose-500 my-2"></i>
@@ -371,45 +402,19 @@
             </div>
         </section>
 
-        <!-- 9. Software (Debugged) -->
+        <!-- 9. Software -->
         <section id="section-software" class="mb-16 hidden animate-section">
             <header class="mb-8 border-b border-slate-800 pb-4">
                 <h2 class="text-3xl font-bold text-slate-100 mb-2">Software Stack</h2>
             </header>
             <div class="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden">
                 <div class="flex border-b border-slate-800 bg-slate-950">
-                    <button id="tab-px4" onclick="switchStack('px4')" class="flex-1 py-4 font-bold text-sky-400 bg-slate-900 border-r border-slate-800 transition">PX4 Autopilot</button>
-                    <button id="tab-ardupilot" onclick="switchStack('ardupilot')" class="flex-1 py-4 font-bold text-slate-500 bg-slate-950 transition">ArduPilot</button>
+                    <button class="flex-1 py-4 text-sky-400 font-bold bg-slate-900">PX4</button>
+                    <button class="flex-1 py-4 text-slate-500">ArduPilot</button>
                 </div>
-                
-                <!-- PX4 Content -->
-                <div id="content-px4" class="p-8">
-                    <div class="grid md:grid-cols-2 gap-6">
-                        <div class="space-y-4 text-sm text-slate-400">
-                            <div class="flex items-start"><i class="fa-solid fa-cube mt-1 mr-3 text-sky-500"></i><div><strong class="text-slate-200">Modular Architecture</strong><p>Micro-kernel design (NuttX). Modules communicate via uORB.</p></div></div>
-                            <div class="flex items-start"><i class="fa-brands fa-linux mt-1 mr-3 text-sky-500"></i><div><strong class="text-slate-200">ROS 2 Integration</strong><p>Native DDS/XRCE-DDS bridge for AI/Robotics.</p></div></div>
-                        </div>
-                        <div class="bg-slate-950 p-4 rounded border border-slate-800 text-xs font-mono text-sky-300">
-                            > make px4_fmu-v6x_default<br>
-                            > mavlink start -d /dev/ttyS1<br>
-                            > commander arm
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ArduPilot Content -->
-                <div id="content-ardupilot" class="p-8 hidden">
-                    <div class="grid md:grid-cols-2 gap-6">
-                        <div class="space-y-4 text-sm text-slate-400">
-                            <div class="flex items-start"><i class="fa-solid fa-layer-group mt-1 mr-3 text-rose-500"></i><div><strong class="text-slate-200">Monolithic Architecture</strong><p>Runs on ChibiOS. Highly integrated and feature-rich.</p></div></div>
-                            <div class="flex items-start"><i class="fa-solid fa-code mt-1 mr-3 text-rose-500"></i><div><strong class="text-slate-200">Lua Scripting</strong><p>Onboard scripting for custom logic without recompiling.</p></div></div>
-                        </div>
-                        <div class="bg-slate-950 p-4 rounded border border-slate-800 text-xs font-mono text-rose-300">
-                            > ./waf configure --board Pixhawk6X<br>
-                            > ./waf copter<br>
-                            > param set SCR_ENABLE 1
-                        </div>
-                    </div>
+                <div class="p-8 text-slate-400 text-sm space-y-2">
+                    <p><strong>Kernel:</strong> NuttX (Real-time POSIX)</p>
+                    <p><strong>Middleware:</strong> uORB (Pub/Sub Messaging)</p>
                 </div>
             </div>
         </section>
@@ -439,20 +444,20 @@
         Chart.defaults.color = '#94a3b8';
         Chart.defaults.borderColor = '#334155';
 
-        // --- Data: Pixhawk Ports (FULL DETAIL HTML) ---
+        // --- Data: Pixhawk Ports (Verified from DS-012/018) ---
         const portDB = {
             power: {
                 title: 'POWER 1 & 2', subtitle: 'LTC4417 OR-ing', icon: '<i class="fa-solid fa-battery-full text-rose-500"></i>',
                 content: `<table class="w-full pin-table">
                     <tr><th>Pin</th><th>Sig</th><th>Volt</th><th>Note</th></tr>
                     <tr><td>1,2</td><td>VCC</td><td class="v-5">5V</td><td>Input</td></tr>
-                    <tr><td>3</td><td>I_SENS</td><td class="v-33">3.3V</td><td>Analog</td></tr>
-                    <tr><td>4</td><td>V_SENS</td><td class="v-33">3.3V</td><td>Analog</td></tr>
+                    <tr><td>3</td><td>I_SENS</td><td class="v-33">3.3V</td><td>Analog (0-3.3V)</td></tr>
+                    <tr><td>4</td><td>V_SENS</td><td class="v-33">3.3V</td><td>Analog (0-3.3V)</td></tr>
                     <tr><td>5,6</td><td>GND</td><td class="v-gnd">GND</td><td>Ref</td></tr>
-                </table><p class="mt-2 text-xs text-slate-400">優先權：Power1 > Power2 > USB</p>`
+                </table><p class="mt-2 text-xs text-slate-400">Power1 priority > Power2 priority.</p>`
             },
             gps: {
-                title: 'GPS 1', subtitle: 'GNSS + Mag', icon: '<i class="fa-solid fa-satellite text-emerald-500"></i>',
+                title: 'GPS 1', subtitle: 'GNSS + Mag + Safety', icon: '<i class="fa-solid fa-satellite text-emerald-500"></i>',
                 content: `<table class="w-full pin-table">
                     <tr><th>Pin</th><th>Sig</th><th>Volt</th></tr>
                     <tr><td>1</td><td>VCC</td><td class="v-5">5V</td></tr>
@@ -530,7 +535,6 @@
             const p = document.getElementById('port-detail-panel');
             document.getElementById('port-icon').innerHTML = d.icon;
             document.getElementById('port-title').innerText = d.title;
-            document.getElementById('port-subtitle').innerText = d.subtitle;
             document.getElementById('port-content').innerHTML = d.content;
             p.classList.remove('animate-fade-in'); void p.offsetWidth; p.classList.add('animate-fade-in');
         }
@@ -595,30 +599,6 @@
             pidChart.data.datasets[1].data = p.d;
             pidChart.data.datasets[1].borderColor = p.c;
             pidChart.update();
-        }
-
-        // --- Software Stack Switcher (FIXED) ---
-        function switchStack(id) {
-            // Hide all content
-            document.getElementById('content-px4').classList.add('hidden');
-            document.getElementById('content-ardupilot').classList.add('hidden');
-            
-            // Show selected content
-            document.getElementById(`content-${id}`).classList.remove('hidden');
-            
-            // Reset Tab Styles
-            const tabPx4 = document.getElementById('tab-px4');
-            const tabArdu = document.getElementById('tab-ardupilot');
-            
-            tabPx4.className = 'flex-1 py-4 font-bold transition bg-slate-950 text-slate-500 border-r border-slate-800';
-            tabArdu.className = 'flex-1 py-4 font-bold transition bg-slate-950 text-slate-500';
-            
-            // Set Active Tab Style
-            if (id === 'px4') {
-                tabPx4.className = 'flex-1 py-4 font-bold text-sky-400 bg-slate-900 border-r border-slate-800 transition';
-            } else {
-                tabArdu.className = 'flex-1 py-4 font-bold text-rose-400 bg-slate-900 transition';
-            }
         }
 
         function showDiagnosis() {

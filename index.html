@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UAS R&D Hub (Omniscient Edition)</title>
+    <title>UAS R&D Hub (Debugged Edition)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
@@ -70,6 +70,11 @@
         .foc-step::after { content: '➜'; position: absolute; right: -20px; top: 50%; transform: translateY(-50%); color: #475569; font-size: 1.2rem; }
         .foc-step:last-child::after { display: none; }
         @media (max-width: 768px) { .foc-step::after { right: 50%; top: auto; bottom: -25px; transform: translateX(50%) rotate(90deg); } }
+        
+        /* Badges */
+        .source-badge { display: inline-flex; align-items: center; padding: 0.125rem 0.5rem; border-radius: 9999px; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+        .badge-holybro { background-color: rgba(234, 88, 12, 0.1); border: 1px solid rgba(234, 88, 12, 0.3); color: #fb923c; }
+        .badge-teardown { background-color: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); color: #34d399; }
     </style>
 </head>
 <body class="flex flex-col md:flex-row min-h-screen">
@@ -86,7 +91,7 @@
             <h1 class="text-xl font-bold text-slate-100 tracking-tight mono-font">
                 UAS<span class="text-sky-500">_Dev</span>
             </h1>
-            <p class="text-xs text-slate-500 mt-1">Omniscient Edition</p>
+            <p class="text-xs text-slate-500 mt-1">Debugged Edition v2.1</p>
         </div>
         <div class="flex-1 py-4 space-y-1">
             <!-- Strategic -->
@@ -120,19 +125,26 @@
         <!-- 1. Roadmap -->
         <section id="section-roadmap" class="mb-16 animate-section">
             <header class="mb-8 border-b border-slate-800 pb-4">
-                <h2 class="text-3xl font-bold text-slate-100 mb-2">技術前瞻 (Tech Roadmap)</h2>
-                <div class="flex items-center gap-2 text-slate-400 text-sm">
-                    <span class="source-badge badge-holybro">Official</span><span>Holybro CTO @ PX4 Summit</span>
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 class="text-3xl font-bold text-slate-100 mb-2">技術前瞻 (Tech Roadmap)</h2>
+                        <div class="flex items-center gap-2 text-slate-400 text-sm">
+                            <span class="source-badge badge-holybro">Official</span><span>Holybro CTO @ PX4 Summit</span>
+                        </div>
+                    </div>
+                    <div class="hidden lg:block text-right">
+                        <span class="block bg-slate-800 text-slate-400 border border-slate-700 px-3 py-1 rounded text-xs font-mono mb-1">Standard: PAB</span>
+                    </div>
                 </div>
             </header>
             <div class="grid lg:grid-cols-2 gap-8">
                 <div class="bg-slate-950 p-6 rounded-xl border border-slate-800">
-                    <h3 class="text-lg font-bold text-slate-200 mb-6 flex items-center"><i class="fa-solid fa-timeline mr-2 text-orange-500"></i>Avionics Evolution</h3>
+                    <h3 class="text-lg font-bold text-slate-200 mb-6 flex items-center"><i class="fa-solid fa-timeline mr-2 text-orange-500"></i>Next-Gen Avionics</h3>
                     <div class="pl-2 space-y-6 border-l-2 border-slate-800 ml-2">
                         <div class="roadmap-item">
                             <div class="roadmap-dot border-orange-500"></div>
                             <h4 class="text-base font-bold text-orange-400">FMURT7 (NXP i.MX RT1176)</h4>
-                            <p class="text-sm text-slate-400 mt-1">1GHz Dual-Core. Native Ethernet. The future beyond STM32.</p>
+                            <p class="text-sm text-slate-400 mt-1">1GHz Dual-Core (Cortex-M7/M4). Native Ethernet.</p>
                         </div>
                         <div class="roadmap-item">
                             <div class="roadmap-dot border-sky-500"></div>
@@ -142,55 +154,32 @@
                     </div>
                 </div>
                 <div class="bg-slate-900 p-6 rounded-xl border border-slate-800 shadow-lg">
-                    <h4 class="font-bold text-slate-200 mb-3 text-sm uppercase tracking-wider">Strategic Peripherals</h4>
+                    <h4 class="font-bold text-slate-200 mb-3 text-sm uppercase tracking-wider">Peripherals</h4>
                     <div class="space-y-3">
                         <div class="bg-slate-950 p-3 rounded border border-slate-700">
-                            <strong class="text-slate-300 text-sm block">Unicore UM982 (Dual Antenna)</strong>
-                            <p class="text-xs text-slate-500 mt-1">GPS Heading (Yaw) source. Immune to magnetic interference.</p>
+                            <strong class="text-slate-300 text-sm block">Unicore UM982</strong>
+                            <p class="text-xs text-slate-500 mt-1">Dual Antenna RTK for Heading.</p>
                         </div>
                         <div class="bg-slate-950 p-3 rounded border border-slate-700">
                             <strong class="text-slate-300 text-sm block">PM08D (200A)</strong>
-                            <p class="text-xs text-slate-500 mt-1">Digital I2C Power Monitor for heavy lift.</p>
+                            <p class="text-xs text-slate-500 mt-1">Digital I2C Power Monitor.</p>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- 2. Pixhawk 6X Master (Expanded) -->
+        <!-- 2. Pixhawk 6X Master -->
         <section id="section-pixhawk" class="mb-16 hidden animate-section">
             <header class="mb-8 border-b border-slate-800 pb-4">
                 <h2 class="text-3xl font-bold text-slate-100 mb-2">Pixhawk 6X 硬體底層全解</h2>
                 <p class="text-slate-400 max-w-3xl">Architecture, Power Path, and Pin-to-Pin Specifications.</p>
             </header>
 
-            <!-- Architecture -->
-            <div class="grid lg:grid-cols-2 gap-6 mb-8">
-                <div class="hw-block bg-slate-900 p-5 rounded-xl relative overflow-hidden">
-                    <span class="text-sky-400 font-mono text-xs border border-sky-500/50 px-2 py-1 rounded">FMU Core</span>
-                    <h3 class="text-2xl font-bold text-white mt-3">STM32 H753</h3>
-                    <ul class="mt-4 space-y-2 text-sm text-slate-300 mono-font">
-                        <li class="flex justify-between border-b border-slate-800 pb-1"><span>Freq</span> <span class="text-sky-300">480 MHz</span></li>
-                        <li class="flex justify-between border-b border-slate-800 pb-1"><span>Core</span> <span class="text-sky-300">Cortex-M7</span></li>
-                        <li class="flex justify-between border-b border-slate-800 pb-1"><span>Role</span> <span>Guidance, Navigation, Control</span></li>
-                    </ul>
-                </div>
-                <div class="hw-block bg-slate-900 p-5 rounded-xl relative overflow-hidden">
-                    <span class="text-emerald-400 font-mono text-xs border border-emerald-500/50 px-2 py-1 rounded">IO Core</span>
-                    <h3 class="text-2xl font-bold text-white mt-3">STM32 F103</h3>
-                    <ul class="mt-4 space-y-2 text-sm text-slate-300 mono-font">
-                        <li class="flex justify-between border-b border-slate-800 pb-1"><span>Freq</span> <span class="text-emerald-300">72 MHz</span></li>
-                        <li class="flex justify-between border-b border-slate-800 pb-1"><span>Core</span> <span class="text-emerald-300">Cortex-M3</span></li>
-                        <li class="flex justify-between border-b border-slate-800 pb-1"><span>Role</span> <span>Failsafe, RC I/O, PWM</span></li>
-                    </ul>
-                </div>
-            </div>
-
-            <!-- Interface Pinouts (Deep Dive) -->
             <div class="grid lg:grid-cols-3 gap-6 mb-8">
-                <!-- Port Visualizer -->
+                <!-- Port Map -->
                 <div class="lg:col-span-2 bg-slate-950 p-6 rounded-xl border border-slate-800">
-                    <h3 class="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4">Interactive Port Map</h3>
+                    <h3 class="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4">Port Map (Click for Pinout)</h3>
                     <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
                         <div class="port-connector bg-slate-900/50 p-3 rounded text-center" onclick="showPortDetail('power')">
                             <div class="port-label text-rose-400">POWER 1 & 2</div><i class="fa-solid fa-battery-full text-xl text-rose-500 my-2"></i>
@@ -217,41 +206,9 @@
                     <div id="port-detail-panel" class="bg-slate-900 border border-slate-700 h-full rounded-xl p-6 shadow-lg animate-fade-in flex flex-col">
                         <div class="flex items-center mb-4 pb-4 border-b border-slate-800">
                             <div id="port-icon" class="text-2xl mr-3"></div>
-                            <div><h4 id="port-title" class="text-xl font-bold text-white">Select Port</h4><p id="port-subtitle" class="text-xs text-slate-500"></p></div>
+                            <div><h4 id="port-title" class="text-xl font-bold text-white">Select Port</h4></div>
                         </div>
                         <div id="port-content" class="text-sm text-slate-400 flex-1 overflow-y-auto"><p class="italic opacity-70">Click diagram to view full electrical specs.</p></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Subsystems Details -->
-            <div class="grid lg:grid-cols-2 gap-6">
-                <!-- PWM Logic -->
-                <div class="bg-slate-900 rounded-xl border border-slate-800 p-5">
-                    <h3 class="text-white font-bold mb-3 text-sm uppercase"><i class="fa-solid fa-wave-square text-amber-500 mr-2"></i>PWM Architecture</h3>
-                    <div class="flex gap-4 text-xs">
-                        <div class="flex-1 bg-slate-950 p-3 rounded border border-amber-900/30">
-                            <strong class="text-amber-400 block mb-1">FMU PWM (Aux)</strong>
-                            <p class="text-slate-400 mb-2">Direct H7 Timer.</p>
-                            <div class="bg-amber-900/20 text-amber-300 px-2 py-1 rounded">Protocol: DShot, OneShot</div>
-                        </div>
-                        <div class="flex-1 bg-slate-950 p-3 rounded border border-slate-700">
-                            <strong class="text-slate-300 block mb-1">IO PWM (Main)</strong>
-                            <p class="text-slate-400 mb-2">Via F103.</p>
-                            <div class="bg-slate-800 text-slate-300 px-2 py-1 rounded">Protocol: PWM (50-400Hz)</div>
-                        </div>
-                    </div>
-                </div>
-                <!-- Sensor Matrix -->
-                <div class="bg-slate-900 rounded-xl border border-slate-800 p-5">
-                    <h3 class="text-white font-bold mb-3 text-sm uppercase"><i class="fa-solid fa-compass text-indigo-500 mr-2"></i>Sensor Redundancy</h3>
-                    <div class="grid grid-cols-3 gap-2 text-center text-xs">
-                        <div class="bg-slate-950 p-2 rounded"><span class="text-indigo-400 block font-bold">IMU1</span>ICM-42688</div>
-                        <div class="bg-slate-950 p-2 rounded"><span class="text-indigo-400 block font-bold">IMU2</span>ICM-42688</div>
-                        <div class="bg-slate-950 p-2 rounded"><span class="text-indigo-400 block font-bold">IMU3</span>BMI088</div>
-                        <div class="bg-slate-950 p-2 rounded"><span class="text-slate-400 block font-bold">Mag</span>BMM150</div>
-                        <div class="bg-slate-950 p-2 rounded"><span class="text-slate-400 block font-bold">Baro1</span>ICP-20100</div>
-                        <div class="bg-slate-950 p-2 rounded"><span class="text-slate-400 block font-bold">Baro2</span>BMP388</div>
                     </div>
                 </div>
             </div>
@@ -414,19 +371,45 @@
             </div>
         </section>
 
-        <!-- 9. Software -->
+        <!-- 9. Software (Debugged) -->
         <section id="section-software" class="mb-16 hidden animate-section">
             <header class="mb-8 border-b border-slate-800 pb-4">
                 <h2 class="text-3xl font-bold text-slate-100 mb-2">Software Stack</h2>
             </header>
             <div class="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden">
                 <div class="flex border-b border-slate-800 bg-slate-950">
-                    <button class="flex-1 py-4 text-sky-400 font-bold bg-slate-900">PX4</button>
-                    <button class="flex-1 py-4 text-slate-500">ArduPilot</button>
+                    <button id="tab-px4" onclick="switchStack('px4')" class="flex-1 py-4 font-bold text-sky-400 bg-slate-900 border-r border-slate-800 transition">PX4 Autopilot</button>
+                    <button id="tab-ardupilot" onclick="switchStack('ardupilot')" class="flex-1 py-4 font-bold text-slate-500 bg-slate-950 transition">ArduPilot</button>
                 </div>
-                <div class="p-8 text-slate-400 text-sm space-y-2">
-                    <p><strong>Kernel:</strong> NuttX (Real-time POSIX)</p>
-                    <p><strong>Middleware:</strong> uORB (Pub/Sub Messaging)</p>
+                
+                <!-- PX4 Content -->
+                <div id="content-px4" class="p-8">
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="space-y-4 text-sm text-slate-400">
+                            <div class="flex items-start"><i class="fa-solid fa-cube mt-1 mr-3 text-sky-500"></i><div><strong class="text-slate-200">Modular Architecture</strong><p>Micro-kernel design (NuttX). Modules communicate via uORB.</p></div></div>
+                            <div class="flex items-start"><i class="fa-brands fa-linux mt-1 mr-3 text-sky-500"></i><div><strong class="text-slate-200">ROS 2 Integration</strong><p>Native DDS/XRCE-DDS bridge for AI/Robotics.</p></div></div>
+                        </div>
+                        <div class="bg-slate-950 p-4 rounded border border-slate-800 text-xs font-mono text-sky-300">
+                            > make px4_fmu-v6x_default<br>
+                            > mavlink start -d /dev/ttyS1<br>
+                            > commander arm
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ArduPilot Content -->
+                <div id="content-ardupilot" class="p-8 hidden">
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="space-y-4 text-sm text-slate-400">
+                            <div class="flex items-start"><i class="fa-solid fa-layer-group mt-1 mr-3 text-rose-500"></i><div><strong class="text-slate-200">Monolithic Architecture</strong><p>Runs on ChibiOS. Highly integrated and feature-rich.</p></div></div>
+                            <div class="flex items-start"><i class="fa-solid fa-code mt-1 mr-3 text-rose-500"></i><div><strong class="text-slate-200">Lua Scripting</strong><p>Onboard scripting for custom logic without recompiling.</p></div></div>
+                        </div>
+                        <div class="bg-slate-950 p-4 rounded border border-slate-800 text-xs font-mono text-rose-300">
+                            > ./waf configure --board Pixhawk6X<br>
+                            > ./waf copter<br>
+                            > param set SCR_ENABLE 1
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -437,10 +420,10 @@
                 <h2 class="text-3xl font-bold text-slate-100 mb-2">Field Diagnostics</h2>
             </header>
             <div class="bg-slate-900 p-6 rounded-xl border border-slate-800">
-                <select id="diagnostic-select" onchange="showDiagnosis()" class="w-full p-3 bg-slate-800 border border-slate-700 rounded text-slate-200">
+                <select id="diagnostic-select" onchange="showDiagnosis()" class="w-full p-3 bg-slate-800 border border-slate-700 rounded text-slate-200 mb-4">
                     <option value="">Select Symptom</option>
                     <option value="desync">Motor Desync</option>
-                    <option value="mag">Mag Error</option>
+                    <option value="mag">Compass Error</option>
                 </select>
                 <div id="diagnostic-result" class="hidden mt-4 p-4 bg-slate-950 border-l-4 border-emerald-500">
                     <h4 id="diag-title" class="font-bold text-emerald-400 mb-2"></h4>
@@ -513,10 +496,12 @@
             document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
             document.getElementById(id).classList.remove('hidden');
             window.scrollTo(0,0);
+            
             document.querySelectorAll('.nav-item').forEach(i => {
                 i.classList.remove('active', 'bg-orange-900/10', 'text-orange-400', 'border-orange-400', 'bg-emerald-900/10', 'text-emerald-400', 'border-emerald-400', 'bg-sky-900/10', 'text-sky-400', 'border-sky-400');
                 i.classList.add('text-slate-400', 'border-transparent');
             });
+
             const link = Array.from(document.querySelectorAll('.nav-item')).find(l => l.getAttribute('onclick').includes(id));
             if(link) {
                 if(id.includes('roadmap')) link.classList.add('active', 'text-orange-400', 'border-l-4', 'border-orange-400');
@@ -528,16 +513,7 @@
             if(window.innerWidth < 768) { document.getElementById('sidebar').classList.add('hidden'); document.getElementById('sidebar').classList.remove('fixed', 'inset-0'); }
         }
 
-        function showPortDetail(k) {
-            const d = portDB[k];
-            document.getElementById('port-icon').innerHTML = d.icon;
-            document.getElementById('port-title').innerText = d.title;
-            document.getElementById('port-subtitle').innerText = d.subtitle;
-            document.getElementById('port-content').innerHTML = d.content;
-            const p = document.getElementById('port-detail-panel');
-            p.classList.remove('animate-fade-in'); void p.offsetWidth; p.classList.add('animate-fade-in');
-        }
-
+        // --- Interactions ---
         function showBldcDetail(k) {
             const d = bldcSpecs[k];
             const b = document.getElementById('bldc-detail-box');
@@ -545,8 +521,18 @@
             document.getElementById('bldc-title').innerText = d.title;
             document.getElementById('bldc-desc').innerText = d.desc;
             const l = document.getElementById('bldc-specs'); l.innerHTML = '';
-            d.specs.forEach(s => l.innerHTML += `<li>> ${s}</li>`);
+            d.specs.forEach(s => l.innerHTML += `<li><span class="text-sky-500 mr-2">></span>${s}</li>`);
             b.classList.remove('hidden'); b.classList.add('animate-fade-in');
+        }
+
+        function showPortDetail(k) {
+            const d = portDB[k];
+            const p = document.getElementById('port-detail-panel');
+            document.getElementById('port-icon').innerHTML = d.icon;
+            document.getElementById('port-title').innerText = d.title;
+            document.getElementById('port-subtitle').innerText = d.subtitle;
+            document.getElementById('port-content').innerHTML = d.content;
+            p.classList.remove('animate-fade-in'); void p.offsetWidth; p.classList.add('animate-fade-in');
         }
 
         function initAnatomyGrid() {
@@ -581,11 +567,11 @@
             new Chart(document.getElementById('vehicleChart'), {
                 type: 'radar',
                 data: {
-                    labels: ['Hover', 'Cruise', 'Payload', 'Range', 'Wind'],
+                    labels: ['Hover Stability', 'Cruise Efficiency', 'Payload', 'Range', 'Wind Resistance'],
                     datasets: [
-                        { label: 'Multi', data: [10, 3, 5, 3, 6], borderColor: '#38bdf8', backgroundColor: '#38bdf833' },
-                        { label: 'Fixed', data: [0, 10, 7, 10, 4], borderColor: '#34d399', backgroundColor: '#34d39933' },
-                        { label: 'VTOL', data: [8, 8, 6, 8, 5], borderColor: '#fbbf24', backgroundColor: '#fbbf2433' }
+                        { label: 'Multicopter', data: [10, 3, 5, 3, 6], borderColor: '#38bdf8', backgroundColor: 'rgba(56, 189, 248, 0.2)' },
+                        { label: 'Fixed-wing', data: [0, 10, 7, 10, 4], borderColor: '#34d399', backgroundColor: 'rgba(52, 211, 153, 0.2)' },
+                        { label: 'VTOL', data: [8, 8, 6, 8, 5], borderColor: '#fbbf24', backgroundColor: 'rgba(251, 191, 36, 0.2)' }
                     ]
                 },
                 options: { responsive: true, maintainAspectRatio: false, scales: { r: { grid: { color: '#334155' }, angleLines: { color: '#334155' } } } }
@@ -598,7 +584,7 @@
                 type: 'line',
                 data: {
                     labels: [0,10,20,30,40,50,60,70,80],
-                    datasets: [{ label: 'Target', data: Array(9).fill(1), borderColor: '#64748b', borderDash: [5,5] }, { label: 'Response', data: [0, 0.6, 1.2, 0.9, 1.05, 0.98, 1.01, 1, 1], borderColor: '#34d399', backgroundColor: '#34d3991A', fill: true }]
+                    datasets: [{ label: 'Target', data: Array(9).fill(1), borderColor: '#64748b', borderDash: [5,5] }, { label: 'Response', data: [0, 0.6, 1.2, 0.9, 1.05, 0.98, 1.01, 1, 1], borderColor: '#34d399', backgroundColor: 'rgba(52, 211, 153, 0.1)', fill: true }]
                 },
                 options: { responsive: true, maintainAspectRatio: false, scales: { y: { min: 0, max: 1.5, grid: { color: '#1e293b' } }, x: { grid: { display: false } } } }
             });
@@ -611,13 +597,42 @@
             pidChart.update();
         }
 
+        // --- Software Stack Switcher (FIXED) ---
+        function switchStack(id) {
+            // Hide all content
+            document.getElementById('content-px4').classList.add('hidden');
+            document.getElementById('content-ardupilot').classList.add('hidden');
+            
+            // Show selected content
+            document.getElementById(`content-${id}`).classList.remove('hidden');
+            
+            // Reset Tab Styles
+            const tabPx4 = document.getElementById('tab-px4');
+            const tabArdu = document.getElementById('tab-ardupilot');
+            
+            tabPx4.className = 'flex-1 py-4 font-bold transition bg-slate-950 text-slate-500 border-r border-slate-800';
+            tabArdu.className = 'flex-1 py-4 font-bold transition bg-slate-950 text-slate-500';
+            
+            // Set Active Tab Style
+            if (id === 'px4') {
+                tabPx4.className = 'flex-1 py-4 font-bold text-sky-400 bg-slate-900 border-r border-slate-800 transition';
+            } else {
+                tabArdu.className = 'flex-1 py-4 font-bold text-rose-400 bg-slate-900 transition';
+            }
+        }
+
         function showDiagnosis() {
             const v = document.getElementById('diagnostic-select').value;
             const r = document.getElementById('diagnostic-result');
             const t = document.getElementById('diag-title');
             const d = document.getElementById('diag-desc');
+            
             if(!v) { r.classList.add('hidden'); return; }
-            const db = { desync: {t:'Motor Desync', d:'Action: Increase Rampup Power.'}, mag: {t:'Mag Error', d:'Action: Recalibrate.'} };
+            
+            const db = {
+                desync: {t:'Motor Desync', d:'Action: 1. Increase Rampup Power in BLHeli. 2. Check for loose bullet connectors.'},
+                mag: {t:'Toilet Bowl Effect', d:'Action: 1. Calibrate Mag. 2. Move GPS mast away from PDB/Power cables.'}
+            };
             const data = db[v];
             t.innerText = data.t; d.innerText = data.d;
             r.classList.remove('hidden');

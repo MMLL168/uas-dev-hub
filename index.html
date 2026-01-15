@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UAS R&D Hub (Engineer Reference)</title>
+    <title>UAS R&D Hub (Omniscient Edition)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- MathJax for rendering formulas -->
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -28,50 +27,49 @@
         ::-webkit-scrollbar-thumb:hover { background: #475569; }
 
         /* Chart Container */
-        .chart-container {
-            position: relative;
-            width: 100%;
-            height: 300px;
-            max-height: 400px;
-        }
+        .chart-container { position: relative; width: 100%; height: 300px; max-height: 400px; }
 
         /* Nav & Interactions */
-        .nav-item.active {
-            background-color: rgba(14, 165, 233, 0.15);
-            color: #38bdf8;
-            border-left: 3px solid #38bdf8;
-        }
+        .nav-item.active { background-color: rgba(14, 165, 233, 0.15); color: #38bdf8; border-left: 3px solid #38bdf8; }
         
         .interactive-card, .port-connector, .topo-block {
-            transition: all 0.2s ease;
-            cursor: pointer;
-            border: 1px solid #334155;
+            transition: all 0.2s ease; cursor: pointer; border: 1px solid #334155;
         }
         .interactive-card:hover, .port-connector:hover, .topo-block:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 0 15px rgba(56, 189, 248, 0.15);
-            border-color: #38bdf8;
-            background-color: rgba(30, 41, 59, 0.8);
+            transform: translateY(-2px); box-shadow: 0 0 15px rgba(56, 189, 248, 0.15); border-color: #38bdf8; background-color: rgba(30, 41, 59, 0.8);
         }
+
+        /* Hardware Specific Styles from Master Ref */
+        .hw-block { border: 1px solid #334155; transition: all 0.2s ease; }
+        .hw-block:hover { border-color: #38bdf8; box-shadow: 0 0 20px rgba(56, 189, 248, 0.1); transform: translateY(-2px); }
+
+        /* Pinout Table Styles */
+        .pin-table th { text-align: left; padding: 0.5rem; color: #94a3b8; font-size: 0.7rem; text-transform: uppercase; border-bottom: 1px solid #334155; }
+        .pin-table td { padding: 0.5rem; border-bottom: 1px solid #1e293b; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: #cbd5e1; }
+        .pin-table tr:last-child td { border-bottom: none; }
+        
+        .voltage-tag { padding: 2px 6px; border-radius: 4px; font-size: 0.65rem; font-weight: bold; margin-right: 4px; display: inline-block;}
+        .v-5 { background: rgba(244, 63, 94, 0.15); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.3); }
+        .v-33 { background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); }
+        .v-gnd { background: rgba(148, 163, 184, 0.15); color: #94a3b8; border: 1px solid rgba(148, 163, 184, 0.3); }
 
         /* Bit Visualization */
         .bit-box { transition: all 0.2s; }
         .bit-box:hover { transform: scale(1.15); z-index: 10; box-shadow: 0 0 10px currentColor; }
 
         /* Roadmap */
-        .roadmap-item {
-            position: relative;
-            padding-left: 2rem;
-            padding-bottom: 2rem;
-            border-left: 2px solid #334155;
-        }
+        .roadmap-item { position: relative; padding-left: 2rem; padding-bottom: 2rem; border-left: 2px solid #334155; }
         .roadmap-item:last-child { border-left: 2px solid transparent; }
-        .roadmap-dot {
-            position: absolute; left: -0.55rem; top: 0; width: 1rem; height: 1rem; border-radius: 50%; background-color: #0f172a; border: 2px solid #38bdf8;
-        }
+        .roadmap-dot { position: absolute; left: -0.55rem; top: 0; width: 1rem; height: 1rem; border-radius: 50%; background-color: #0f172a; border: 2px solid #38bdf8; }
 
         /* Math formula style override */
         mjx-container { color: #cbd5e1 !important; }
+        
+        /* FOC Steps */
+        .foc-step { position: relative; }
+        .foc-step::after { content: '➜'; position: absolute; right: -20px; top: 50%; transform: translateY(-50%); color: #475569; font-size: 1.2rem; }
+        .foc-step:last-child::after { display: none; }
+        @media (max-width: 768px) { .foc-step::after { right: 50%; top: auto; bottom: -25px; transform: translateX(50%) rotate(90deg); } }
     </style>
 </head>
 <body class="flex flex-col md:flex-row min-h-screen">
@@ -85,244 +83,114 @@
     <!-- Sidebar Navigation -->
     <nav id="sidebar" class="hidden md:flex flex-col w-64 bg-slate-900 border-r border-slate-800 h-screen sticky top-0 z-40 overflow-y-auto">
         <div class="p-6 border-b border-slate-800">
-            <h1 class="text-2xl font-bold text-slate-100 tracking-tight mono-font">
+            <h1 class="text-xl font-bold text-slate-100 tracking-tight mono-font">
                 UAS<span class="text-sky-500">_Dev</span>
             </h1>
-            <p class="text-xs text-slate-500 mt-1">Engineer Reference Ed.</p>
+            <p class="text-xs text-slate-500 mt-1">Omniscient Edition</p>
         </div>
         <div class="flex-1 py-4 space-y-1">
-            
             <!-- Strategic -->
             <div class="px-4 py-2 text-xs font-bold text-slate-600 uppercase tracking-wider">Strategic</div>
             <a href="#" onclick="navTo('section-roadmap')" class="nav-item block px-6 py-3 text-sm font-medium text-orange-400 hover:bg-slate-800 hover:text-orange-200 border-l-4 border-transparent transition-colors active bg-orange-900/10"><i class="fa-solid fa-chess-knight mr-2 w-4"></i>Tech Roadmap (CTO)</a>
             <a href="#" onclick="navTo('section-teardown')" class="nav-item block px-6 py-3 text-sm font-medium text-emerald-400 hover:bg-slate-800 hover:text-emerald-200 border-l-4 border-transparent transition-colors"><i class="fa-solid fa-box-open mr-2 w-4"></i>X500 硬體拆解 (Ref)</a>
 
             <!-- Hardware Deep Dive -->
-            <div class="px-4 py-2 mt-4 text-xs font-bold text-slate-600 uppercase tracking-wider">Hardware Engineering</div>
+            <div class="px-4 py-2 mt-4 text-xs font-bold text-slate-600 uppercase tracking-wider">Engineering Deep Dive</div>
+            <a href="#" onclick="navTo('section-pixhawk')" class="nav-item block px-6 py-3 text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-slate-200 border-l-4 border-transparent transition-colors"><i class="fa-solid fa-microchip mr-2 w-4"></i>Pixhawk 6X Master</a>
             <a href="#" onclick="navTo('section-bldc')" class="nav-item block px-6 py-3 text-sm font-medium text-sky-400 hover:bg-slate-800 hover:text-sky-200 border-l-4 border-transparent transition-colors"><i class="fa-solid fa-bolt mr-2 w-4"></i>BLDC 馬達實驗室 (Full)</a>
-            <a href="#" onclick="navTo('section-pixhawk')" class="nav-item block px-6 py-3 text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-slate-200 border-l-4 border-transparent transition-colors"><i class="fa-solid fa-microchip mr-2 w-4"></i>Pixhawk 6X Pinout</a>
-            <a href="#" onclick="navTo('section-hardware')" class="nav-item block px-6 py-3 text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-slate-200 border-l-4 border-transparent transition-colors"><i class="fa-solid fa-dna mr-2 w-4"></i>Sensors & Anatomy</a>
+            <a href="#" onclick="navTo('section-hardware')" class="nav-item block px-6 py-3 text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-slate-200 border-l-4 border-transparent transition-colors"><i class="fa-solid fa-dna mr-2 w-4"></i>硬體解剖 (Anatomy)</a>
             
             <!-- System & Logic -->
-            <div class="px-4 py-2 mt-4 text-xs font-bold text-slate-600 uppercase tracking-wider">Control & Signals</div>
-            <a href="#" onclick="navTo('section-protocols')" class="nav-item block px-6 py-3 text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-slate-200 border-l-4 border-transparent transition-colors"><i class="fa-solid fa-wave-square mr-2 w-4"></i>DShot Timing Specs</a>
-            <a href="#" onclick="navTo('section-pid')" class="nav-item block px-6 py-3 text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-slate-200 border-l-4 border-transparent transition-colors"><i class="fa-solid fa-arrow-trend-up mr-2 w-4"></i>PID Control Theory</a>
-            <a href="#" onclick="navTo('section-intro')" class="nav-item block px-6 py-3 text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-slate-200 border-l-4 border-transparent transition-colors"><i class="fa-solid fa-chart-pie mr-2 w-4"></i>Physics Overview</a>
+            <div class="px-4 py-2 mt-4 text-xs font-bold text-slate-600 uppercase tracking-wider">Control & Logic</div>
+            <a href="#" onclick="navTo('section-intro')" class="nav-item block px-6 py-3 text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-slate-200 border-l-4 border-transparent transition-colors"><i class="fa-solid fa-chart-pie mr-2 w-4"></i>系統概觀 (Physics)</a>
+            <a href="#" onclick="navTo('section-protocols')" class="nav-item block px-6 py-3 text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-slate-200 border-l-4 border-transparent transition-colors"><i class="fa-solid fa-wave-square mr-2 w-4"></i>DShot 通訊時序</a>
+            <a href="#" onclick="navTo('section-pid')" class="nav-item block px-6 py-3 text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-slate-200 border-l-4 border-transparent transition-colors"><i class="fa-solid fa-arrow-trend-up mr-2 w-4"></i>PID 控制理論</a>
             
-            <!-- Software -->
-            <div class="px-4 py-2 mt-4 text-xs font-bold text-slate-600 uppercase tracking-wider">Software Ops</div>
-            <a href="#" onclick="navTo('section-software')" class="nav-item block px-6 py-3 text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-slate-200 border-l-4 border-transparent transition-colors"><i class="fa-brands fa-git-alt mr-2 w-4"></i>Architecture Stack</a>
-            <a href="#" onclick="navTo('section-maint')" class="nav-item block px-6 py-3 text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-slate-200 border-l-4 border-transparent transition-colors"><i class="fa-solid fa-wrench mr-2 w-4"></i>Diagnostics</a>
+            <!-- Ops -->
+            <div class="px-4 py-2 mt-4 text-xs font-bold text-slate-600 uppercase tracking-wider">Operations</div>
+            <a href="#" onclick="navTo('section-software')" class="nav-item block px-6 py-3 text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-slate-200 border-l-4 border-transparent transition-colors"><i class="fa-brands fa-git-alt mr-2 w-4"></i>軟體棧 (Stack)</a>
+            <a href="#" onclick="navTo('section-maint')" class="nav-item block px-6 py-3 text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-slate-200 border-l-4 border-transparent transition-colors"><i class="fa-solid fa-wrench mr-2 w-4"></i>故障診斷 (Debug)</a>
         </div>
-        <div class="p-4 bg-slate-950 border-t border-slate-800">
-            <div class="text-xs text-slate-500 flex items-center">
-                <span class="w-2 h-2 rounded-full bg-emerald-500 mr-2 shadow-[0_0_5px_#10b981]"></span>
-                Engineer: Marlon
-            </div>
-        </div>
+        <div class="p-4 bg-slate-950 border-t border-slate-800 text-xs text-slate-500">Engineer: Marlon</div>
     </nav>
 
     <!-- Main Content Area -->
     <main class="flex-1 p-4 md:p-10 overflow-x-hidden">
 
-        <!-- 1. Roadmap (CTO) -->
+        <!-- 1. Roadmap -->
         <section id="section-roadmap" class="mb-16 animate-section">
             <header class="mb-8 border-b border-slate-800 pb-4">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <h2 class="text-3xl font-bold text-slate-100 mb-2">技術前瞻 (Tech Roadmap)</h2>
-                        <p class="text-slate-400 max-w-3xl leading-relaxed">
-                            Holybro CTO 觀點：PX4 硬體標準從 FMUv6 向 **PAB 標準** 與 **i.MX RT** 架構的演進。
-                        </p>
-                    </div>
-                    <div class="hidden lg:block text-right">
-                        <span class="block bg-slate-800 text-slate-400 border border-slate-700 px-3 py-1 rounded text-xs font-mono mb-1">Standard: PAB</span>
-                    </div>
+                <h2 class="text-3xl font-bold text-slate-100 mb-2">技術前瞻 (Tech Roadmap)</h2>
+                <div class="flex items-center gap-2 text-slate-400 text-sm">
+                    <span class="source-badge badge-holybro">Official</span><span>Holybro CTO @ PX4 Summit</span>
                 </div>
             </header>
             <div class="grid lg:grid-cols-2 gap-8">
                 <div class="bg-slate-950 p-6 rounded-xl border border-slate-800">
-                    <h3 class="text-lg font-bold text-slate-200 mb-6 flex items-center"><i class="fa-solid fa-timeline mr-2 text-orange-500"></i>Next-Gen Avionics</h3>
+                    <h3 class="text-lg font-bold text-slate-200 mb-6 flex items-center"><i class="fa-solid fa-timeline mr-2 text-orange-500"></i>Avionics Evolution</h3>
                     <div class="pl-2 space-y-6 border-l-2 border-slate-800 ml-2">
                         <div class="roadmap-item">
                             <div class="roadmap-dot border-orange-500"></div>
-                            <h4 class="text-base font-bold text-orange-400">FMURT7 (i.MX RT1176)</h4>
-                            <p class="text-sm text-slate-400 mt-1">1GHz Dual-Core (Cortex-M7/M4). 突破 STM32 算力瓶頸，原生支援 Ethernet。</p>
+                            <h4 class="text-base font-bold text-orange-400">FMURT7 (NXP i.MX RT1176)</h4>
+                            <p class="text-sm text-slate-400 mt-1">1GHz Dual-Core. Native Ethernet. The future beyond STM32.</p>
                         </div>
                         <div class="roadmap-item">
                             <div class="roadmap-dot border-sky-500"></div>
                             <h4 class="text-base font-bold text-sky-400">PAB Standard</h4>
-                            <p class="text-sm text-slate-400 mt-1">Pixhawk Autopilot Bus. 將 Flight Core 與 Carrier Board 解耦，實現硬體熱插拔升級。</p>
+                            <p class="text-sm text-slate-400 mt-1">Pixhawk Autopilot Bus. Decouples core from carrier.</p>
                         </div>
                     </div>
                 </div>
-                <!-- Peripherals -->
                 <div class="bg-slate-900 p-6 rounded-xl border border-slate-800 shadow-lg">
-                    <h4 class="font-bold text-slate-200 mb-3 text-sm uppercase tracking-wider">Industrial Peripherals</h4>
+                    <h4 class="font-bold text-slate-200 mb-3 text-sm uppercase tracking-wider">Strategic Peripherals</h4>
                     <div class="space-y-3">
                         <div class="bg-slate-950 p-3 rounded border border-slate-700">
                             <strong class="text-slate-300 text-sm block">Unicore UM982 (Dual Antenna)</strong>
-                            <p class="text-xs text-slate-500 mt-1">Moving Baseline RTK。透過雙天線相位差計算 <strong class="text-sky-400">Heading (航向)</strong>，完全免疫磁干擾。</p>
+                            <p class="text-xs text-slate-500 mt-1">GPS Heading (Yaw) source. Immune to magnetic interference.</p>
                         </div>
                         <div class="bg-slate-950 p-3 rounded border border-slate-700">
-                            <strong class="text-slate-300 text-sm block">PM08D (200A/14S)</strong>
-                            <p class="text-xs text-slate-500 mt-1">數位 I2C 電流計。針對大型農業機與物流機設計。</p>
+                            <strong class="text-slate-300 text-sm block">PM08D (200A)</strong>
+                            <p class="text-xs text-slate-500 mt-1">Digital I2C Power Monitor for heavy lift.</p>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- 2. Teardown (Ref) -->
-        <section id="section-teardown" class="mb-16 hidden animate-section">
+        <!-- 2. Pixhawk 6X Master (Expanded) -->
+        <section id="section-pixhawk" class="mb-16 hidden animate-section">
             <header class="mb-8 border-b border-slate-800 pb-4">
-                <h2 class="text-3xl font-bold text-slate-100 mb-2">X500 V2 硬體參考設計</h2>
-                <p class="text-slate-400">Mads Tech 拆解驗證。標準 PX4 開發機配置。</p>
+                <h2 class="text-3xl font-bold text-slate-100 mb-2">Pixhawk 6X 硬體底層全解</h2>
+                <p class="text-slate-400 max-w-3xl">Architecture, Power Path, and Pin-to-Pin Specifications.</p>
             </header>
-            <div class="grid lg:grid-cols-2 gap-8">
-                <div class="bg-slate-950 p-6 rounded-xl border border-slate-800">
-                    <h3 class="text-lg font-bold text-slate-200 mb-4">BOM & Specs</h3>
-                    <div class="space-y-4 font-mono text-sm">
-                        <div class="border-l-2 border-emerald-500 pl-4">
-                            <div class="text-emerald-400 font-bold">1. Frame</div>
-                            <div class="text-xs text-slate-500">X500 V2 (500mm). Injection Molded PDB (No soldering required).</div>
-                        </div>
-                        <div class="border-l-2 border-rose-500 pl-4">
-                            <div class="text-rose-400 font-bold">2. Propulsion</div>
-                            <div class="text-xs text-slate-500">
-                                Motors: 2216 920KV (DJI F450 Class)<br>
-                                ESC: 20A BLHeli_S (DShot Capable)<br>
-                                Props: 1045 Self-tightening
-                            </div>
-                        </div>
-                        <div class="border-l-2 border-sky-500 pl-4">
-                            <div class="text-sky-400 font-bold">3. Avionics</div>
-                            <div class="text-xs text-slate-500">
-                                FC: Pixhawk 6C (H743)<br>
-                                Power: PM02D (Digital I2C)<br>
-                                GPS: M8N / M10 (Standard)
-                            </div>
-                        </div>
-                    </div>
+
+            <!-- Architecture -->
+            <div class="grid lg:grid-cols-2 gap-6 mb-8">
+                <div class="hw-block bg-slate-900 p-5 rounded-xl relative overflow-hidden">
+                    <span class="text-sky-400 font-mono text-xs border border-sky-500/50 px-2 py-1 rounded">FMU Core</span>
+                    <h3 class="text-2xl font-bold text-white mt-3">STM32 H753</h3>
+                    <ul class="mt-4 space-y-2 text-sm text-slate-300 mono-font">
+                        <li class="flex justify-between border-b border-slate-800 pb-1"><span>Freq</span> <span class="text-sky-300">480 MHz</span></li>
+                        <li class="flex justify-between border-b border-slate-800 pb-1"><span>Core</span> <span class="text-sky-300">Cortex-M7</span></li>
+                        <li class="flex justify-between border-b border-slate-800 pb-1"><span>Role</span> <span>Guidance, Navigation, Control</span></li>
+                    </ul>
                 </div>
-                <div class="bg-slate-900 p-6 rounded-xl border border-slate-800">
-                    <h4 class="font-bold text-slate-200 mb-3 text-sm uppercase"><i class="fa-solid fa-triangle-exclamation text-yellow-500 mr-2"></i>Critical Notes</h4>
-                    <ul class="text-sm text-slate-400 space-y-2 list-disc list-inside">
-                        <li><strong>PM02 vs PM02D:</strong> 務必確認參數 <code class="bg-slate-800 px-1 rounded text-sky-300">SENS_EN_INA226</code> 已啟用，否則讀不到電壓。</li>
-                        <li><strong>Motor Order:</strong> PX4 Quad-X 順序為 M1(FR), M2(RL), M3(FL), M4(RR)。與 ArduPilot 定義不同。</li>
+                <div class="hw-block bg-slate-900 p-5 rounded-xl relative overflow-hidden">
+                    <span class="text-emerald-400 font-mono text-xs border border-emerald-500/50 px-2 py-1 rounded">IO Core</span>
+                    <h3 class="text-2xl font-bold text-white mt-3">STM32 F103</h3>
+                    <ul class="mt-4 space-y-2 text-sm text-slate-300 mono-font">
+                        <li class="flex justify-between border-b border-slate-800 pb-1"><span>Freq</span> <span class="text-emerald-300">72 MHz</span></li>
+                        <li class="flex justify-between border-b border-slate-800 pb-1"><span>Core</span> <span class="text-emerald-300">Cortex-M3</span></li>
+                        <li class="flex justify-between border-b border-slate-800 pb-1"><span>Role</span> <span>Failsafe, RC I/O, PWM</span></li>
                     </ul>
                 </div>
             </div>
-        </section>
 
-        <!-- 3. BLDC Lab (FULL - NO SIMPLIFICATION) -->
-        <section id="section-bldc" class="mb-16 hidden animate-section">
-            <header class="mb-8 border-b border-slate-800 pb-4">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <h2 class="text-3xl font-bold text-slate-100 mb-2">BLDC 馬達控制板實驗室</h2>
-                        <p class="text-slate-400 max-w-3xl leading-relaxed">
-                            STM32 FOC (磁場導向控制) 硬體架構與數學模型。<strong>包含元件選型計算公式。</strong>
-                        </p>
-                    </div>
-                    <div class="hidden md:block">
-                        <span class="bg-sky-900/30 text-sky-400 border border-sky-700/50 px-3 py-1 rounded text-xs font-mono">Target: Custom ESC / Driver</span>
-                    </div>
-                </div>
-            </header>
-
-            <!-- Topology -->
-            <div class="bg-slate-950 p-6 rounded-xl border border-slate-800 shadow-inner mb-8 overflow-x-auto">
-                <h3 class="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4">3-Phase Inverter Topology</h3>
-                <div class="flex flex-col md:flex-row gap-4 items-stretch min-w-[700px]">
-                    <!-- MCU -->
-                    <div class="topo-block flex-1 bg-slate-900 rounded-lg p-4 cursor-pointer relative" onclick="showBldcDetail('mcu')">
-                        <div class="absolute -top-3 left-3 bg-slate-800 text-sky-400 text-xs px-2 py-0.5 rounded border border-slate-700">Controller</div>
-                        <div class="text-center mt-2">
-                            <i class="fa-solid fa-microchip text-3xl text-sky-500 mb-2"></i>
-                            <h4 class="font-bold text-slate-200">STM32 G4</h4>
-                            <p class="text-xs text-slate-500 mt-1 mono-font">CORDIC / FMAC</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center justify-center text-slate-600"><i class="fa-solid fa-arrow-right-long text-xl"></i></div>
-                    <!-- Driver -->
-                    <div class="topo-block flex-1 bg-slate-900 rounded-lg p-4 cursor-pointer relative" onclick="showBldcDetail('driver')">
-                        <div class="absolute -top-3 left-3 bg-slate-800 text-amber-400 text-xs px-2 py-0.5 rounded border border-slate-700">Pre-Driver</div>
-                        <div class="text-center mt-2">
-                            <i class="fa-solid fa-charging-station text-3xl text-amber-500 mb-2"></i>
-                            <h4 class="font-bold text-slate-200">Gate Driver</h4>
-                            <p class="text-xs text-slate-500 mt-1 mono-font">DRV8301</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center justify-center text-slate-600"><i class="fa-solid fa-arrow-right-long text-xl"></i></div>
-                    <!-- MOSFET -->
-                    <div class="topo-block flex-1 bg-slate-900 rounded-lg p-4 cursor-pointer relative" onclick="showBldcDetail('mosfet')">
-                        <div class="absolute -top-3 left-3 bg-slate-800 text-rose-400 text-xs px-2 py-0.5 rounded border border-slate-700">Power Stage</div>
-                        <div class="text-center mt-2">
-                            <i class="fa-solid fa-bolt text-3xl text-rose-500 mb-2"></i>
-                            <h4 class="font-bold text-slate-200">MOSFETs</h4>
-                            <p class="text-xs text-slate-500 mt-1 mono-font">Low Rds(on)</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Detail Box (With Formulas) -->
-            <div id="bldc-detail-box" class="bg-slate-800 border border-slate-700 p-6 rounded-xl shadow-lg mb-8 transition-all hidden">
-                <div class="flex items-start">
-                    <div class="mr-4 text-3xl" id="bldc-icon"></div>
-                    <div class="flex-1">
-                        <h3 class="text-xl font-bold text-slate-100 mb-2" id="bldc-title"></h3>
-                        <p class="text-slate-300 mb-4 text-sm leading-relaxed" id="bldc-desc"></p>
-                        <div class="bg-slate-950 p-4 rounded border border-slate-800">
-                            <h4 class="text-xs text-sky-500 font-bold uppercase mb-3 border-b border-slate-800 pb-1">Engineering Math & Selection</h4>
-                            <ul class="text-sm text-slate-400 mono-font space-y-3" id="bldc-specs"></ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- FOC Workflow (Restored) -->
-            <div class="bg-slate-900 p-6 rounded-xl border border-slate-800">
-                <h3 class="text-lg font-bold text-slate-200 mb-6 flex items-center">
-                    <i class="fa-solid fa-wave-square mr-2 text-emerald-500"></i>
-                    FOC Control Loop (Math Model)
-                </h3>
-                <div class="grid md:grid-cols-4 gap-4 text-center">
-                    <div class="foc-step bg-slate-800 p-4 rounded border border-slate-700">
-                        <div class="text-xs text-slate-500 mb-1">1. Sampling</div>
-                        <h4 class="font-bold text-emerald-400">ADC $I_a, I_b$</h4>
-                        <p class="text-xs text-slate-400 mt-2">Center-Aligned PWM Trigger</p>
-                    </div>
-                    <div class="foc-step bg-slate-800 p-4 rounded border border-slate-700">
-                        <div class="text-xs text-slate-500 mb-1">2. Transforms</div>
-                        <h4 class="font-bold text-emerald-400">Clarke & Park</h4>
-                        <p class="text-xs text-slate-400 mt-2">$$ abc \rightarrow \alpha\beta \rightarrow dq $$</p>
-                    </div>
-                    <div class="foc-step bg-slate-800 p-4 rounded border border-slate-700">
-                        <div class="text-xs text-slate-500 mb-1">3. Loop</div>
-                        <h4 class="font-bold text-emerald-400">PI Controller</h4>
-                        <p class="text-xs text-slate-400 mt-2">$$ V_q = K_p e + K_i \int e $$</p>
-                    </div>
-                    <div class="foc-step bg-slate-800 p-4 rounded border border-slate-700">
-                        <div class="text-xs text-slate-500 mb-1">4. Modulation</div>
-                        <h4 class="font-bold text-emerald-400">SVPWM</h4>
-                        <p class="text-xs text-slate-400 mt-2">Sector Calc & Duty Cycle</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- 4. Pixhawk Pinout (FULL DETAIL) -->
-        <section id="section-pixhawk" class="mb-16 hidden animate-section">
-            <header class="mb-8 border-b border-slate-800 pb-4">
-                <h2 class="text-3xl font-bold text-slate-100 mb-2">Pixhawk 6X 接口定義 (Pinout)</h2>
-                <p class="text-slate-400 max-w-3xl">Standard Baseboard 接口電氣特性。</p>
-            </header>
-            
-            <div class="grid lg:grid-cols-3 gap-6">
-                <!-- Port Map -->
+            <!-- Interface Pinouts (Deep Dive) -->
+            <div class="grid lg:grid-cols-3 gap-6 mb-8">
+                <!-- Port Visualizer -->
                 <div class="lg:col-span-2 bg-slate-950 p-6 rounded-xl border border-slate-800">
+                    <h3 class="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4">Interactive Port Map</h3>
                     <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
                         <div class="port-connector bg-slate-900/50 p-3 rounded text-center" onclick="showPortDetail('power')">
                             <div class="port-label text-rose-400">POWER 1 & 2</div><i class="fa-solid fa-battery-full text-xl text-rose-500 my-2"></i>
@@ -346,18 +214,140 @@
                 </div>
                 <!-- Detail Panel -->
                 <div class="lg:col-span-1">
-                    <div id="port-detail-panel" class="bg-slate-900 border border-slate-700 h-full rounded-xl p-6 shadow-lg animate-fade-in">
+                    <div id="port-detail-panel" class="bg-slate-900 border border-slate-700 h-full rounded-xl p-6 shadow-lg animate-fade-in flex flex-col">
                         <div class="flex items-center mb-4 pb-4 border-b border-slate-800">
                             <div id="port-icon" class="text-2xl mr-3"></div>
-                            <div><h4 id="port-title" class="text-xl font-bold text-white">Select Port</h4></div>
+                            <div><h4 id="port-title" class="text-xl font-bold text-white">Select Port</h4><p id="port-subtitle" class="text-xs text-slate-500"></p></div>
                         </div>
-                        <div id="port-content" class="text-sm text-slate-400"><p class="italic opacity-70">Click diagram to view full electrical specs.</p></div>
+                        <div id="port-content" class="text-sm text-slate-400 flex-1 overflow-y-auto"><p class="italic opacity-70">Click diagram to view full electrical specs.</p></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Subsystems Details -->
+            <div class="grid lg:grid-cols-2 gap-6">
+                <!-- PWM Logic -->
+                <div class="bg-slate-900 rounded-xl border border-slate-800 p-5">
+                    <h3 class="text-white font-bold mb-3 text-sm uppercase"><i class="fa-solid fa-wave-square text-amber-500 mr-2"></i>PWM Architecture</h3>
+                    <div class="flex gap-4 text-xs">
+                        <div class="flex-1 bg-slate-950 p-3 rounded border border-amber-900/30">
+                            <strong class="text-amber-400 block mb-1">FMU PWM (Aux)</strong>
+                            <p class="text-slate-400 mb-2">Direct H7 Timer.</p>
+                            <div class="bg-amber-900/20 text-amber-300 px-2 py-1 rounded">Protocol: DShot, OneShot</div>
+                        </div>
+                        <div class="flex-1 bg-slate-950 p-3 rounded border border-slate-700">
+                            <strong class="text-slate-300 block mb-1">IO PWM (Main)</strong>
+                            <p class="text-slate-400 mb-2">Via F103.</p>
+                            <div class="bg-slate-800 text-slate-300 px-2 py-1 rounded">Protocol: PWM (50-400Hz)</div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Sensor Matrix -->
+                <div class="bg-slate-900 rounded-xl border border-slate-800 p-5">
+                    <h3 class="text-white font-bold mb-3 text-sm uppercase"><i class="fa-solid fa-compass text-indigo-500 mr-2"></i>Sensor Redundancy</h3>
+                    <div class="grid grid-cols-3 gap-2 text-center text-xs">
+                        <div class="bg-slate-950 p-2 rounded"><span class="text-indigo-400 block font-bold">IMU1</span>ICM-42688</div>
+                        <div class="bg-slate-950 p-2 rounded"><span class="text-indigo-400 block font-bold">IMU2</span>ICM-42688</div>
+                        <div class="bg-slate-950 p-2 rounded"><span class="text-indigo-400 block font-bold">IMU3</span>BMI088</div>
+                        <div class="bg-slate-950 p-2 rounded"><span class="text-slate-400 block font-bold">Mag</span>BMM150</div>
+                        <div class="bg-slate-950 p-2 rounded"><span class="text-slate-400 block font-bold">Baro1</span>ICP-20100</div>
+                        <div class="bg-slate-950 p-2 rounded"><span class="text-slate-400 block font-bold">Baro2</span>BMP388</div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- 5. System Overview (Updated with Physics) -->
+        <!-- 3. Teardown (Ref) -->
+        <section id="section-teardown" class="mb-16 hidden animate-section">
+            <header class="mb-8 border-b border-slate-800 pb-4">
+                <h2 class="text-3xl font-bold text-slate-100 mb-2">X500 V2 硬體參考設計</h2>
+                <div class="flex items-center gap-2 text-slate-400 text-sm">
+                    <span class="source-badge badge-teardown"><i class="fa-solid fa-check mr-1"></i> Data Verified</span>
+                </div>
+            </header>
+            <div class="grid lg:grid-cols-2 gap-8">
+                <div class="bg-slate-950 p-6 rounded-xl border border-slate-800">
+                    <h3 class="text-lg font-bold text-slate-200 mb-4">BOM & Specs</h3>
+                    <div class="space-y-4 font-mono text-sm">
+                        <div class="border-l-2 border-emerald-500 pl-4">
+                            <div class="text-emerald-400 font-bold">1. Frame</div>
+                            <div class="text-xs text-slate-500">X500 V2 (500mm). Injection Molded PDB.</div>
+                        </div>
+                        <div class="border-l-2 border-rose-500 pl-4">
+                            <div class="text-rose-400 font-bold">2. Propulsion</div>
+                            <div class="text-xs text-slate-500">Motors: 2216 920KV. ESC: 20A BLHeli_S.</div>
+                        </div>
+                        <div class="border-l-2 border-sky-500 pl-4">
+                            <div class="text-sky-400 font-bold">3. Avionics</div>
+                            <div class="text-xs text-slate-500">FC: Pixhawk 6C (Standard). Power: PM02D.</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-slate-900 p-6 rounded-xl border border-slate-800 shadow-lg">
+                    <h4 class="font-bold text-slate-200 mb-3 text-sm uppercase"><i class="fa-solid fa-triangle-exclamation text-yellow-500 mr-2"></i>Critical Notes</h4>
+                    <ul class="text-sm text-slate-400 space-y-2 list-disc list-inside">
+                        <li><strong>PM02 vs PM02D:</strong> Ensure `SENS_EN_INA226` is enabled for digital power monitoring.</li>
+                        <li><strong>Motor Order:</strong> PX4 Quad-X: M1(FR), M2(RL), M3(FL), M4(RR).</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. BLDC Lab (Full Math) -->
+        <section id="section-bldc" class="mb-16 hidden animate-section">
+            <header class="mb-8 border-b border-slate-800 pb-4">
+                <h2 class="text-3xl font-bold text-slate-100 mb-2">BLDC 馬達控制板實驗室</h2>
+                <p class="text-slate-400 max-w-3xl">STM32 FOC Architecture & Component Selection.</p>
+            </header>
+
+            <!-- Topology -->
+            <div class="bg-slate-950 p-6 rounded-xl border border-slate-800 shadow-inner mb-8 overflow-x-auto">
+                <h3 class="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4">Inverter Topology</h3>
+                <div class="flex flex-col md:flex-row gap-4 items-stretch min-w-[700px]">
+                    <div class="topo-block flex-1 bg-slate-900 rounded-lg p-4 cursor-pointer relative" onclick="showBldcDetail('mcu')">
+                        <div class="absolute -top-3 left-3 bg-slate-800 text-sky-400 text-xs px-2 py-0.5 rounded border border-slate-700">Controller</div>
+                        <div class="text-center mt-2"><i class="fa-solid fa-microchip text-3xl text-sky-500 mb-2"></i><h4 class="font-bold text-slate-200">STM32 G4</h4></div>
+                    </div>
+                    <div class="flex items-center justify-center text-slate-600"><i class="fa-solid fa-arrow-right-long text-xl"></i></div>
+                    <div class="topo-block flex-1 bg-slate-900 rounded-lg p-4 cursor-pointer relative" onclick="showBldcDetail('driver')">
+                        <div class="absolute -top-3 left-3 bg-slate-800 text-amber-400 text-xs px-2 py-0.5 rounded border border-slate-700">Pre-Driver</div>
+                        <div class="text-center mt-2"><i class="fa-solid fa-charging-station text-3xl text-amber-500 mb-2"></i><h4 class="font-bold text-slate-200">Gate Driver</h4></div>
+                    </div>
+                    <div class="flex items-center justify-center text-slate-600"><i class="fa-solid fa-arrow-right-long text-xl"></i></div>
+                    <div class="topo-block flex-1 bg-slate-900 rounded-lg p-4 cursor-pointer relative" onclick="showBldcDetail('mosfet')">
+                        <div class="absolute -top-3 left-3 bg-slate-800 text-rose-400 text-xs px-2 py-0.5 rounded border border-slate-700">Power Stage</div>
+                        <div class="text-center mt-2"><i class="fa-solid fa-bolt text-3xl text-rose-500 mb-2"></i><h4 class="font-bold text-slate-200">MOSFETs</h4></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="bldc-detail-box" class="bg-slate-800 border border-slate-700 p-6 rounded-xl shadow-lg mb-8 hidden">
+                <div class="flex items-start">
+                    <div class="mr-4 text-3xl" id="bldc-icon"></div>
+                    <div class="flex-1">
+                        <h3 class="text-xl font-bold text-slate-100 mb-2" id="bldc-title"></h3>
+                        <p class="text-slate-300 mb-4 text-sm" id="bldc-desc"></p>
+                        <div class="bg-slate-950 p-4 rounded border border-slate-800">
+                            <h4 class="text-xs text-sky-500 font-bold uppercase mb-3">Math & Selection</h4>
+                            <ul class="text-sm text-slate-400 mono-font space-y-3" id="bldc-specs"></ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FOC Workflow -->
+            <div class="bg-slate-900 p-6 rounded-xl border border-slate-800">
+                <h3 class="text-lg font-bold text-slate-200 mb-6 flex items-center"><i class="fa-solid fa-wave-square mr-2 text-emerald-500"></i>FOC Control Loop</h3>
+                <div class="grid md:grid-cols-4 gap-4 text-center">
+                    <div class="foc-step bg-slate-800 p-4 rounded border border-slate-700"><h4 class="font-bold text-emerald-400 text-sm">1. ADC Sampling</h4><p class="text-xs text-slate-400 mt-2">Read Ia, Ib</p></div>
+                    <div class="foc-step bg-slate-800 p-4 rounded border border-slate-700"><h4 class="font-bold text-emerald-400 text-sm">2. Clarke / Park</h4><p class="text-xs text-slate-400 mt-2">abc ➜ dq</p></div>
+                    <div class="foc-step bg-slate-800 p-4 rounded border border-slate-700"><h4 class="font-bold text-emerald-400 text-sm">3. PID Loop</h4><p class="text-xs text-slate-400 mt-2">Torque Ctrl</p></div>
+                    <div class="foc-step bg-slate-800 p-4 rounded border border-slate-700"><h4 class="font-bold text-emerald-400 text-sm">4. SVPWM</h4><p class="text-xs text-slate-400 mt-2">Duty Cycle</p></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. System Overview (Physics) -->
         <section id="section-intro" class="mb-16 hidden animate-section">
             <header class="mb-8 border-b border-slate-800 pb-4">
                 <h2 class="text-3xl font-bold text-slate-100 mb-2">系統概觀 (Engineering Physics)</h2>
@@ -368,14 +358,12 @@
                 </div>
                 <div class="space-y-4">
                     <div class="bg-slate-950 p-4 rounded border border-slate-800">
-                        <strong class="text-sky-400 block mb-1">Disk Loading (圓盤負載)</strong>
+                        <strong class="text-sky-400 block mb-1">Disk Loading</strong>
                         <p class="text-xs text-slate-400">$$ DL = \frac{Weight}{PropArea} $$</p>
-                        <p class="text-xs text-slate-500 mt-1">High DL (Racing) = Stable in wind, inefficient.<br>Low DL (Endurance) = Efficient, sensitive to wind.</p>
                     </div>
                     <div class="bg-slate-950 p-4 rounded border border-slate-800">
-                        <strong class="text-emerald-400 block mb-1">Stall Speed (失速速度)</strong>
+                        <strong class="text-emerald-400 block mb-1">Stall Speed</strong>
                         <p class="text-xs text-slate-400">$$ V_{stall} = \sqrt{\frac{2W}{\rho S C_{L,max}}} $$</p>
-                        <p class="text-xs text-slate-500 mt-1">Fixed-wing critical parameter. Must fly above this speed.</p>
                     </div>
                 </div>
             </div>
@@ -384,19 +372,17 @@
         <!-- 6. Hardware Anatomy -->
         <section id="section-hardware" class="mb-16 hidden animate-section">
             <header class="mb-8 border-b border-slate-800 pb-4">
-                <h2 class="text-3xl font-bold text-slate-100 mb-2">硬體解剖 (Components)</h2>
+                <h2 class="text-3xl font-bold text-slate-100 mb-2">硬體解剖 (Anatomy)</h2>
             </header>
             <div class="grid md:grid-cols-4 gap-4" id="anatomy-grid"></div>
             <div id="anatomy-detail" class="mt-6 bg-slate-800/50 border border-slate-700 p-6 rounded-xl shadow-lg hidden">
                 <h3 id="detail-title" class="text-xl font-bold text-sky-400 mb-2"></h3>
                 <p id="detail-desc" class="text-slate-300 mb-2"></p>
-                <div class="bg-slate-950 p-3 rounded border border-slate-800">
-                    <ul class="space-y-1 text-sm text-emerald-400 mono-font" id="detail-specs"></ul>
-                </div>
+                <div class="bg-slate-950 p-3 rounded border border-slate-800"><ul class="space-y-1 text-sm text-emerald-400 mono-font" id="detail-specs"></ul></div>
             </div>
         </section>
 
-        <!-- 7. Protocols (Detailed Timing) -->
+        <!-- 7. Protocols -->
         <section id="section-protocols" class="mb-16 hidden animate-section">
             <header class="mb-8 border-b border-slate-800 pb-4">
                 <h2 class="text-3xl font-bold text-slate-100 mb-2">DShot Timing Specs</h2>
@@ -404,71 +390,43 @@
             <div class="bg-slate-900 p-8 rounded-xl shadow-lg border border-slate-800">
                 <div class="flex flex-wrap justify-center gap-1 mb-8" id="dshot-bits"></div>
                 <div class="grid md:grid-cols-3 gap-4 text-center text-xs mono-font">
-                    <div class="bg-slate-950 p-3 rounded border border-slate-700">
-                        <strong class="text-sky-400 block mb-1">DShot150</strong>
-                        <span>150 kbit/s</span><br>
-                        <span class="text-slate-500">Bit Period: 6.67µs</span>
-                    </div>
-                    <div class="bg-slate-950 p-3 rounded border border-slate-700">
-                        <strong class="text-sky-400 block mb-1">DShot300</strong>
-                        <span>300 kbit/s</span><br>
-                        <span class="text-slate-500">Bit Period: 3.33µs</span>
-                    </div>
-                    <div class="bg-slate-950 p-3 rounded border border-slate-700">
-                        <strong class="text-sky-400 block mb-1">DShot600</strong>
-                        <span>600 kbit/s</span><br>
-                        <span class="text-slate-500">Bit Period: 1.67µs</span>
-                    </div>
-                </div>
-                <div class="mt-6 text-center text-xs text-slate-500">
-                    * Frame Length: 16 bits (11 Throttle + 1 Telem + 4 CRC). Requires DMA on STM32.
+                    <div class="bg-slate-950 p-3 rounded border border-slate-700"><strong class="text-sky-400 block">DShot150</strong><span>150 kbit/s</span></div>
+                    <div class="bg-slate-950 p-3 rounded border border-slate-700"><strong class="text-sky-400 block">DShot300</strong><span>300 kbit/s</span></div>
+                    <div class="bg-slate-950 p-3 rounded border border-slate-700"><strong class="text-sky-400 block">DShot600</strong><span>600 kbit/s</span></div>
                 </div>
             </div>
         </section>
 
-        <!-- 8. PID (Theory) -->
+        <!-- 8. PID -->
         <section id="section-pid" class="mb-16 hidden animate-section">
             <header class="mb-8 border-b border-slate-800 pb-4">
                 <h2 class="text-3xl font-bold text-slate-100 mb-2">PID Control Theory</h2>
             </header>
             <div class="bg-slate-900 p-6 rounded-xl border border-slate-800">
                 <div class="mb-6 bg-slate-950 p-4 rounded border border-slate-700 text-center">
-                    <p class="text-slate-300 text-sm mono-font">
-                        $$ u(t) = K_p e(t) + K_i \int_0^t e(\tau)d\tau + K_d \frac{de(t)}{dt} + FF $$
-                    </p>
-                    <p class="text-xs text-slate-500 mt-2">Standard PID Form + Feed Forward (FF) for latency compensation.</p>
+                    <p class="text-slate-300 text-sm mono-font">$$ u(t) = K_p e(t) + K_i \int_0^t e(\tau)d\tau + K_d \frac{de(t)}{dt} + FF $$</p>
                 </div>
                 <div class="chart-container"><canvas id="pidChart"></canvas></div>
                 <div class="flex justify-center gap-4 mt-4">
-                    <button onclick="updatePidChart('balanced')" class="px-3 py-1 bg-emerald-900/30 text-emerald-400 border border-emerald-800 rounded text-xs font-bold">Perfect Tune</button>
-                    <button onclick="updatePidChart('highP')" class="px-3 py-1 bg-rose-900/30 text-rose-400 border border-rose-800 rounded text-xs font-bold">High P (Oscillation)</button>
+                    <button onclick="updatePidChart('balanced')" class="px-3 py-1 bg-emerald-900/30 text-emerald-400 border border-emerald-800 rounded">Perfect</button>
+                    <button onclick="updatePidChart('highP')" class="px-3 py-1 bg-rose-900/30 text-rose-400 border border-rose-800 rounded">High P</button>
                 </div>
             </div>
         </section>
 
-        <!-- 9. Software Architecture -->
+        <!-- 9. Software -->
         <section id="section-software" class="mb-16 hidden animate-section">
             <header class="mb-8 border-b border-slate-800 pb-4">
-                <h2 class="text-3xl font-bold text-slate-100 mb-2">Software Architecture Stack</h2>
+                <h2 class="text-3xl font-bold text-slate-100 mb-2">Software Stack</h2>
             </header>
-            <div class="grid lg:grid-cols-2 gap-8">
-                <div class="bg-slate-900 p-6 rounded-xl border border-slate-800">
-                    <h3 class="text-lg font-bold text-sky-400 mb-4">PX4 Autopilot</h3>
-                    <ul class="space-y-3 text-sm text-slate-400">
-                        <li class="flex justify-between border-b border-slate-800 pb-1"><span>OS Kernel</span> <span class="mono-font text-slate-200">NuttX (POSIX-like)</span></li>
-                        <li class="flex justify-between border-b border-slate-800 pb-1"><span>Middleware</span> <span class="mono-font text-slate-200">uORB (Pub/Sub)</span></li>
-                        <li class="flex justify-between border-b border-slate-800 pb-1"><span>License</span> <span class="mono-font text-slate-200">BSD 3-Clause</span></li>
-                        <li class="flex justify-between border-b border-slate-800 pb-1"><span>Sim</span> <span class="mono-font text-slate-200">Gazebo / JMAVSim</span></li>
-                    </ul>
+            <div class="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden">
+                <div class="flex border-b border-slate-800 bg-slate-950">
+                    <button class="flex-1 py-4 text-sky-400 font-bold bg-slate-900">PX4</button>
+                    <button class="flex-1 py-4 text-slate-500">ArduPilot</button>
                 </div>
-                <div class="bg-slate-900 p-6 rounded-xl border border-slate-800">
-                    <h3 class="text-lg font-bold text-rose-400 mb-4">ArduPilot</h3>
-                    <ul class="space-y-3 text-sm text-slate-400">
-                        <li class="flex justify-between border-b border-slate-800 pb-1"><span>OS Kernel</span> <span class="mono-font text-slate-200">ChibiOS (Real-time)</span></li>
-                        <li class="flex justify-between border-b border-slate-800 pb-1"><span>Architecture</span> <span class="mono-font text-slate-200">Monolithic</span></li>
-                        <li class="flex justify-between border-b border-slate-800 pb-1"><span>License</span> <span class="mono-font text-slate-200">GPL v3</span></li>
-                        <li class="flex justify-between border-b border-slate-800 pb-1"><span>Scripting</span> <span class="mono-font text-slate-200">Lua</span></li>
-                    </ul>
+                <div class="p-8 text-slate-400 text-sm space-y-2">
+                    <p><strong>Kernel:</strong> NuttX (Real-time POSIX)</p>
+                    <p><strong>Middleware:</strong> uORB (Pub/Sub Messaging)</p>
                 </div>
             </div>
         </section>
@@ -479,16 +437,14 @@
                 <h2 class="text-3xl font-bold text-slate-100 mb-2">Field Diagnostics</h2>
             </header>
             <div class="bg-slate-900 p-6 rounded-xl border border-slate-800">
-                <select id="diagnostic-select" onchange="showDiagnosis()" class="w-full p-3 bg-slate-800 border border-slate-700 rounded text-slate-200 mb-4">
+                <select id="diagnostic-select" onchange="showDiagnosis()" class="w-full p-3 bg-slate-800 border border-slate-700 rounded text-slate-200">
                     <option value="">Select Symptom</option>
-                    <option value="desync">Motor Desync / Screeching</option>
-                    <option value="mag">Toilet Bowl Effect (TBE)</option>
-                    <option value="vib">High Vibrations (Z-Axis)</option>
+                    <option value="desync">Motor Desync</option>
+                    <option value="mag">Mag Error</option>
                 </select>
-                <div id="diagnostic-result" class="hidden p-4 bg-slate-950 border-l-4 border-emerald-500">
+                <div id="diagnostic-result" class="hidden mt-4 p-4 bg-slate-950 border-l-4 border-emerald-500">
                     <h4 id="diag-title" class="font-bold text-emerald-400 mb-2"></h4>
-                    <p id="diag-desc" class="text-sm text-slate-300 mb-2"></p>
-                    <p id="diag-action" class="text-xs text-sky-400 mono-font"></p>
+                    <p id="diag-desc" class="text-sm text-slate-300"></p>
                 </div>
             </div>
         </section>
@@ -496,62 +452,50 @@
     </main>
 
     <script>
-        // --- Init Chart.js ---
+        // --- Chart Defaults ---
         Chart.defaults.color = '#94a3b8';
         Chart.defaults.borderColor = '#334155';
 
-        // --- Data: BLDC Specs (Restored & Enhanced) ---
-        const bldcSpecs = {
-            mcu: {
-                icon: '<i class="fa-solid fa-microchip text-sky-500"></i>',
-                title: 'MCU (Computation)',
-                desc: 'FOC requires heavy math (Trig/Matrix).',
-                specs: [
-                    'Rec: STM32G431 (170MHz, CORDIC, FMAC)',
-                    'ADC: 3x 12-bit (5Msps) for simultaneous I_sense',
-                    'Timer: TIM1 (Advanced) for 6-ch PWM generation',
-                    'Flash: 128KB+ for bootloader + app'
-                ]
+        // --- Data: Pixhawk Ports (FULL DETAIL HTML) ---
+        const portDB = {
+            power: {
+                title: 'POWER 1 & 2', subtitle: 'LTC4417 OR-ing', icon: '<i class="fa-solid fa-battery-full text-rose-500"></i>',
+                content: `<table class="w-full pin-table">
+                    <tr><th>Pin</th><th>Sig</th><th>Volt</th><th>Note</th></tr>
+                    <tr><td>1,2</td><td>VCC</td><td class="v-5">5V</td><td>Input</td></tr>
+                    <tr><td>3</td><td>I_SENS</td><td class="v-33">3.3V</td><td>Analog</td></tr>
+                    <tr><td>4</td><td>V_SENS</td><td class="v-33">3.3V</td><td>Analog</td></tr>
+                    <tr><td>5,6</td><td>GND</td><td class="v-gnd">GND</td><td>Ref</td></tr>
+                </table><p class="mt-2 text-xs text-slate-400">優先權：Power1 > Power2 > USB</p>`
             },
-            driver: {
-                icon: '<i class="fa-solid fa-charging-station text-amber-500"></i>',
-                title: 'Gate Driver',
-                desc: 'Interface between 3.3V Logic and High Voltage Power Stage.',
-                specs: [
-                    'Current: Ig_peak > Qg / t_rise (Ensure fast switching)',
-                    'Dead-time: Hardware insertion (prevent shoot-through)',
-                    'Protection: UVLO, OCP, OTP',
-                    'Bootstrap: Requires capacitor for High-Side driving'
-                ]
+            gps: {
+                title: 'GPS 1', subtitle: 'GNSS + Mag', icon: '<i class="fa-solid fa-satellite text-emerald-500"></i>',
+                content: `<table class="w-full pin-table">
+                    <tr><th>Pin</th><th>Sig</th><th>Volt</th></tr>
+                    <tr><td>1</td><td>VCC</td><td class="v-5">5V</td></tr>
+                    <tr><td>2</td><td>TX</td><td class="v-33">3.3V</td></tr>
+                    <tr><td>3</td><td>RX</td><td class="v-33">3.3V</td></tr>
+                    <tr><td>4,5</td><td>I2C</td><td class="v-33">3.3V</td></tr>
+                    <tr><td>6</td><td>Safe</td><td class="v-33">3.3V</td></tr>
+                </table>`
             },
-            mosfet: {
-                icon: '<i class="fa-solid fa-bolt text-rose-500"></i>',
-                title: 'MOSFETs (Inverter)',
-                desc: '3-Phase Bridge (6x NMOS). Main heat source.',
-                specs: [
-                    'Vds: > 1.5x V_batt (e.g., 40V for 6S/25V)',
-                    'Rds(on): < 3mΩ (Power Loss = I² * Rds)',
-                    'Qg: Low Qg minimizes switching loss',
-                    'Package: DFN 5x6 (Good thermal pad)'
-                ]
-            }
+            telem: { title: 'TELEM 1', subtitle: 'High Power', icon: '<i class="fa-solid fa-wifi text-sky-500"></i>', content: `<table class="w-full pin-table"><tr><th>Pin</th><th>Sig</th><th>Volt</th></tr><tr><td>1</td><td>VCC</td><td class="v-5">5V (1.5A)</td></tr><tr><td>2,3</td><td>TX/RX</td><td class="v-33">3.3V</td></tr><tr><td>4,5</td><td>CTS/RTS</td><td class="v-33">3.3V</td></tr></table>` },
+            fmu_pwm: { title: 'FMU PWM', subtitle: 'DShot', icon: '<i class="fa-solid fa-fan text-amber-500"></i>', content: `<p class="text-xs text-slate-300">Signal pins direct to STM32 H7 Timer.</p><div class="mt-2 bg-slate-950 p-2 rounded border border-amber-900/50 text-xs text-amber-400">VCC pin is usually unconnected or opto-isolated. Do not power servos here.</div>` },
+            io_pwm: { title: 'IO PWM', subtitle: 'Servo', icon: '<i class="fa-solid fa-gears text-slate-400"></i>', content: `<p class="text-xs text-slate-300">Managed by F103 Co-processor.</p><div class="mt-2 bg-slate-950 p-2 rounded border border-rose-900/50 text-xs text-rose-400">Requires external BEC on Servo Rail for power.</div>` },
+            can: { title: 'CAN 1/2', subtitle: 'UAVCAN', icon: '<i class="fa-solid fa-network-wired text-indigo-500"></i>', content: `<table class="w-full pin-table"><tr><th>Pin</th><th>Sig</th></tr><tr><td>1</td><td>VCC</td></tr><tr><td>2</td><td>CAN_H</td></tr><tr><td>3</td><td>CAN_L</td></tr><tr><td>4</td><td>GND</td></tr></table>` }
         };
 
-        // --- Data: Pixhawk Ports (Detailed) ---
-        const portDB = {
-            power: { title: 'POWER 1 & 2', subtitle: 'Redundant Input', icon: '<i class="fa-solid fa-battery-full text-rose-500"></i>', content: '<ul class="mono-font space-y-1 text-xs"><li>1,2: VCC (4.9-5.5V)</li><li>3: I_SENS (0-3.3V Analog)</li><li>4: V_SENS (0-3.3V Analog)</li><li>5,6: GND</li></ul><p class="mt-2 text-xs text-slate-400">Uses LTC4417 for ideal diode OR-ing priority.</p>' },
-            gps: { title: 'GPS 1 & 2', subtitle: 'UART + I2C', icon: '<i class="fa-solid fa-satellite text-emerald-500"></i>', content: '<ul class="mono-font space-y-1 text-xs"><li>1: VCC_5V</li><li>2: TX (MCU Out)</li><li>3: RX (MCU In)</li><li>4: I2C_SCL (Mag)</li><li>5: I2C_SDA (Mag)</li><li>6: Safety Switch (GPS1 Only)</li></ul>' },
-            telem: { title: 'TELEM 1-3', subtitle: 'Mavlink UART', icon: '<i class="fa-solid fa-wifi text-sky-500"></i>', content: '<ul class="mono-font space-y-1 text-xs"><li>1: VCC (Max 1.5A)</li><li>2: TX</li><li>3: RX</li><li>4: CTS (Flow Ctrl)</li><li>5: RTS (Flow Ctrl)</li><li>6: GND</li></ul>' },
-            fmu_pwm: { title: 'FMU PWM', subtitle: 'DShot / Motor', icon: '<i class="fa-solid fa-fan text-amber-500"></i>', content: '<p class="text-xs">Direct STM32H7 Timer connection. Used for DShot ESCs. <br><span class="text-rose-400">Warning:</span> No servo rail power provided on most baseboards.</p>' },
-            io_pwm: { title: 'IO PWM', subtitle: 'Servo / Aux', icon: '<i class="fa-solid fa-gears text-slate-400"></i>', content: '<p class="text-xs">Controlled by STM32F1 IO co-processor. 50-400Hz PWM. <br>Requires external BEC on Servo Rail for power.</p>' },
-            can: { title: 'CAN 1 & 2', subtitle: 'UAVCAN', icon: '<i class="fa-solid fa-network-wired text-indigo-500"></i>', content: '<ul class="mono-font space-y-1 text-xs"><li>1: VCC_5V</li><li>2: CAN_H</li><li>3: CAN_L</li><li>4: GND</li></ul><p class="mt-2 text-xs">Differential signal. Requires 120Ω termination.</p>' }
+        const bldcSpecs = {
+            mcu: { icon: '<i class="fa-solid fa-microchip text-sky-500"></i>', title: 'STM32 G4', desc: 'Math Accelerator', specs: ['CORDIC/FMAC Engine', '3x 12-bit ADC (5Msps)', 'TIM1 Adv. PWM'] },
+            driver: { icon: '<i class="fa-solid fa-charging-station text-amber-500"></i>', title: 'Gate Driver', desc: 'Pre-Driver Stage', specs: ['Current: Ig > Qg/tr', 'Dead-time HW Insert', 'Bootstrap Cap Req'] },
+            mosfet: { icon: '<i class="fa-solid fa-bolt text-rose-500"></i>', title: 'MOSFETs', desc: 'Inverter Bridge', specs: ['Vds > 1.5x Vbatt', 'Rds(on) < 3mΩ', 'Pkg: DFN 5x6'] }
         };
 
         const anatomyData = [
-            { id: 'brain', icon: '🧠', title: 'Flight Controller', desc: 'STM32 H7', specs: ['H753/H743', 'Floating Point Unit', 'Triple Redundant IMU'] },
-            { id: 'muscle', icon: '💪', title: 'ESC / Motor', desc: 'FOC System', specs: ['Field Oriented Control', 'DShot Digital Protocol', 'Regenerative Braking'] },
-            { id: 'senses', icon: '👁️', title: 'Sensors', desc: 'Perception', specs: ['ICM-42688 (Gyro/Acc)', 'RM3100 (Mag)', 'BMP388 (Baro)'] },
-            { id: 'heart', icon: '🔋', title: 'Power', desc: 'Management', specs: ['PM02D (Digital I2C)', 'LTC4417 (OR-ing)', 'High-C LiPo'] }
+            { id: 'brain', icon: '🧠', title: 'FC', desc: 'H753', specs: ['Triple IMU'] },
+            { id: 'muscle', icon: '💪', title: 'ESC', desc: 'FOC', specs: ['DShot600'] },
+            { id: 'senses', icon: '👁️', title: 'Sensor', desc: 'Array', specs: ['ICM/BMI'] },
+            { id: 'heart', icon: '🔋', title: 'Power', desc: 'PM02D', specs: ['I2C Digital'] }
         ];
 
         // --- Logic ---
@@ -560,10 +504,8 @@
             initAnatomyGrid();
             initDShotBits();
             initPidChart();
-            
             document.getElementById('mobile-menu-btn').addEventListener('click', () => {
-                const s = document.getElementById('sidebar');
-                s.classList.toggle('hidden'); s.classList.toggle('fixed'); s.classList.toggle('inset-0');
+                const s = document.getElementById('sidebar'); s.classList.toggle('hidden'); s.classList.toggle('fixed'); s.classList.toggle('inset-0');
             });
         });
 
@@ -571,24 +513,31 @@
             document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
             document.getElementById(id).classList.remove('hidden');
             window.scrollTo(0,0);
-            
             document.querySelectorAll('.nav-item').forEach(i => {
                 i.classList.remove('active', 'bg-orange-900/10', 'text-orange-400', 'border-orange-400', 'bg-emerald-900/10', 'text-emerald-400', 'border-emerald-400', 'bg-sky-900/10', 'text-sky-400', 'border-sky-400');
                 i.classList.add('text-slate-400', 'border-transparent');
             });
-
             const link = Array.from(document.querySelectorAll('.nav-item')).find(l => l.getAttribute('onclick').includes(id));
             if(link) {
                 if(id.includes('roadmap')) link.classList.add('active', 'text-orange-400', 'border-l-4', 'border-orange-400');
                 else if(id.includes('teardown')) link.classList.add('active', 'text-emerald-400', 'border-l-4', 'border-emerald-400');
-                else if(id.includes('bldc')) link.classList.add('active', 'text-sky-400', 'border-l-4', 'border-sky-400');
+                else if(id.includes('bldc') || id.includes('pixhawk')) link.classList.add('active', 'text-sky-400', 'border-l-4', 'border-sky-400');
                 else link.classList.add('active', 'text-sky-400', 'border-l-4', 'border-sky-400');
                 link.classList.remove('text-slate-400', 'border-transparent');
             }
             if(window.innerWidth < 768) { document.getElementById('sidebar').classList.add('hidden'); document.getElementById('sidebar').classList.remove('fixed', 'inset-0'); }
         }
 
-        // --- Interactions ---
+        function showPortDetail(k) {
+            const d = portDB[k];
+            document.getElementById('port-icon').innerHTML = d.icon;
+            document.getElementById('port-title').innerText = d.title;
+            document.getElementById('port-subtitle').innerText = d.subtitle;
+            document.getElementById('port-content').innerHTML = d.content;
+            const p = document.getElementById('port-detail-panel');
+            p.classList.remove('animate-fade-in'); void p.offsetWidth; p.classList.add('animate-fade-in');
+        }
+
         function showBldcDetail(k) {
             const d = bldcSpecs[k];
             const b = document.getElementById('bldc-detail-box');
@@ -596,17 +545,8 @@
             document.getElementById('bldc-title').innerText = d.title;
             document.getElementById('bldc-desc').innerText = d.desc;
             const l = document.getElementById('bldc-specs'); l.innerHTML = '';
-            d.specs.forEach(s => l.innerHTML += `<li><span class="text-sky-500 mr-2">></span>${s}</li>`);
+            d.specs.forEach(s => l.innerHTML += `<li>> ${s}</li>`);
             b.classList.remove('hidden'); b.classList.add('animate-fade-in');
-        }
-
-        function showPortDetail(k) {
-            const d = portDB[k];
-            const p = document.getElementById('port-detail-panel');
-            document.getElementById('port-icon').innerHTML = d.icon;
-            document.getElementById('port-title').innerText = d.title;
-            document.getElementById('port-content').innerHTML = d.content;
-            p.classList.remove('animate-fade-in'); void p.offsetWidth; p.classList.add('animate-fade-in');
         }
 
         function initAnatomyGrid() {
@@ -641,11 +581,11 @@
             new Chart(document.getElementById('vehicleChart'), {
                 type: 'radar',
                 data: {
-                    labels: ['Hover Stability', 'Cruise Efficiency', 'Payload', 'Range', 'Wind Resistance'],
+                    labels: ['Hover', 'Cruise', 'Payload', 'Range', 'Wind'],
                     datasets: [
-                        { label: 'Multicopter', data: [10, 3, 5, 3, 6], borderColor: '#38bdf8', backgroundColor: 'rgba(56, 189, 248, 0.2)' },
-                        { label: 'Fixed-wing', data: [0, 10, 7, 10, 4], borderColor: '#34d399', backgroundColor: 'rgba(52, 211, 153, 0.2)' },
-                        { label: 'VTOL', data: [8, 8, 6, 8, 5], borderColor: '#fbbf24', backgroundColor: 'rgba(251, 191, 36, 0.2)' }
+                        { label: 'Multi', data: [10, 3, 5, 3, 6], borderColor: '#38bdf8', backgroundColor: '#38bdf833' },
+                        { label: 'Fixed', data: [0, 10, 7, 10, 4], borderColor: '#34d399', backgroundColor: '#34d39933' },
+                        { label: 'VTOL', data: [8, 8, 6, 8, 5], borderColor: '#fbbf24', backgroundColor: '#fbbf2433' }
                     ]
                 },
                 options: { responsive: true, maintainAspectRatio: false, scales: { r: { grid: { color: '#334155' }, angleLines: { color: '#334155' } } } }
@@ -658,7 +598,7 @@
                 type: 'line',
                 data: {
                     labels: [0,10,20,30,40,50,60,70,80],
-                    datasets: [{ label: 'Target', data: Array(9).fill(1), borderColor: '#64748b', borderDash: [5,5] }, { label: 'Response', data: [0, 0.6, 1.2, 0.9, 1.05, 0.98, 1.01, 1, 1], borderColor: '#34d399', backgroundColor: 'rgba(52, 211, 153, 0.1)', fill: true }]
+                    datasets: [{ label: 'Target', data: Array(9).fill(1), borderColor: '#64748b', borderDash: [5,5] }, { label: 'Response', data: [0, 0.6, 1.2, 0.9, 1.05, 0.98, 1.01, 1, 1], borderColor: '#34d399', backgroundColor: '#34d3991A', fill: true }]
                 },
                 options: { responsive: true, maintainAspectRatio: false, scales: { y: { min: 0, max: 1.5, grid: { color: '#1e293b' } }, x: { grid: { display: false } } } }
             });
@@ -676,17 +616,10 @@
             const r = document.getElementById('diagnostic-result');
             const t = document.getElementById('diag-title');
             const d = document.getElementById('diag-desc');
-            const a = document.getElementById('diag-action');
-            
             if(!v) { r.classList.add('hidden'); return; }
-            
-            const db = {
-                desync: { t: 'Motor Desync', d: 'ESC loses commutation sync at high RPM.', a: 'Action: 1. Increase Rampup Power in BLHeli. 2. Check for loose bullet connectors.' },
-                mag: { t: 'Toilet Bowl Effect', d: 'Compass interference causes circling.', a: 'Action: 1. Calibrate Mag. 2. Move GPS mast away from PDB/Power cables.' },
-                vib: { t: 'Z-Axis Vibration', d: 'High vibrations confuse the EKF altitude est.', a: 'Action: 1. Balance Props. 2. Check FC damping mount.' }
-            };
+            const db = { desync: {t:'Motor Desync', d:'Action: Increase Rampup Power.'}, mag: {t:'Mag Error', d:'Action: Recalibrate.'} };
             const data = db[v];
-            t.innerText = data.t; d.innerText = data.d; a.innerText = data.a;
+            t.innerText = data.t; d.innerText = data.d;
             r.classList.remove('hidden');
         }
     </script>

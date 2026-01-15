@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UAS R&D Hub (Standard Edition)</title>
+    <title>UAS R&D Hub (Standard Compliant)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
@@ -62,7 +62,13 @@
         .roadmap-item:last-child { border-left: 2px solid transparent; }
         .roadmap-dot { position: absolute; left: -0.55rem; top: 0; width: 1rem; height: 1rem; border-radius: 50%; background-color: #0f172a; border: 2px solid #38bdf8; }
 
-        /* Badges */
+        /* FOC Steps */
+        .foc-step { position: relative; }
+        .foc-step::after { content: '➜'; position: absolute; right: -20px; top: 50%; transform: translateY(-50%); color: #475569; font-size: 1.2rem; }
+        .foc-step:last-child::after { display: none; }
+        @media (max-width: 768px) { .foc-step::after { right: 50%; top: auto; bottom: -25px; transform: translateX(50%) rotate(90deg); } }
+
+        /* Source Badge */
         .source-badge { display: inline-flex; align-items: center; padding: 0.125rem 0.5rem; border-radius: 9999px; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
         .badge-holybro { background-color: rgba(234, 88, 12, 0.1); border: 1px solid rgba(234, 88, 12, 0.3); color: #fb923c; }
         .badge-teardown { background-color: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); color: #34d399; }
@@ -83,7 +89,7 @@
             <h1 class="text-xl font-bold text-slate-100 tracking-tight mono-font">
                 UAS<span class="text-sky-500">_Dev</span>
             </h1>
-            <p class="text-xs text-slate-500 mt-1">Standard Edition (DS-012/018)</p>
+            <p class="text-xs text-slate-500 mt-1">Standard Compliant (DS-012/018)</p>
         </div>
         <div class="flex-1 py-4 space-y-1">
             <!-- Strategic -->
@@ -93,7 +99,7 @@
 
             <!-- Hardware Deep Dive -->
             <div class="px-4 py-2 mt-4 text-xs font-bold text-slate-600 uppercase tracking-wider">Engineering Deep Dive</div>
-            <a href="#" onclick="navTo('section-pixhawk')" class="nav-item block px-6 py-3 text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-slate-200 border-l-4 border-transparent transition-colors"><i class="fa-solid fa-microchip mr-2 w-4"></i>Pixhawk 6 Standards</a>
+            <a href="#" onclick="navTo('section-pixhawk')" class="nav-item block px-6 py-3 text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-slate-200 border-l-4 border-transparent transition-colors"><i class="fa-solid fa-microchip mr-2 w-4"></i>Pixhawk 6X vs 6C</a>
             <a href="#" onclick="navTo('section-bldc')" class="nav-item block px-6 py-3 text-sm font-medium text-sky-400 hover:bg-slate-800 hover:text-sky-200 border-l-4 border-transparent transition-colors"><i class="fa-solid fa-bolt mr-2 w-4"></i>BLDC 馬達實驗室 (Full)</a>
             <a href="#" onclick="navTo('section-hardware')" class="nav-item block px-6 py-3 text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-slate-200 border-l-4 border-transparent transition-colors"><i class="fa-solid fa-dna mr-2 w-4"></i>硬體解剖 (Anatomy)</a>
             
@@ -128,8 +134,8 @@
                     <div class="pl-2 space-y-6 border-l-2 border-slate-800 ml-2">
                         <div class="roadmap-item">
                             <div class="roadmap-dot border-orange-500"></div>
-                            <h4 class="text-base font-bold text-orange-400">FMURT7 (i.MX RT1176)</h4>
-                            <p class="text-sm text-slate-400 mt-1">1GHz Dual-Core. Native Ethernet.</p>
+                            <h4 class="text-base font-bold text-orange-400">FMURT7 (NXP i.MX RT1176)</h4>
+                            <p class="text-sm text-slate-400 mt-1">1GHz Dual-Core. Native Ethernet. Beyond STM32 limits.</p>
                         </div>
                         <div class="roadmap-item">
                             <div class="roadmap-dot border-sky-500"></div>
@@ -139,78 +145,97 @@
                     </div>
                 </div>
                 <div class="bg-slate-900 p-6 rounded-xl border border-slate-800 shadow-lg">
-                    <h4 class="font-bold text-slate-200 mb-3 text-sm uppercase tracking-wider">Peripherals</h4>
+                    <h4 class="font-bold text-slate-200 mb-3 text-sm uppercase tracking-wider">Strategic Peripherals</h4>
                     <div class="space-y-3">
                         <div class="bg-slate-950 p-3 rounded border border-slate-700">
                             <strong class="text-slate-300 text-sm block">Unicore UM982</strong>
-                            <p class="text-xs text-slate-500 mt-1">Dual Antenna RTK for Heading.</p>
+                            <p class="text-xs text-slate-500 mt-1">Dual Antenna RTK for Heading. Immune to mag interference.</p>
                         </div>
                         <div class="bg-slate-950 p-3 rounded border border-slate-700">
                             <strong class="text-slate-300 text-sm block">PM08D (200A)</strong>
-                            <p class="text-xs text-slate-500 mt-1">Digital I2C Power Monitor.</p>
+                            <p class="text-xs text-slate-500 mt-1">Digital I2C Power Monitor for heavy lift.</p>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- 2. Pixhawk 6 Standards (Updated with DS-012/018 Data) -->
+        <!-- 2. Pixhawk 6X vs 6C Comparison (Updated with DS-012/018 Data) -->
         <section id="section-pixhawk" class="mb-16 hidden animate-section">
             <header class="mb-8 border-b border-slate-800 pb-4">
                 <div class="flex items-center justify-between">
                     <div>
-                        <h2 class="text-3xl font-bold text-slate-100 mb-2">Pixhawk 6X/6C 硬體標準對照</h2>
-                        <div class="flex items-center gap-2 text-slate-400 text-sm">
-                            <span class="source-badge badge-standard">DS-012/018</span>
-                            <span>Specs Verified</span>
-                        </div>
+                        <h2 class="text-3xl font-bold text-slate-100 mb-2">Pixhawk 6X vs 6C 選型指南</h2>
+                        <p class="text-slate-400 max-w-3xl">基於 DS-012 (v6X) 與 DS-018 (v6C) 官方標準書的架構級差異分析。</p>
+                    </div>
+                    <div class="hidden lg:block text-right">
+                        <span class="source-badge badge-standard">Specs Verified</span>
                     </div>
                 </div>
             </header>
 
+            <!-- Usage Selector -->
+            <div class="mb-8 bg-slate-900 p-6 rounded-xl border border-slate-800">
+                <h3 class="text-lg font-bold text-white mb-4"><i class="fa-solid fa-filter mr-2 text-sky-500"></i>應用場景建議 (Use Case Recommender)</h3>
+                <div class="grid md:grid-cols-2 gap-4">
+                    <button onclick="recommendBoard('industrial')" class="p-4 bg-slate-950 border border-emerald-900/50 hover:border-emerald-500 hover:bg-emerald-900/10 rounded-lg text-left transition group">
+                        <strong class="text-emerald-400 block mb-1 group-hover:translate-x-1 transition-transform">工業/科研 (Industrial/Research)</strong>
+                        <span class="text-xs text-slate-500">BVLOS, Mapping, AI Edge, High Value Payload</span>
+                    </button>
+                    <button onclick="recommendBoard('swarm')" class="p-4 bg-slate-950 border border-sky-900/50 hover:border-sky-500 hover:bg-sky-900/10 rounded-lg text-left transition group">
+                        <strong class="text-sky-400 block mb-1 group-hover:translate-x-1 transition-transform">機群/教育 (Swarms/Education)</strong>
+                        <span class="text-xs text-slate-500">Light Shows, FPV, University Labs, Cost Sensitive</span>
+                    </button>
+                </div>
+                <div id="recommendation-result" class="mt-4 p-4 bg-slate-800 rounded border-l-4 border-slate-600 hidden animate-fade-in">
+                    <!-- JS populated -->
+                </div>
+            </div>
+
+            <!-- Detailed Comparison Table -->
             <div class="bg-slate-950 rounded-xl border border-slate-800 overflow-hidden mb-8">
                 <table class="w-full comp-table text-slate-300">
                     <thead>
                         <tr class="bg-slate-900">
-                            <th>Spec</th>
-                            <th class="text-emerald-400">Pixhawk 6X (DS-012)</th>
-                            <th class="text-sky-400">Pixhawk 6C (DS-018)</th>
+                            <th class="w-1/4">Specification</th>
+                            <th class="w-1/3 text-emerald-400">Pixhawk 6X (Flagship)</th>
+                            <th class="w-1/3 text-sky-400">Pixhawk 6C (Compact)</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr><td>FMU MCU</td><td>STM32H753 (480MHz, 2MB Flash, 1MB RAM)</td><td>STM32H743 (480MHz, 2MB Flash, 1MB RAM)</td></tr>
-                        <tr><td>IO MCU</td><td>STM32F103 (64KB Flash, 20KB RAM)</td><td>STM32F103 (64KB Flash, 20KB RAM)</td></tr>
-                        <tr><td>Ethernet</td><td><span class="text-emerald-400">100Base-T (Realtek RTL8201F)</span></td><td><span class="text-slate-500">None (USB OTG Only)</span></td></tr>
-                        <tr><td>Security</td><td>NXP SE050 Secure Element</td><td><span class="text-slate-500">None</span></td></tr>
-                        <tr><td>Sensor Domains</td><td>3 Isolated Domains (Triple Redundancy)</td><td>2 Domains (Dual Redundancy)</td></tr>
-                        <tr><td>Form Factor</td><td>Standard PAB (Modular)</td><td>Cost-Optimized (Compact)</td></tr>
-                        <tr><td>Dimensions</td><td>FMUM: 38.8 x 31.8 mm</td><td>Specific to 6C case</td></tr>
+                        <tr>
+                            <td>MCU</td>
+                            <td><strong class="text-slate-200">STM32H753</strong><br><span class="text-xs text-slate-500">Crypto/Hash Accel</span></td>
+                            <td><strong class="text-slate-200">STM32H743</strong><br><span class="text-xs text-slate-500">Standard High Perf</span></td>
+                        </tr>
+                        <tr>
+                            <td>Redundancy</td>
+                            <td><span class="bg-emerald-900/30 text-emerald-400 px-2 py-0.5 rounded text-xs">Triple (3x) Domains</span></td>
+                            <td><span class="bg-slate-800 text-slate-400 px-2 py-0.5 rounded text-xs">Dual (2x) Domains</span></td>
+                        </tr>
+                        <tr>
+                            <td>Connectivity</td>
+                            <td><span class="text-emerald-400">Ethernet (100Base-T)</span></td>
+                            <td><span class="text-slate-500">USB OTG Only</span></td>
+                        </tr>
+                        <tr>
+                            <td>Security</td>
+                            <td><span class="text-emerald-400">NXP SE050 (Secure Element)</span></td>
+                            <td><span class="text-slate-500">None</span></td>
+                        </tr>
+                        <tr>
+                            <td>Form Factor</td>
+                            <td>Modular (Standard PAB)</td>
+                            <td>Integrated / Proprietary</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
-
-            <!-- Sensor Revisions (New) -->
-            <div class="bg-slate-900 p-6 rounded-xl border border-slate-800 mb-8">
-                <h3 class="text-lg font-bold text-slate-200 mb-4 text-sm uppercase tracking-wider"><i class="fa-solid fa-list-ol mr-2 text-amber-500"></i>6X Sensor Set Revisions (Firmware Impact)</h3>
-                <div class="overflow-x-auto">
-                    <table class="w-full comp-table text-slate-300 text-xs">
-                        <thead>
-                            <tr class="bg-slate-950"><th>Rev</th><th>IMU 1</th><th>IMU 2</th><th>IMU 3</th><th>Mag</th></tr>
-                        </thead>
-                        <tbody>
-                            <tr><td>Rev 1</td><td>BMI088</td><td>ICM-42688-P</td><td>ICM-20649</td><td>BMM150</td></tr>
-                            <tr><td>Rev 2</td><td>ICM-20649</td><td>ICM-42688-P</td><td>ICM-20649</td><td>BMM150</td></tr>
-                            <tr><td>Rev 5</td><td>BMI088</td><td>ICM-42688-P</td><td><span class="text-sky-400">ICM-42649</span></td><td>BMM150 + RM3100</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-                <p class="text-xs text-slate-500 mt-2 italic">* Drivers must match revision ID stored in EEPROM.</p>
-            </div>
             
-            <!-- Port Map -->
+            <!-- Port Map (6X Standard) -->
             <div class="grid lg:grid-cols-3 gap-6">
                 <div class="lg:col-span-2 bg-slate-950 p-6 rounded-xl border border-slate-800">
-                    <h3 class="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4">Port Pinout (6X Reference)</h3>
+                    <h3 class="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4">Port Pinout (6X Baseboard)</h3>
                     <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
                         <div class="port-connector bg-slate-900/50 p-3 rounded text-center" onclick="showPortDetail('power')">
                             <div class="port-label text-rose-400">POWER 1 & 2</div><i class="fa-solid fa-battery-full text-xl text-rose-500 my-2"></i>
@@ -409,12 +434,14 @@
             </header>
             <div class="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden">
                 <div class="flex border-b border-slate-800 bg-slate-950">
-                    <button class="flex-1 py-4 text-sky-400 font-bold bg-slate-900">PX4</button>
-                    <button class="flex-1 py-4 text-slate-500">ArduPilot</button>
+                    <button id="tab-px4" onclick="switchStack('px4')" class="flex-1 py-4 font-bold text-sky-400 bg-slate-900 border-r border-slate-800 transition">PX4 Autopilot</button>
+                    <button id="tab-ardupilot" onclick="switchStack('ardupilot')" class="flex-1 py-4 font-bold text-slate-500 bg-slate-950 transition">ArduPilot</button>
                 </div>
-                <div class="p-8 text-slate-400 text-sm space-y-2">
-                    <p><strong>Kernel:</strong> NuttX (Real-time POSIX)</p>
-                    <p><strong>Middleware:</strong> uORB (Pub/Sub Messaging)</p>
+                <div id="content-px4" class="p-8">
+                    <div class="space-y-2 text-sm text-slate-400"><p><strong>Kernel:</strong> NuttX (POSIX)</p><p><strong>License:</strong> BSD 3-Clause</p></div>
+                </div>
+                <div id="content-ardupilot" class="p-8 hidden">
+                    <div class="space-y-2 text-sm text-slate-400"><p><strong>Kernel:</strong> ChibiOS</p><p><strong>License:</strong> GPL v3</p></div>
                 </div>
             </div>
         </section>
@@ -444,7 +471,26 @@
         Chart.defaults.color = '#94a3b8';
         Chart.defaults.borderColor = '#334155';
 
-        // --- Data: Pixhawk Ports (Verified from DS-012/018) ---
+        // --- Recommendation Logic (New) ---
+        function recommendBoard(type) {
+            const el = document.getElementById('recommendation-result');
+            el.classList.remove('hidden');
+            if (type === 'industrial') {
+                el.innerHTML = `
+                    <div class="flex items-center mb-2"><span class="text-emerald-400 text-xl font-bold mr-2">Recommended: Pixhawk 6X</span></div>
+                    <p class="text-sm text-slate-300">Why? <strong>Triple Redundancy</strong> (3x IMU) is required for high-reliability missions. <strong>Ethernet</strong> enables AI companion computer integration.</p>
+                `;
+                el.style.borderColor = '#10b981'; // Emerald
+            } else {
+                el.innerHTML = `
+                    <div class="flex items-center mb-2"><span class="text-sky-400 text-xl font-bold mr-2">Recommended: Pixhawk 6C</span></div>
+                    <p class="text-sm text-slate-300">Why? <strong>Cost Optimized</strong>. H743 processor provides same flight performance. Dual IMU is sufficient for non-critical payloads.</p>
+                `;
+                el.style.borderColor = '#38bdf8'; // Sky
+            }
+        }
+
+        // --- Data: Pixhawk Ports ---
         const portDB = {
             power: {
                 title: 'POWER 1 & 2', subtitle: 'LTC4417 OR-ing', icon: '<i class="fa-solid fa-battery-full text-rose-500"></i>',
@@ -454,7 +500,7 @@
                     <tr><td>3</td><td>I_SENS</td><td class="v-33">3.3V</td><td>Analog (0-3.3V)</td></tr>
                     <tr><td>4</td><td>V_SENS</td><td class="v-33">3.3V</td><td>Analog (0-3.3V)</td></tr>
                     <tr><td>5,6</td><td>GND</td><td class="v-gnd">GND</td><td>Ref</td></tr>
-                </table><p class="mt-2 text-xs text-slate-400">Power1 priority > Power2 priority.</p>`
+                </table><p class="mt-2 text-xs text-slate-400">優先權：Power1 > Power2 > USB</p>`
             },
             gps: {
                 title: 'GPS 1', subtitle: 'GNSS + Mag + Safety', icon: '<i class="fa-solid fa-satellite text-emerald-500"></i>',
@@ -601,14 +647,20 @@
             pidChart.update();
         }
 
+        function switchStack(id) {
+            document.getElementById('content-px4').classList.add('hidden');
+            document.getElementById('content-ardupilot').classList.add('hidden');
+            document.getElementById(`content-${id}`).classList.remove('hidden');
+            document.getElementById('tab-px4').className = id === 'px4' ? 'flex-1 py-4 font-bold text-sky-400 bg-slate-900 border-r border-slate-800 transition' : 'flex-1 py-4 font-bold text-slate-500 bg-slate-950 transition';
+            document.getElementById('tab-ardupilot').className = id === 'ardupilot' ? 'flex-1 py-4 font-bold text-rose-400 bg-slate-900 transition' : 'flex-1 py-4 font-bold text-slate-500 bg-slate-950 transition';
+        }
+
         function showDiagnosis() {
             const v = document.getElementById('diagnostic-select').value;
             const r = document.getElementById('diagnostic-result');
             const t = document.getElementById('diag-title');
             const d = document.getElementById('diag-desc');
-            
             if(!v) { r.classList.add('hidden'); return; }
-            
             const db = {
                 desync: {t:'Motor Desync', d:'Action: 1. Increase Rampup Power in BLHeli. 2. Check for loose bullet connectors.'},
                 mag: {t:'Toilet Bowl Effect', d:'Action: 1. Calibrate Mag. 2. Move GPS mast away from PDB/Power cables.'}

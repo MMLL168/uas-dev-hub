@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UAS R&D Hub (Standard Compliant)</title>
+    <title>UAS R&D Hub (Processor Deep Dive)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
@@ -68,7 +68,7 @@
         .foc-step:last-child::after { display: none; }
         @media (max-width: 768px) { .foc-step::after { right: 50%; top: auto; bottom: -25px; transform: translateX(50%) rotate(90deg); } }
 
-        /* Source Badge */
+        /* Badges */
         .source-badge { display: inline-flex; align-items: center; padding: 0.125rem 0.5rem; border-radius: 9999px; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
         .badge-holybro { background-color: rgba(234, 88, 12, 0.1); border: 1px solid rgba(234, 88, 12, 0.3); color: #fb923c; }
         .badge-teardown { background-color: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); color: #34d399; }
@@ -89,7 +89,7 @@
             <h1 class="text-xl font-bold text-slate-100 tracking-tight mono-font">
                 UAS<span class="text-sky-500">_Dev</span>
             </h1>
-            <p class="text-xs text-slate-500 mt-1">Standard Compliant (DS-012/018)</p>
+            <p class="text-xs text-slate-500 mt-1">Processor Deep Dive Ed.</p>
         </div>
         <div class="flex-1 py-4 space-y-1">
             <!-- Strategic -->
@@ -99,7 +99,8 @@
 
             <!-- Hardware Deep Dive -->
             <div class="px-4 py-2 mt-4 text-xs font-bold text-slate-600 uppercase tracking-wider">Engineering Deep Dive</div>
-            <a href="#" onclick="navTo('section-pixhawk')" class="nav-item block px-6 py-3 text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-slate-200 border-l-4 border-transparent transition-colors"><i class="fa-solid fa-microchip mr-2 w-4"></i>Pixhawk 6X vs 6C</a>
+            <a href="#" onclick="navTo('section-processors')" class="nav-item block px-6 py-3 text-sm font-medium text-indigo-400 hover:bg-slate-800 hover:text-indigo-200 border-l-4 border-transparent transition-colors bg-indigo-900/10"><i class="fa-solid fa-microchip mr-2 w-4"></i>H7 vs F1 Dual Core</a>
+            <a href="#" onclick="navTo('section-pixhawk')" class="nav-item block px-6 py-3 text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-slate-200 border-l-4 border-transparent transition-colors"><i class="fa-solid fa-server mr-2 w-4"></i>Pixhawk 6 Standards</a>
             <a href="#" onclick="navTo('section-bldc')" class="nav-item block px-6 py-3 text-sm font-medium text-sky-400 hover:bg-slate-800 hover:text-sky-200 border-l-4 border-transparent transition-colors"><i class="fa-solid fa-bolt mr-2 w-4"></i>BLDC 馬達實驗室 (Full)</a>
             <a href="#" onclick="navTo('section-hardware')" class="nav-item block px-6 py-3 text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-slate-200 border-l-4 border-transparent transition-colors"><i class="fa-solid fa-dna mr-2 w-4"></i>硬體解剖 (Anatomy)</a>
             
@@ -120,8 +121,9 @@
     <!-- Main Content Area -->
     <main class="flex-1 p-4 md:p-10 overflow-x-hidden">
 
-        <!-- 1. Roadmap -->
-        <section id="section-roadmap" class="mb-16 animate-section">
+        <!-- 0.1 Roadmap -->
+        <section id="section-roadmap" class="mb-16 animate-section hidden">
+            <!-- (Roadmap Content same as before) -->
             <header class="mb-8 border-b border-slate-800 pb-4">
                 <h2 class="text-3xl font-bold text-slate-100 mb-2">技術前瞻 (Tech Roadmap)</h2>
                 <div class="flex items-center gap-2 text-slate-400 text-sm">
@@ -135,107 +137,171 @@
                         <div class="roadmap-item">
                             <div class="roadmap-dot border-orange-500"></div>
                             <h4 class="text-base font-bold text-orange-400">FMURT7 (NXP i.MX RT1176)</h4>
-                            <p class="text-sm text-slate-400 mt-1">1GHz Dual-Core. Native Ethernet. Beyond STM32 limits.</p>
+                            <p class="text-sm text-slate-400 mt-1">1GHz Dual-Core. Native Ethernet.</p>
                         </div>
                         <div class="roadmap-item">
                             <div class="roadmap-dot border-sky-500"></div>
                             <h4 class="text-base font-bold text-sky-400">PAB Standard</h4>
-                            <p class="text-sm text-slate-400 mt-1">Pixhawk Autopilot Bus (DS-010). Modular carrier boards.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="bg-slate-900 p-6 rounded-xl border border-slate-800 shadow-lg">
-                    <h4 class="font-bold text-slate-200 mb-3 text-sm uppercase tracking-wider">Strategic Peripherals</h4>
-                    <div class="space-y-3">
-                        <div class="bg-slate-950 p-3 rounded border border-slate-700">
-                            <strong class="text-slate-300 text-sm block">Unicore UM982</strong>
-                            <p class="text-xs text-slate-500 mt-1">Dual Antenna RTK for Heading. Immune to mag interference.</p>
-                        </div>
-                        <div class="bg-slate-950 p-3 rounded border border-slate-700">
-                            <strong class="text-slate-300 text-sm block">PM08D (200A)</strong>
-                            <p class="text-xs text-slate-500 mt-1">Digital I2C Power Monitor for heavy lift.</p>
+                            <p class="text-sm text-slate-400 mt-1">Pixhawk Autopilot Bus.</p>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- 2. Pixhawk 6X vs 6C Comparison (Updated with DS-012/018 Data) -->
-        <section id="section-pixhawk" class="mb-16 hidden animate-section">
+        <!-- 0.2 Processors (NEW FEATURE) -->
+        <section id="section-processors" class="mb-16 animate-section">
             <header class="mb-8 border-b border-slate-800 pb-4">
                 <div class="flex items-center justify-between">
                     <div>
-                        <h2 class="text-3xl font-bold text-slate-100 mb-2">Pixhawk 6X vs 6C 選型指南</h2>
-                        <p class="text-slate-400 max-w-3xl">基於 DS-012 (v6X) 與 DS-018 (v6C) 官方標準書的架構級差異分析。</p>
+                        <h2 class="text-3xl font-bold text-slate-100 mb-2">Pixhawk 雙核架構解密 (H7 + F1)</h2>
+                        <p class="text-slate-400 max-w-3xl">Understanding the Brain (FMU) and the Spine (IO) of the Autopilot.</p>
                     </div>
                     <div class="hidden lg:block text-right">
-                        <span class="source-badge badge-standard">Specs Verified</span>
+                        <span class="source-badge badge-standard">Architecture</span>
                     </div>
                 </div>
             </header>
 
-            <!-- Usage Selector -->
-            <div class="mb-8 bg-slate-900 p-6 rounded-xl border border-slate-800">
-                <h3 class="text-lg font-bold text-white mb-4"><i class="fa-solid fa-filter mr-2 text-sky-500"></i>應用場景建議 (Use Case Recommender)</h3>
-                <div class="grid md:grid-cols-2 gap-4">
-                    <button onclick="recommendBoard('industrial')" class="p-4 bg-slate-950 border border-emerald-900/50 hover:border-emerald-500 hover:bg-emerald-900/10 rounded-lg text-left transition group">
-                        <strong class="text-emerald-400 block mb-1 group-hover:translate-x-1 transition-transform">工業/科研 (Industrial/Research)</strong>
-                        <span class="text-xs text-slate-500">BVLOS, Mapping, AI Edge, High Value Payload</span>
-                    </button>
-                    <button onclick="recommendBoard('swarm')" class="p-4 bg-slate-950 border border-sky-900/50 hover:border-sky-500 hover:bg-sky-900/10 rounded-lg text-left transition group">
-                        <strong class="text-sky-400 block mb-1 group-hover:translate-x-1 transition-transform">機群/教育 (Swarms/Education)</strong>
-                        <span class="text-xs text-slate-500">Light Shows, FPV, University Labs, Cost Sensitive</span>
-                    </button>
+            <div class="grid lg:grid-cols-2 gap-8">
+                
+                <!-- FMU H7 -->
+                <div class="bg-slate-950 p-8 rounded-xl border border-sky-900/50 shadow-[0_0_20px_rgba(14,165,233,0.05)] relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 p-6 opacity-10 text-9xl text-sky-500 transition group-hover:scale-110 duration-500"><i class="fa-solid fa-brain"></i></div>
+                    <div class="relative z-10">
+                        <div class="flex items-center mb-4">
+                            <div class="w-10 h-10 rounded-full bg-sky-500/20 flex items-center justify-center mr-3 border border-sky-500/50">
+                                <span class="text-sky-400 font-bold text-xs">FMU</span>
+                            </div>
+                            <div>
+                                <h3 class="text-2xl font-bold text-white">STM32 H753 / H743</h3>
+                                <p class="text-sky-400 text-sm mono-font">The Brain (Flight Management Unit)</p>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4 mb-6">
+                            <div class="bg-slate-900 p-3 rounded border border-slate-800">
+                                <span class="text-xs text-slate-500 uppercase block">Clock Speed</span>
+                                <span class="text-white font-mono font-bold">480 MHz</span>
+                            </div>
+                            <div class="bg-slate-900 p-3 rounded border border-slate-800">
+                                <span class="text-xs text-slate-500 uppercase block">Flash / RAM</span>
+                                <span class="text-white font-mono font-bold">2MB / 1MB</span>
+                            </div>
+                        </div>
+
+                        <div class="space-y-3">
+                            <h4 class="text-sm font-bold text-slate-300 border-b border-slate-800 pb-2">Core Responsibilities</h4>
+                            <ul class="text-sm text-slate-400 space-y-2">
+                                <li class="flex items-start"><i class="fa-solid fa-calculator mt-1 mr-2 text-sky-500 text-xs"></i> <span><strong>EKF Estimation:</strong> High-precision attitude & position fusion.</span></li>
+                                <li class="flex items-start"><i class="fa-solid fa-route mt-1 mr-2 text-sky-500 text-xs"></i> <span><strong>Navigation:</strong> Waypoint missions, obstacle avoidance.</span></li>
+                                <li class="flex items-start"><i class="fa-solid fa-wifi mt-1 mr-2 text-sky-500 text-xs"></i> <span><strong>Communication:</strong> MAVLink (USB, Telem, Eth), UAVCAN.</span></li>
+                                <li class="flex items-start"><i class="fa-solid fa-fan mt-1 mr-2 text-sky-500 text-xs"></i> <span><strong>Motor Control:</strong> DShot generation (High bandwidth).</span></li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
-                <div id="recommendation-result" class="mt-4 p-4 bg-slate-800 rounded border-l-4 border-slate-600 hidden animate-fade-in">
-                    <!-- JS populated -->
+
+                <!-- IO F1 -->
+                <div class="bg-slate-950 p-8 rounded-xl border border-emerald-900/50 shadow-[0_0_20px_rgba(16,185,129,0.05)] relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 p-6 opacity-10 text-9xl text-emerald-500 transition group-hover:scale-110 duration-500"><i class="fa-solid fa-shield-halved"></i></div>
+                    <div class="relative z-10">
+                        <div class="flex items-center mb-4">
+                            <div class="w-10 h-10 rounded-full bg-emerald-500/20 flex items-center justify-center mr-3 border border-emerald-500/50">
+                                <span class="text-emerald-400 font-bold text-xs">IO</span>
+                            </div>
+                            <div>
+                                <h3 class="text-2xl font-bold text-white">STM32 F103</h3>
+                                <p class="text-emerald-400 text-sm mono-font">The Spine (Failsafe Co-Processor)</p>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4 mb-6">
+                            <div class="bg-slate-900 p-3 rounded border border-slate-800">
+                                <span class="text-xs text-slate-500 uppercase block">Clock Speed</span>
+                                <span class="text-white font-mono font-bold">72 MHz</span>
+                            </div>
+                            <div class="bg-slate-900 p-3 rounded border border-slate-800">
+                                <span class="text-xs text-slate-500 uppercase block">Flash / RAM</span>
+                                <span class="text-white font-mono font-bold">64KB / 20KB</span>
+                            </div>
+                        </div>
+
+                        <div class="space-y-3">
+                            <h4 class="text-sm font-bold text-slate-300 border-b border-slate-800 pb-2">Safety Critical Tasks</h4>
+                            <ul class="text-sm text-slate-400 space-y-2">
+                                <li class="flex items-start"><i class="fa-solid fa-gamepad mt-1 mr-2 text-emerald-500 text-xs"></i> <span><strong>RC Input Parsing:</strong> Decodes SBUS/PPM signals directly.</span></li>
+                                <li class="flex items-start"><i class="fa-solid fa-life-ring mt-1 mr-2 text-emerald-500 text-xs"></i> <span><strong>Manual Override:</strong> Direct RC-to-Servo pass-through if FMU crashes.</span></li>
+                                <li class="flex items-start"><i class="fa-solid fa-gears mt-1 mr-2 text-emerald-500 text-xs"></i> <span><strong>PWM Output:</strong> Driving standard servos (50-400Hz).</span></li>
+                                <li class="flex items-start"><i class="fa-solid fa-lock mt-1 mr-2 text-emerald-500 text-xs"></i> <span><strong>Safety Switch:</strong> Hardware-level motor arming lock.</span></li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
+
             </div>
 
-            <!-- Detailed Comparison Table -->
+            <!-- Inter-Processor Communication -->
+            <div class="mt-8 bg-slate-900 p-6 rounded-xl border border-slate-800">
+                <h3 class="text-lg font-bold text-white mb-4"><i class="fa-solid fa-link mr-2 text-slate-400"></i>Inter-Processor Communication (IPC)</h3>
+                <div class="flex items-center justify-between bg-slate-950 p-4 rounded-lg border border-slate-800">
+                    <div class="text-center">
+                        <strong class="text-sky-400">FMU (H7)</strong>
+                        <div class="text-xs text-slate-500">Master</div>
+                    </div>
+                    <div class="flex-1 px-8 relative">
+                        <div class="h-1 bg-slate-700 w-full rounded"></div>
+                        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-slate-900 px-3 text-xs text-slate-400 border border-slate-700 rounded-full">
+                            UART / Serial (1.5 Mbps)
+                        </div>
+                        <i class="fa-solid fa-arrow-right-arrow-left absolute left-1/2 -top-4 transform -translate-x-1/2 text-slate-500 text-xs"></i>
+                    </div>
+                    <div class="text-center">
+                        <strong class="text-emerald-400">IO (F1)</strong>
+                        <div class="text-xs text-slate-500">Slave</div>
+                    </div>
+                </div>
+                <p class="text-xs text-slate-500 mt-3 text-center">
+                    The FMU sends mixing commands to the IO processor. The IO processor handles the physical PWM generation for Main outputs.
+                    <br>This architecture ensures that basic vehicle control (Manual Mode) remains available even during high CPU load or FMU software failure.
+                </p>
+            </div>
+        </section>
+
+        <!-- 2. Pixhawk 6 Standards -->
+        <section id="section-pixhawk" class="mb-16 hidden animate-section">
+            <header class="mb-8 border-b border-slate-800 pb-4">
+                <h2 class="text-3xl font-bold text-slate-100 mb-2">Pixhawk 6X/6C 硬體標準對照</h2>
+                <div class="flex items-center gap-2 text-slate-400 text-sm">
+                    <span class="source-badge badge-standard">DS-012/018</span>
+                    <span>Specs Verified</span>
+                </div>
+            </header>
+
             <div class="bg-slate-950 rounded-xl border border-slate-800 overflow-hidden mb-8">
                 <table class="w-full comp-table text-slate-300">
                     <thead>
                         <tr class="bg-slate-900">
-                            <th class="w-1/4">Specification</th>
-                            <th class="w-1/3 text-emerald-400">Pixhawk 6X (Flagship)</th>
-                            <th class="w-1/3 text-sky-400">Pixhawk 6C (Compact)</th>
+                            <th>Spec</th>
+                            <th class="text-emerald-400">Pixhawk 6X (Flagship)</th>
+                            <th class="text-sky-400">Pixhawk 6C (Compact)</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>MCU</td>
-                            <td><strong class="text-slate-200">STM32H753</strong><br><span class="text-xs text-slate-500">Crypto/Hash Accel</span></td>
-                            <td><strong class="text-slate-200">STM32H743</strong><br><span class="text-xs text-slate-500">Standard High Perf</span></td>
-                        </tr>
-                        <tr>
-                            <td>Redundancy</td>
-                            <td><span class="bg-emerald-900/30 text-emerald-400 px-2 py-0.5 rounded text-xs">Triple (3x) Domains</span></td>
-                            <td><span class="bg-slate-800 text-slate-400 px-2 py-0.5 rounded text-xs">Dual (2x) Domains</span></td>
-                        </tr>
-                        <tr>
-                            <td>Connectivity</td>
-                            <td><span class="text-emerald-400">Ethernet (100Base-T)</span></td>
-                            <td><span class="text-slate-500">USB OTG Only</span></td>
-                        </tr>
-                        <tr>
-                            <td>Security</td>
-                            <td><span class="text-emerald-400">NXP SE050 (Secure Element)</span></td>
-                            <td><span class="text-slate-500">None</span></td>
-                        </tr>
-                        <tr>
-                            <td>Form Factor</td>
-                            <td>Modular (Standard PAB)</td>
-                            <td>Integrated / Proprietary</td>
-                        </tr>
+                        <tr><td>FMU MCU</td><td>STM32H753 (480MHz, 2MB Flash, 1MB RAM)</td><td>STM32H743 (480MHz, 2MB Flash, 1MB RAM)</td></tr>
+                        <tr><td>IO MCU</td><td>STM32F103 (64KB Flash, 20KB RAM)</td><td>STM32F103 (64KB Flash, 20KB RAM)</td></tr>
+                        <tr><td>Ethernet</td><td><span class="text-emerald-400">100Base-T (Realtek RTL8201F)</span></td><td><span class="text-slate-500">None (USB OTG Only)</span></td></tr>
+                        <tr><td>Security</td><td>NXP SE050 Secure Element</td><td><span class="text-slate-500">None</span></td></tr>
+                        <tr><td>Sensor Domains</td><td>3 Isolated Domains (Triple Redundancy)</td><td>2 Domains (Dual Redundancy)</td></tr>
+                        <tr><td>Form Factor</td><td>Standard PAB (Modular)</td><td>Cost-Optimized (Compact)</td></tr>
                     </tbody>
                 </table>
             </div>
             
-            <!-- Port Map (6X Standard) -->
+            <!-- Port Map -->
             <div class="grid lg:grid-cols-3 gap-6">
                 <div class="lg:col-span-2 bg-slate-950 p-6 rounded-xl border border-slate-800">
-                    <h3 class="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4">Port Pinout (6X Baseboard)</h3>
+                    <h3 class="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4">Port Pinout (6X Reference)</h3>
                     <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
                         <div class="port-connector bg-slate-900/50 p-3 rounded text-center" onclick="showPortDetail('power')">
                             <div class="port-label text-rose-400">POWER 1 & 2</div><i class="fa-solid fa-battery-full text-xl text-rose-500 my-2"></i>
@@ -471,26 +537,7 @@
         Chart.defaults.color = '#94a3b8';
         Chart.defaults.borderColor = '#334155';
 
-        // --- Recommendation Logic (New) ---
-        function recommendBoard(type) {
-            const el = document.getElementById('recommendation-result');
-            el.classList.remove('hidden');
-            if (type === 'industrial') {
-                el.innerHTML = `
-                    <div class="flex items-center mb-2"><span class="text-emerald-400 text-xl font-bold mr-2">Recommended: Pixhawk 6X</span></div>
-                    <p class="text-sm text-slate-300">Why? <strong>Triple Redundancy</strong> (3x IMU) is required for high-reliability missions. <strong>Ethernet</strong> enables AI companion computer integration.</p>
-                `;
-                el.style.borderColor = '#10b981'; // Emerald
-            } else {
-                el.innerHTML = `
-                    <div class="flex items-center mb-2"><span class="text-sky-400 text-xl font-bold mr-2">Recommended: Pixhawk 6C</span></div>
-                    <p class="text-sm text-slate-300">Why? <strong>Cost Optimized</strong>. H743 processor provides same flight performance. Dual IMU is sufficient for non-critical payloads.</p>
-                `;
-                el.style.borderColor = '#38bdf8'; // Sky
-            }
-        }
-
-        // --- Data: Pixhawk Ports ---
+        // --- Data: Pixhawk Ports (FULL DETAIL HTML) ---
         const portDB = {
             power: {
                 title: 'POWER 1 & 2', subtitle: 'LTC4417 OR-ing', icon: '<i class="fa-solid fa-battery-full text-rose-500"></i>',
@@ -503,7 +550,7 @@
                 </table><p class="mt-2 text-xs text-slate-400">優先權：Power1 > Power2 > USB</p>`
             },
             gps: {
-                title: 'GPS 1', subtitle: 'GNSS + Mag + Safety', icon: '<i class="fa-solid fa-satellite text-emerald-500"></i>',
+                title: 'GPS 1', subtitle: 'GNSS + Mag', icon: '<i class="fa-solid fa-satellite text-emerald-500"></i>',
                 content: `<table class="w-full pin-table">
                     <tr><th>Pin</th><th>Sig</th><th>Volt</th></tr>
                     <tr><td>1</td><td>VCC</td><td class="v-5">5V</td></tr>
@@ -549,7 +596,7 @@
             window.scrollTo(0,0);
             
             document.querySelectorAll('.nav-item').forEach(i => {
-                i.classList.remove('active', 'bg-orange-900/10', 'text-orange-400', 'border-orange-400', 'bg-emerald-900/10', 'text-emerald-400', 'border-emerald-400', 'bg-sky-900/10', 'text-sky-400', 'border-sky-400');
+                i.classList.remove('active', 'bg-orange-900/10', 'text-orange-400', 'border-orange-400', 'bg-emerald-900/10', 'text-emerald-400', 'border-emerald-400', 'bg-sky-900/10', 'text-sky-400', 'border-sky-400', 'bg-indigo-900/10', 'text-indigo-400', 'border-indigo-400');
                 i.classList.add('text-slate-400', 'border-transparent');
             });
 
@@ -557,6 +604,7 @@
             if(link) {
                 if(id.includes('roadmap')) link.classList.add('active', 'text-orange-400', 'border-l-4', 'border-orange-400');
                 else if(id.includes('teardown')) link.classList.add('active', 'text-emerald-400', 'border-l-4', 'border-emerald-400');
+                else if(id.includes('processors')) link.classList.add('active', 'text-indigo-400', 'border-l-4', 'border-indigo-400');
                 else if(id.includes('bldc') || id.includes('pixhawk')) link.classList.add('active', 'text-sky-400', 'border-l-4', 'border-sky-400');
                 else link.classList.add('active', 'text-sky-400', 'border-l-4', 'border-sky-400');
                 link.classList.remove('text-slate-400', 'border-transparent');
@@ -647,6 +695,7 @@
             pidChart.update();
         }
 
+        // --- Software Stack Switcher ---
         function switchStack(id) {
             document.getElementById('content-px4').classList.add('hidden');
             document.getElementById('content-ardupilot').classList.add('hidden');
@@ -660,7 +709,9 @@
             const r = document.getElementById('diagnostic-result');
             const t = document.getElementById('diag-title');
             const d = document.getElementById('diag-desc');
+            
             if(!v) { r.classList.add('hidden'); return; }
+            
             const db = {
                 desync: {t:'Motor Desync', d:'Action: 1. Increase Rampup Power in BLHeli. 2. Check for loose bullet connectors.'},
                 mag: {t:'Toilet Bowl Effect', d:'Action: 1. Calibrate Mag. 2. Move GPS mast away from PDB/Power cables.'}

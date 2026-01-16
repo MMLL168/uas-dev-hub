@@ -74,6 +74,7 @@
         .badge-teardown { background-color: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); color: #34d399; }
         .badge-standard { background-color: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); color: #60a5fa; }
         .badge-datasheet { background-color: rgba(168, 85, 247, 0.1); border: 1px solid rgba(168, 85, 247, 0.3); color: #c084fc; }
+        .badge-design { background-color: rgba(236, 72, 153, 0.1); border: 1px solid rgba(236, 72, 153, 0.3); color: #f472b6; }
 
         /* Chip Diagram */
         .chip-pkg { position: relative; background: #1e293b; border: 2px solid #475569; border-radius: 4px; }
@@ -105,6 +106,7 @@
             <!-- Hardware Deep Dive -->
             <div class="px-4 py-2 mt-4 text-xs font-bold text-slate-600 uppercase tracking-wider">硬體工程 (Hardware)</div>
             <a href="#" onclick="navTo('section-mcu')" class="nav-item block px-6 py-3 text-sm font-medium text-purple-400 hover:bg-slate-800 hover:text-purple-200 border-l-4 border-transparent transition-colors"><i class="fa-solid fa-microchip mr-2 w-4"></i>MCU 架構詳解 (Chips)</a>
+            <a href="#" onclick="navTo('section-design')" class="nav-item block px-6 py-3 text-sm font-medium text-pink-400 hover:bg-slate-800 hover:text-pink-200 border-l-4 border-transparent transition-colors"><i class="fa-solid fa-compass-drafting mr-2 w-4"></i>自製指南 (Design)</a>
             <a href="#" onclick="navTo('section-pixhawk')" class="nav-item block px-6 py-3 text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-slate-200 border-l-4 border-transparent transition-colors"><i class="fa-solid fa-server mr-2 w-4"></i>Pixhawk 6X vs 6C</a>
             <a href="#" onclick="navTo('section-bldc')" class="nav-item block px-6 py-3 text-sm font-medium text-sky-400 hover:bg-slate-800 hover:text-sky-200 border-l-4 border-transparent transition-colors"><i class="fa-solid fa-bolt mr-2 w-4"></i>BLDC 馬達實驗室 (Full)</a>
             <a href="#" onclick="navTo('section-hardware')" class="nav-item block px-6 py-3 text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-slate-200 border-l-4 border-transparent transition-colors"><i class="fa-solid fa-dna mr-2 w-4"></i>硬體解剖 (Anatomy)</a>
@@ -166,7 +168,7 @@
             </div>
         </section>
 
-        <!-- New Section: MCU Deep Dive -->
+        <!-- MCU Deep Dive -->
         <section id="section-mcu" class="mb-16 hidden animate-section">
             <header class="mb-8 border-b border-slate-800 pb-4">
                 <h2 class="text-3xl font-bold text-slate-100 mb-2">STM32 晶片架構詳解 (MCU Deep Dive)</h2>
@@ -259,6 +261,152 @@
                                 <br>H7 與 F103 之間透過高速串口交換控制指令與馬達數值。
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- New Section: Hardware Design Guide -->
+        <section id="section-design" class="mb-16 hidden animate-section">
+            <header class="mb-8 border-b border-slate-800 pb-4">
+                <h2 class="text-3xl font-bold text-slate-100 mb-2">自製硬體指南 (Hardware Design Guide)</h2>
+                <div class="flex items-center gap-2 text-slate-400 text-sm">
+                    <span class="source-badge badge-design">Reference Design</span>
+                    <span>相容 FMUv6C 標準</span>
+                </div>
+            </header>
+
+            <!-- Warning / Intro -->
+            <div class="bg-amber-900/10 border border-amber-800 p-4 rounded-lg mb-8 flex items-start">
+                <i class="fa-solid fa-circle-exclamation text-amber-500 mt-1 mr-3"></i>
+                <div class="text-sm text-slate-300">
+                    <strong class="text-amber-400 block mb-1">關於 Pixhawk 6C 原理圖</strong>
+                    <p>Holybro 官方並未公開 6C 的完整原理圖 (SCH)。若需自製相容硬體，建議採用 <strong>FMUv6C 標準 + 開源參考設計 (如 Pix32 v6)</strong> 的策略，而非嘗試 1:1 複製。下方提供實作導向的模組拆解與 Pin Mapping。</p>
+                </div>
+            </div>
+
+            <!-- Tab Navigation for Design -->
+            <div class="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden mb-8">
+                <div class="flex border-b border-slate-800 bg-slate-950 overflow-x-auto">
+                    <button onclick="showDesignTab('modules')" id="tab-modules" class="px-6 py-4 text-sm font-bold text-pink-400 bg-slate-900 border-r border-slate-800 transition whitespace-nowrap">模組拆解清單</button>
+                    <button onclick="showDesignTab('pinout')" id="tab-pinout" class="px-6 py-4 text-sm font-bold text-slate-500 bg-slate-950 transition whitespace-nowrap">H743 Pin Mapping (一體板)</button>
+                </div>
+
+                <!-- Tab 1: Modules Breakdown -->
+                <div id="content-modules" class="p-6 md:p-8 animate-fade-in">
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div>
+                            <h4 class="text-sky-400 font-bold mb-3 border-b border-sky-900 pb-2">1. 核心與 IO (Core)</h4>
+                            <ul class="space-y-3 text-sm text-slate-400">
+                                <li><strong class="text-white">FMU:</strong> STM32H743ZIT6 (LQFP144)。外掛 QSPI Flash (儲存)、FRAM (參數)。</li>
+                                <li><strong class="text-white">IO MCU:</strong> STM32F103C8T6。負責 PWM 輸出與 RC 解碼。與 FMU 透過 UART 通訊。</li>
+                                <li><strong class="text-white">Debug:</strong> SWD 介面 (建議保留 6-pin JST-GH)。</li>
+                            </ul>
+
+                            <h4 class="text-emerald-400 font-bold mb-3 mt-6 border-b border-emerald-900 pb-2">2. 感測器 (Sensors)</h4>
+                            <ul class="space-y-3 text-sm text-slate-400">
+                                <li><strong class="text-white">IMU 1 (SPI):</strong> ICM-42688-P (高頻震動性能佳)。</li>
+                                <li><strong class="text-white">IMU 2 (SPI):</strong> BMI088 (工業級穩定性)。</li>
+                                <li><strong class="text-white">Mag (I2C):</strong> IST8310 (外部 I2C 磁羅盤)。</li>
+                                <li><strong class="text-white">Baro (SPI/I2C):</strong> MS5611 (高精度氣壓計)。</li>
+                                <li class="text-xs italic">* 建議加入 IMU 加熱電阻與溫控電路。</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="text-rose-400 font-bold mb-3 border-b border-rose-900 pb-2">3. 電源架構 (Power)</h4>
+                            <ul class="space-y-3 text-sm text-slate-400">
+                                <li><strong class="text-white">輸入冗餘:</strong> POWER1 / POWER2 / USB 三路輸入 (Ideal Diode OR-ing)。</li>
+                                <li><strong class="text-white">電壓軌:</strong> 5V (主供電), 3.3V_FMU, 3.3V_SENSORS (分開 LDO 以減少雜訊)。</li>
+                                <li><strong class="text-white">監測:</strong> ADC 讀取電壓與電流 (分壓電路)。</li>
+                            </ul>
+
+                            <h4 class="text-amber-400 font-bold mb-3 mt-6 border-b border-amber-900 pb-2">4. 通訊與接口 (Comms)</h4>
+                            <ul class="space-y-3 text-sm text-slate-400">
+                                <li><strong class="text-white">Connectors:</strong> JST-GH 1.25mm (Pixhawk 標準)。</li>
+                                <li><strong class="text-white">CAN:</strong> 2x CAN-FD (需外掛 Transceiver 如 TJA1051)。</li>
+                                <li><strong class="text-white">Protection:</strong> 所有對外接口皆需 ESD TVS 保護。</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab 2: Pin Mapping -->
+                <div id="content-pinout" class="hidden p-6 md:p-8 animate-fade-in">
+                    <div class="mb-4 text-sm text-slate-400 bg-slate-950 p-4 rounded border border-slate-800">
+                        <strong class="text-pink-400">設計目標：</strong> 類 Pixhawk 6C 一體板 (All-in-one)。<br>
+                        <strong class="text-pink-400">MCU 型號：</strong> STM32H743ZIT6 (LQFP144)。<br>
+                        <span class="text-xs">此表可直接作為原理圖 Symbol Pin Assignment 參考。</span>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-sm">
+                            <thead>
+                                <tr class="bg-slate-800 text-slate-200">
+                                    <th class="p-3 border-b border-slate-700">Port Name (Function)</th>
+                                    <th class="p-3 border-b border-slate-700">MCU Pin</th>
+                                    <th class="p-3 border-b border-slate-700">STM32 Function</th>
+                                    <th class="p-3 border-b border-slate-700">Connector (JST-GH)</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-slate-400 font-mono">
+                                <!-- GPS1 -->
+                                <tr class="border-b border-slate-800 hover:bg-slate-800/50">
+                                    <td class="p-3 text-emerald-400 font-bold">GPS 1</td>
+                                    <td class="p-3">PA9 / PA10</td>
+                                    <td class="p-3">USART1_TX / RX</td>
+                                    <td class="p-3">10-Pin (含 I2C, Safety)</td>
+                                </tr>
+                                <!-- TELEM1 -->
+                                <tr class="border-b border-slate-800 hover:bg-slate-800/50">
+                                    <td class="p-3 text-sky-400 font-bold">TELEM 1</td>
+                                    <td class="p-3">PE7 / PE8</td>
+                                    <td class="p-3">UART7_TX / RX</td>
+                                    <td class="p-3">6-Pin (Pin 2/3)</td>
+                                </tr>
+                                <!-- TELEM2 -->
+                                <tr class="border-b border-slate-800 hover:bg-slate-800/50">
+                                    <td class="p-3 text-sky-400">TELEM 2</td>
+                                    <td class="p-3">PC12 / PD2</td>
+                                    <td class="p-3">UART5_TX / RX</td>
+                                    <td class="p-3">6-Pin</td>
+                                </tr>
+                                <!-- TELEM3 -->
+                                <tr class="border-b border-slate-800 hover:bg-slate-800/50">
+                                    <td class="p-3 text-sky-400">TELEM 3</td>
+                                    <td class="p-3">PA2 / PA3</td>
+                                    <td class="p-3">USART2_TX / RX</td>
+                                    <td class="p-3">4-Pin or 6-Pin</td>
+                                </tr>
+                                <!-- GPS2 -->
+                                <tr class="border-b border-slate-800 hover:bg-slate-800/50">
+                                    <td class="p-3 text-emerald-400">GPS 2</td>
+                                    <td class="p-3">PE0 / PE1</td>
+                                    <td class="p-3">UART8_TX / RX</td>
+                                    <td class="p-3">6-Pin</td>
+                                </tr>
+                                <!-- IO Link -->
+                                <tr class="border-b border-slate-800 bg-slate-800/30">
+                                    <td class="p-3 text-rose-400">IO LINK (Internal)</td>
+                                    <td class="p-3">PC6 / PC7</td>
+                                    <td class="p-3">USART6_TX / RX</td>
+                                    <td class="p-3">To STM32F103</td>
+                                </tr>
+                                <!-- Debug -->
+                                <tr class="border-b border-slate-800 hover:bg-slate-800/50">
+                                    <td class="p-3 text-amber-400">DEBUG Console</td>
+                                    <td class="p-3">PB10 / PB11</td>
+                                    <td class="p-3">USART3_TX / RX</td>
+                                    <td class="p-3">6-Pin (含 SWD)</td>
+                                </tr>
+                                <!-- USB -->
+                                <tr class="border-b border-slate-800 hover:bg-slate-800/50">
+                                    <td class="p-3 text-white">USB OTG</td>
+                                    <td class="p-3">PA11 / PA12</td>
+                                    <td class="p-3">USB_DM / DP</td>
+                                    <td class="p-3">Type-C</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -612,6 +760,25 @@
             }
         }
 
+        // --- Design Section Tabs Logic ---
+        function showDesignTab(tabId) {
+            // Hide all contents
+            document.getElementById('content-modules').classList.add('hidden');
+            document.getElementById('content-pinout').classList.add('hidden');
+            
+            // Remove active style from tabs
+            document.getElementById('tab-modules').className = "px-6 py-4 text-sm font-bold text-slate-500 bg-slate-950 transition whitespace-nowrap";
+            document.getElementById('tab-pinout').className = "px-6 py-4 text-sm font-bold text-slate-500 bg-slate-950 transition whitespace-nowrap";
+
+            // Show selected content & style tab
+            document.getElementById(`content-${tabId}`).classList.remove('hidden');
+            if(tabId === 'modules') {
+                document.getElementById('tab-modules').className = "px-6 py-4 text-sm font-bold text-pink-400 bg-slate-900 border-r border-slate-800 transition whitespace-nowrap";
+            } else {
+                document.getElementById('tab-pinout').className = "px-6 py-4 text-sm font-bold text-pink-400 bg-slate-900 border-l border-slate-800 transition whitespace-nowrap";
+            }
+        }
+
         // --- Data: Pixhawk Ports (TC Translated) ---
         const portDB = {
             power: {
@@ -670,7 +837,7 @@
             document.getElementById(id).classList.remove('hidden');
             window.scrollTo(0,0);
             document.querySelectorAll('.nav-item').forEach(i => {
-                i.classList.remove('active', 'bg-orange-900/10', 'text-orange-400', 'border-orange-400', 'bg-emerald-900/10', 'text-emerald-400', 'border-emerald-400', 'bg-sky-900/10', 'text-sky-400', 'border-sky-400', 'text-purple-400', 'border-purple-400', 'bg-slate-800');
+                i.classList.remove('active', 'bg-orange-900/10', 'text-orange-400', 'border-orange-400', 'bg-emerald-900/10', 'text-emerald-400', 'border-emerald-400', 'bg-sky-900/10', 'text-sky-400', 'border-sky-400', 'text-purple-400', 'border-purple-400', 'text-pink-400', 'border-pink-400', 'bg-slate-800');
                 i.classList.add('text-slate-400', 'border-transparent');
             });
             const link = Array.from(document.querySelectorAll('.nav-item')).find(l => l.getAttribute('onclick').includes(id));
@@ -678,6 +845,7 @@
                 if(id.includes('roadmap')) link.classList.add('active', 'text-orange-400', 'border-l-4', 'border-orange-400');
                 else if(id.includes('teardown')) link.classList.add('active', 'text-emerald-400', 'border-l-4', 'border-emerald-400');
                 else if(id.includes('mcu')) link.classList.add('active', 'text-purple-400', 'border-l-4', 'border-purple-400');
+                else if(id.includes('design')) link.classList.add('active', 'text-pink-400', 'border-l-4', 'border-pink-400');
                 else if(id.includes('bldc') || id.includes('pixhawk')) link.classList.add('active', 'text-sky-400', 'border-l-4', 'border-sky-400');
                 else link.classList.add('active', 'text-sky-400', 'border-l-4', 'border-sky-400');
                 link.classList.remove('text-slate-400', 'border-transparent');

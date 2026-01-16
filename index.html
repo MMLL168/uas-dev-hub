@@ -79,6 +79,11 @@
         /* Chip Diagram */
         .chip-pkg { position: relative; background: #1e293b; border: 2px solid #475569; border-radius: 4px; }
         .chip-pin { width: 6px; height: 2px; background: #64748b; position: absolute; }
+        
+        /* IO Logic Flow */
+        .io-flow-container { position: relative; display: flex; align-items: center; justify-content: space-between; font-size: 0.75rem; }
+        .io-box { padding: 0.5rem; border-radius: 4px; border: 1px solid #475569; background: #1e293b; text-align: center; font-weight: bold; width: 22%; }
+        .io-arrow { color: #64748b; font-size: 1rem; }
     </style>
 </head>
 <body class="flex flex-col md:flex-row min-h-screen">
@@ -168,7 +173,7 @@
             </div>
         </section>
 
-        <!-- MCU Deep Dive -->
+        <!-- MCU Deep Dive (Enhanced) -->
         <section id="section-mcu" class="mb-16 hidden animate-section">
             <header class="mb-8 border-b border-slate-800 pb-4">
                 <h2 class="text-3xl font-bold text-slate-100 mb-2">STM32 晶片架構詳解 (MCU Deep Dive)</h2>
@@ -191,74 +196,77 @@
                         <div class="bg-slate-950 p-4 rounded-lg border border-slate-700">
                             <div class="grid grid-cols-2 gap-4 border-b border-slate-800 pb-2 mb-2">
                                 <div>
-                                    <h4 class="text-emerald-400 font-bold">STM32H753 (Pixhawk 6X)</h4>
-                                    <span class="text-xs text-slate-500">旗艦 / 企業級</span>
+                                    <h4 class="text-emerald-400 font-bold">STM32H753</h4>
+                                    <span class="text-xs text-slate-500">Pixhawk 6X (企業級)</span>
                                 </div>
                                 <div>
-                                    <h4 class="text-sky-400 font-bold">STM32H743 (Pixhawk 6C)</h4>
-                                    <span class="text-xs text-slate-500">標準 / 消費級</span>
+                                    <h4 class="text-sky-400 font-bold">STM32H743</h4>
+                                    <span class="text-xs text-slate-500">Pixhawk 6C (標準級)</span>
                                 </div>
                             </div>
                             <ul class="text-sm text-slate-300 space-y-2 list-disc list-inside">
-                                <li><strong>核心架構:</strong> 兩者皆為 Cortex-M7 @ 480MHz。</li>
-                                <li><strong>算力關鍵:</strong> 具備 <span class="text-yellow-400">DP-FPU (雙精度浮點運算單元)</span>。
-                                    <p class="text-xs text-slate-500 ml-5 mt-1">這對於運行 EKF3 (Extended Kalman Filter) 至關重要，能大幅減少姿態解算的累積誤差。</p>
-                                </li>
+                                <li><strong>運算核心:</strong> Cortex-M7 @ 480MHz (2144 CoreMark)。</li>
+                                <li><strong>AXI Bus Matrix:</strong> 確保 RAM 與週邊 (Ethernet/SDMMC) 的併發存取不塞車。</li>
                                 <li><strong>差異點 (Security):</strong> <br>
-                                    <span class="text-emerald-400">H753</span> 內建硬體加密加速引擎 (Crypto/Hash) 與更強的 Secure Boot 功能。適合需要防篡改、加密通訊的軍用/物流專案。<br>
-                                    <span class="text-sky-400">H743</span> 則移除部分加密硬體，性價比更高。
+                                    <span class="text-emerald-400">H753</span> 獨有硬體加密引擎 (Crypto/Hash)，支援高強度 Secure Boot 防篡改。
                                 </li>
                             </ul>
                         </div>
 
-                        <!-- Technical Specs -->
-                        <div class="grid grid-cols-2 gap-4 text-xs font-mono">
-                            <div class="bg-slate-800 p-2 rounded">
-                                <span class="block text-slate-500">Flash / RAM</span>
-                                <span class="text-white">2MB / 1MB</span>
-                            </div>
-                            <div class="bg-slate-800 p-2 rounded">
-                                <span class="block text-slate-500">DMA 通道</span>
-                                <span class="text-white">MDMA + DMA2D</span>
-                                <span class="block text-[10px] text-slate-500">AXI Bus Matrix 確保高速 IO 不卡頓</span>
-                            </div>
+                        <!-- DMA Note -->
+                        <div class="bg-slate-800 p-3 rounded text-xs text-slate-400 border-l-4 border-purple-500">
+                            <strong>DMA 架構重點：</strong>H7 具備 MDMA (Master DMA)，可在不佔用 CPU 情況下，自主搬運大量感測器 SPI 數據到 RAM，這是高頻率 (8kHz Loop) 運作的關鍵。
                         </div>
                     </div>
                 </div>
 
-                <!-- IO Processor (F103) -->
+                <!-- IO Processor (F103) - Deep Dive -->
                 <div class="bg-slate-900 p-6 rounded-xl border border-slate-800">
                     <h3 class="text-xl font-bold text-white mb-4 flex items-center">
                         <i class="fa-solid fa-shield-halved mr-2 text-rose-500"></i>
-                        協處理器 (IO / Failsafe): F103
+                        IO 協處理器深度解析 (STM32F103)
                     </h3>
                     
                     <div class="bg-slate-950 p-4 rounded-lg border border-slate-700 h-full">
-                        <div class="mb-4">
-                            <h4 class="text-rose-400 font-bold">STM32F103 (PX4IO)</h4>
-                            <span class="text-xs text-slate-500">Cortex-M3 @ 72MHz</span>
+                        <div class="mb-4 pb-2 border-b border-slate-800">
+                            <h4 class="text-rose-400 font-bold">PX4IO 架構 (Safety Island)</h4>
+                            <span class="text-xs text-slate-500">目的：當主核 (H7) 當機時，確保飛機仍受控制。</span>
                         </div>
                         
+                        <!-- IO Flow Diagram -->
+                        <div class="io-flow-container mb-6 bg-slate-900 p-2 rounded border border-slate-800">
+                            <div class="io-box border-emerald-900 text-emerald-400">RC Input<br><span class="text-[10px] text-slate-500">SBUS/PPM</span></div>
+                            <i class="fa-solid fa-arrow-right io-arrow"></i>
+                            <div class="io-box border-rose-900 text-rose-400">F103 IO<br><span class="text-[10px] text-slate-500">Mixing/Mux</span></div>
+                            <i class="fa-solid fa-arrow-right io-arrow"></i>
+                            <div class="io-box border-sky-900 text-sky-400">Main Out<br><span class="text-[10px] text-slate-500">PWM 1-8</span></div>
+                        </div>
+
                         <div class="space-y-4 text-sm text-slate-300">
                             <div>
-                                <strong class="text-white block mb-1">存在的目的? (Why do we need it?)</strong>
-                                <p>若主核 (H7) 因為軟體 Bug 或過載而崩潰/重啟，F103 仍能獨立運作。</p>
-                            </div>
-                            
-                            <div class="border-l-2 border-rose-900 pl-3">
-                                <strong class="text-rose-300">1. 硬體級 Failsafe (失效保護)</strong>
-                                <p class="text-xs text-slate-400 mt-1">當與主核失去 UART 連線時，F103 會立即接管 PWM 輸出，鎖定舵機或關閉馬達，防止飛機全速衝撞。</p>
-                            </div>
-
-                            <div class="border-l-2 border-sky-900 pl-3">
-                                <strong class="text-sky-300">2. RC 訊號解碼</strong>
-                                <p class="text-xs text-slate-400 mt-1">專門處理 SBUS / PPM 訊號的解析。支援 "RC Passthrough" (手動直通模式)，即使飛控當機，飛手仍可能控制飛機姿態。</p>
-                            </div>
-
-                            <div class="mt-4 p-2 bg-slate-900 border border-slate-800 rounded text-xs">
-                                <span class="text-slate-500">通訊鏈路:</span>
-                                <span class="text-mono text-emerald-400">UART (1.5Mbps)</span>
-                                <br>H7 與 F103 之間透過高速串口交換控制指令與馬達數值。
+                                <strong class="text-white block mb-1">IO 分配與功能目的 (Pin Allocation & Purpose)</strong>
+                                <ul class="list-none space-y-3 mt-2">
+                                    <li class="relative pl-4 border-l-2 border-emerald-500">
+                                        <strong class="text-emerald-300 text-xs uppercase block">1. RC Input Decoding (PB7 / PA0)</strong>
+                                        <span>接收遙控器訊號 (SBUS/PPM)。</span>
+                                        <p class="text-[10px] text-slate-500 mt-0.5">目的：由 F103 負責解碼繁重的時序中斷，H7 僅需透過 UART 讀取最終數值，減輕主核負擔。</p>
+                                    </li>
+                                    <li class="relative pl-4 border-l-2 border-rose-500">
+                                        <strong class="text-rose-300 text-xs uppercase block">2. Hardware Failsafe Mux</strong>
+                                        <span>F103 內部具有「直通混控」邏輯。</span>
+                                        <p class="text-[10px] text-slate-500 mt-0.5">目的：若 H7 停止發送心跳包 (Heartbeat)，F103 會自動切換模式，將 RC 訊號直接映射到 PWM 輸出 (Manual Override)，讓飛手能手動救機。</p>
+                                    </li>
+                                    <li class="relative pl-4 border-l-2 border-sky-500">
+                                        <strong class="text-sky-300 text-xs uppercase block">3. Safety Switch & LED (PB14 / PB15)</strong>
+                                        <span>物理安全鎖。</span>
+                                        <p class="text-[10px] text-slate-500 mt-0.5">目的：在未解鎖前，由硬體邏輯強制將 PWM 輸出鎖定在無效值，防止通電瞬間馬達暴衝。</p>
+                                    </li>
+                                    <li class="relative pl-4 border-l-2 border-amber-500">
+                                        <strong class="text-amber-300 text-xs uppercase block">4. FMU Link (USART2/3 @ 1.5Mbps)</strong>
+                                        <span>與主核的高速通訊鏈路。</span>
+                                        <p class="text-[10px] text-slate-500 mt-0.5">目的：傳輸混控後的 PWM 值 (H7 -> F103) 與 RC 數值 (F103 -> H7)。</p>
+                                    </li>
+                                </ul>
                             </div>
                         </div>
                     </div>

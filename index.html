@@ -262,9 +262,17 @@
                                         <p class="text-[10px] text-slate-500 mt-0.5">目的：在未解鎖前，由硬體邏輯強制將 PWM 輸出鎖定在無效值，防止通電瞬間馬達暴衝。</p>
                                     </li>
                                     <li class="relative pl-4 border-l-2 border-amber-500">
-                                        <strong class="text-amber-300 text-xs uppercase block">4. FMU Link (USART2/3 @ 1.5Mbps)</strong>
-                                        <span>與主核的高速通訊鏈路。</span>
-                                        <p class="text-[10px] text-slate-500 mt-0.5">目的：傳輸混控後的 PWM 值 (H7 -> F103) 與 RC 數值 (F103 -> H7)。</p>
+                                        <strong class="text-amber-300 text-xs uppercase block">4. FMU Link (USART @ 1.5Mbps)</strong>
+                                        <span>H7 與 F103 之間的生命線 (Life-line)。</span>
+                                        <div class="mt-1 space-y-1">
+                                            <p class="text-[10px] text-slate-400"><span class="text-amber-500 font-bold">通訊協定:</span> 基於 CRC 校驗的二進制 PX4IO 協議 (非 MAVLink)。</p>
+                                            <p class="text-[10px] text-slate-400"><span class="text-amber-500 font-bold">正常模式:</span> H7 計算完混控 (Mixing) 後，將 8 路 PWM 數值以 50-400Hz 更新率推播給 F103 执行。</p>
+                                            <p class="text-[10px] text-slate-400"><span class="text-amber-500 font-bold">Watchdog 機制:</span> H7 必須持續發送 "Heartbeat"。若 F103 超過 500ms 未收到更新，判定 H7 當機，立即接管控制權 (進入 Failsafe)。</p>
+                                            <p class="text-[10px] text-slate-400"><span class="text-amber-500 font-bold">雙向傳輸:</span> 
+                                                <br>H7 &rarr; F103: PWM 輸出值, LED 顏色指令, 安全開關設定。
+                                                <br>F103 &rarr; H7: RC 原始數據 (SBUS), 安全開關狀態, 電池電壓 (類比)。
+                                            </p>
+                                        </div>
                                     </li>
                                 </ul>
                             </div>

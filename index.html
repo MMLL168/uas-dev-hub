@@ -174,7 +174,7 @@
             <a href="#" data-section="section-software" class="nav-item block px-6 py-3 text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-slate-200 border-l-4 border-transparent transition-colors"><i class="fa-brands fa-git-alt mr-2 w-4"></i>軟體棧 (Stack)</a>
             <a href="#" data-section="section-aiot" class="nav-item block px-6 py-3 text-sm font-medium text-violet-400 hover:bg-slate-800 hover:text-violet-200 border-l-4 border-transparent transition-colors"><i class="fa-solid fa-network-wired mr-2 w-4"></i>AIoT 與 ROS 2</a>
             <a href="#" data-section="section-maint" class="nav-item block px-6 py-3 text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-slate-200 border-l-4 border-transparent transition-colors"><i class="fa-solid fa-wrench mr-2 w-4"></i>故障診斷 (Debug)</a>
-            <a href="#" data-section="section-resources" class="nav-item block px-6 py-3 text-sm font-medium text-teal-400 hover:bg-slate-800 hover:text-teal-200 border-l-4 border-transparent transition-colors"><i class="fa-solid fa-coins mr-2 w-4"></i>資源與成本 (Resources)</a>
+            <a href="#" data-section="section-resources" class="nav-item block px-6 py-3 text-sm font-medium text-teal-400 hover:bg-slate-800 hover:text-teal-200 border-l-4 border-transparent transition-colors"><i class="fa-solid fa-coins mr-2 w-4"></i>資源與術語 (Resources)</a>
         </div>
 
         <div class="p-4 border-t border-slate-800">
@@ -259,7 +259,7 @@
             </div>
         </section>
 
-        <!-- 3. R&D Logs (Major Update) -->
+        <!-- 3. R&D Logs (Upgraded) -->
         <section id="section-logs" class="mb-16 hidden animate-section relative">
             <i class="fa-regular fa-bookmark bookmark-badge" data-bookmark="section-logs"></i>
             <header class="mb-8 border-b border-slate-800 pb-4">
@@ -270,61 +270,101 @@
                 </div>
             </header>
 
-            <!-- Project Status Header -->
-            <div class="bg-slate-900 p-6 rounded-xl border border-slate-800 mb-8">
-                <div class="flex justify-between items-center mb-4">
-                    <div>
-                        <h3 class="text-xl font-bold text-amber-400"><i class="fa-solid fa-helicopter mr-2"></i>Holybro X500 V2 系統整合</h3>
-                        <p class="text-sm text-slate-400 mt-1">Pixhawk 6C / PX4 v1.14.x / Operator: Marlon</p>
-                    </div>
-                    <div class="text-right">
-                        <span class="bg-emerald-900/30 text-emerald-400 px-3 py-1 rounded text-sm font-bold border border-emerald-800">Pre-Flight Ready</span>
-                    </div>
+            <!-- Tabs -->
+            <div class="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden mb-8">
+                <div class="flex border-b border-slate-800 bg-slate-950 overflow-x-auto">
+                    <button onclick="switchLogsTab('status')" id="tab-log-status" class="px-6 py-4 text-sm font-bold text-amber-400 bg-slate-900 border-r border-slate-800 transition whitespace-nowrap">專案現況 (Status)</button>
+                    <button onclick="switchLogsTab('sop')" id="tab-log-sop" class="px-6 py-4 text-sm font-bold text-slate-500 bg-slate-950 transition whitespace-nowrap">SOP 配置指南 (Configuration)</button>
                 </div>
-                <div class="grid md:grid-cols-2 gap-6">
-                    <div class="bg-slate-950 p-4 rounded border border-slate-700">
-                        <strong class="text-sky-400 block mb-2">1. 系統驗收狀態 (System Status)</strong>
-                        <ul class="text-sm text-slate-300 space-y-2">
-                            <li><i class="fa-solid fa-check text-emerald-500 mr-2"></i><strong>機架:</strong> Holybro X500 V2 (Quad X)</li>
-                            <li><i class="fa-solid fa-check text-emerald-500 mr-2"></i><strong>感測器:</strong> Accel, Gyro, Mag, Level 校正完成</li>
-                            <li><i class="fa-solid fa-check text-emerald-500 mr-2"></i><strong>動力:</strong> 馬達轉向 (CW/CCW) 驗證通過</li>
-                            <li><i class="fa-regular fa-square text-slate-500 mr-2"></i><strong>遙控:</strong> 待 R81 接收機安裝校正</li>
-                        </ul>
+
+                <!-- Tab 1: Status -->
+                <div id="content-logs-status" class="p-6 md:p-8 animate-fade-in">
+                    <div class="flex justify-between items-center mb-4">
+                        <div>
+                            <h3 class="text-xl font-bold text-amber-400"><i class="fa-solid fa-helicopter mr-2"></i>Holybro X500 V2 系統整合</h3>
+                            <p class="text-sm text-slate-400 mt-1">Pixhawk 6C / PX4 v1.14.x / Operator: Marlon</p>
+                        </div>
+                        <div class="text-right">
+                            <span class="bg-emerald-900/30 text-emerald-400 px-3 py-1 rounded text-sm font-bold border border-emerald-800">Pre-Flight Ready</span>
+                        </div>
                     </div>
-                    <div class="bg-slate-950 p-4 rounded border border-slate-700">
-                        <strong class="text-amber-400 block mb-2">2. 架構定義 (Architecture)</strong>
-                        <div class="overflow-x-auto">
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="bg-slate-950 p-4 rounded border border-slate-700">
+                            <strong class="text-sky-400 block mb-2">系統驗收狀態</strong>
+                            <ul class="text-sm text-slate-300 space-y-2">
+                                <li><i class="fa-solid fa-check text-emerald-500 mr-2"></i><strong>機架:</strong> Holybro X500 V2 (Quad X)</li>
+                                <li><i class="fa-solid fa-check text-emerald-500 mr-2"></i><strong>感測器:</strong> Accel, Gyro, Mag, Level 校正完成</li>
+                                <li><i class="fa-solid fa-check text-emerald-500 mr-2"></i><strong>動力:</strong> 馬達轉向 (CW/CCW) 驗證通過</li>
+                                <li><i class="fa-regular fa-square text-slate-500 mr-2"></i><strong>遙控:</strong> 待 R81 接收機安裝校正</li>
+                            </ul>
+                        </div>
+                        <div class="bg-slate-950 p-4 rounded border border-slate-700">
+                            <strong class="text-amber-400 block mb-2">決策分析：IO PWM vs DShot</strong>
                             <table class="w-full text-xs text-left text-slate-400">
-                                <thead class="border-b border-slate-800"><tr><th class="pb-1">組件</th><th class="pb-1">連線</th><th class="pb-1">功能定義</th></tr></thead>
+                                <thead><tr><th class="pb-1">特性</th><th class="pb-1 text-emerald-400">IO PWM</th><th class="pb-1 text-slate-500">FMU DShot</th></tr></thead>
                                 <tbody class="divide-y divide-slate-800">
-                                    <tr><td class="py-1">QGC (PC)</td><td>USB</td><td>工廠配置、韌體更新</td></tr>
-                                    <tr><td class="py-1">QGC (PC)</td><td>433MHz</td><td>地面站監控 (Telemetry)</td></tr>
-                                    <tr><td class="py-1">RC</td><td>2.4GHz</td><td>即時姿態控制 (Real-time)</td></tr>
+                                    <tr><td class="py-1">接口</td><td>MAIN Out (F103)</td><td>AUX Out (H7)</td></tr>
+                                    <tr><td class="py-1">安全</td><td class="text-emerald-400">獨立 Failsafe</td><td>依賴主核</td></tr>
+                                    <tr><td class="py-1">雙向</td><td>否 (無 RPM)</td><td>是</td></tr>
                                 </tbody>
                             </table>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Protocol Decision -->
-            <div class="bg-slate-900 p-6 rounded-xl border border-slate-800">
-                <h3 class="text-lg font-bold text-slate-200 mb-4 flex items-center"><i class="fa-solid fa-scale-balanced mr-2 text-purple-400"></i>決策分析：IO PWM vs FMU DShot</h3>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-sm text-left text-slate-300">
-                        <thead class="bg-slate-950 text-xs text-slate-500 uppercase">
-                            <tr><th class="px-4 py-2">特性</th><th class="px-4 py-2 text-emerald-400">IO PWM (目前配置)</th><th class="px-4 py-2 text-slate-400">FMU DShot (進階)</th></tr>
-                        </thead>
-                        <tbody class="divide-y divide-slate-800">
-                            <tr><td class="px-4 py-2 font-bold">硬體接口</td><td>MAIN Out (STM32F103)</td><td>AUX Out (STM32H7)</td></tr>
-                            <tr><td class="px-4 py-2 font-bold">通訊協定</td><td>PWM 400Hz</td><td>DShot300 / 600</td></tr>
-                            <tr><td class="px-4 py-2 font-bold">雙向通訊</td><td>否 (無 RPM)</td><td>是 (支援 Bidirectional)</td></tr>
-                            <tr><td class="px-4 py-2 font-bold">核心優勢</td><td class="text-emerald-400">高安全性 (獨立 Failsafe)</td><td class="text-sky-400">高效能 (低延遲、濾波)</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="mt-4 p-3 bg-slate-950 border-l-4 border-emerald-500 text-xs text-slate-400">
-                    <strong>決策結論：</strong> 考量 X500 V2 定位為穩定載具，維持 <span class="text-emerald-400">IO PWM 400Hz</span> 配置以確保最高系統安全性。RPM 監控暫透過 SERVO_OUTPUT_RAW 推估。
+                <!-- Tab 2: SOP -->
+                <div id="content-logs-sop" class="hidden p-6 md:p-8 animate-fade-in">
+                    <div class="space-y-8">
+                        <div>
+                            <h4 class="text-lg font-bold text-slate-200 mb-3 border-l-4 border-sky-500 pl-3">1. 硬體環境 (Environment)</h4>
+                            <ul class="grid md:grid-cols-2 gap-4 text-sm text-slate-400">
+                                <li class="bg-slate-950 p-3 rounded"><strong>TX:</strong> RadioMaster TX16S (EdgeTX)</li>
+                                <li class="bg-slate-950 p-3 rounded"><strong>RX:</strong> RadioMaster R1 V2 Mini (FrSkyX2/D16)</li>
+                                <li class="bg-slate-950 p-3 rounded"><strong>Battery:</strong> 4S LiPo (Power Module)</li>
+                                <li class="bg-slate-950 p-3 rounded"><strong>GCS:</strong> QGroundControl</li>
+                            </ul>
+                        </div>
+
+                        <div>
+                            <h4 class="text-lg font-bold text-slate-200 mb-3 border-l-4 border-emerald-500 pl-3">2. 感測器校正 (Calibration)</h4>
+                            <div class="bg-slate-950 p-4 rounded text-sm text-slate-300 space-y-2">
+                                <p><strong class="text-emerald-400">加速度計:</strong> 依序放置 6 個面向，靜止直到黃條跑完。驗證 Z 軸 ≈ 9.8 m/s²。</p>
+                                <p><strong class="text-emerald-400">羅盤:</strong> 旋轉機身 6 面。若報錯 "Inconsistent"，需重啟或遠離磁干擾。</p>
+                                <p class="text-xs text-slate-500 italic mt-2">*校正後務必斷電重啟以更新 EKF。</p>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h4 class="text-lg font-bold text-slate-200 mb-3 border-l-4 border-rose-500 pl-3">3. 飛行模式 (Flight Modes)</h4>
+                            <table class="w-full text-sm text-left text-slate-400">
+                                <thead class="bg-slate-950 text-xs uppercase"><tr><th class="p-2">開關</th><th class="p-2">模式</th><th class="p-2">特性</th></tr></thead>
+                                <tbody class="divide-y divide-slate-800">
+                                    <tr><td class="p-2">High</td><td class="text-white font-bold">Stabilized</td><td>自穩 (手動)，室內無 GPS 必用。</td></tr>
+                                    <tr><td class="p-2">Mid</td><td class="text-white font-bold">Position</td><td>定點 (Loiter)，戶外標準模式。</td></tr>
+                                    <tr><td class="p-2">Low</td><td class="text-rose-400 font-bold">Return</td><td>自動返航 (RTL)。</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div>
+                                <h4 class="text-lg font-bold text-slate-200 mb-3 border-l-4 border-amber-500 pl-3">4. 電源設定</h4>
+                                <ul class="text-sm text-slate-400 space-y-1 bg-slate-950 p-3 rounded">
+                                    <li><strong>Cells:</strong> 4S</li>
+                                    <li><strong>Full:</strong> 4.20V (16.8V)</li>
+                                    <li><strong>Empty:</strong> 3.60V (14.4V)</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 class="text-lg font-bold text-slate-200 mb-3 border-l-4 border-violet-500 pl-3">5. 動力驗證 (Props OFF)</h4>
+                                <ul class="text-sm text-slate-400 space-y-1 bg-slate-950 p-3 rounded">
+                                    <li><strong>解鎖:</strong> 左手油門最低 + 方向舵最右。</li>
+                                    <li><strong>M1/M2:</strong> CCW (銀帽)</li>
+                                    <li><strong>M3/M4:</strong> CW (黑帽)</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -586,12 +626,12 @@
             <div class="bg-slate-900 p-6 rounded-xl border border-slate-800 mb-8">
                 <h3 class="text-xl font-bold text-amber-400 mb-4 flex items-center"><i class="fa-solid fa-vr-cardboard mr-2"></i>第 3 層：仿真驗證環境 (SITL)</h3>
                 <div class="grid md:grid-cols-2 gap-6">
-                    <div class="bg-slate-950 p-4 rounded border border-slate-700">
+                    <div class="bg-slate-900 p-4 rounded border border-slate-700">
                         <strong class="text-white block mb-2">Gazebo Ignition (推薦)</strong>
                         <p class="text-xs text-slate-400 mb-2">高保真物理引擎，支援 ROS 2 整合。</p>
                         <code class="block bg-slate-900 p-2 rounded text-emerald-400 text-xs">make px4_sitl_default gazebo</code>
                     </div>
-                    <div class="bg-slate-950 p-4 rounded border border-slate-700">
+                    <div class="bg-slate-900 p-4 rounded border border-slate-700">
                         <strong class="text-white block mb-2">jMAVSim</strong>
                         <p class="text-xs text-slate-400 mb-2">輕量級，適合快速測試演算法。</p>
                         <code class="block bg-slate-900 p-2 rounded text-sky-400 text-xs">make px4_sitl_default jmavsim</code>
@@ -630,7 +670,7 @@
                                 </li>
                             </ul>
                         </div>
-                        <div class="bg-slate-950 p-4 rounded border border-slate-700">
+                        <div class="bg-slate-900 p-4 rounded border border-slate-700">
                             <strong class="text-sky-400 text-xs block mb-2">安裝與編譯 (Ubuntu 22.04+):</strong>
                             <code class="text-xs text-slate-400 block whitespace-pre">git clone https://github.com/PX4/PX4-Autopilot.git
 bash Tools/setup/ubuntu.sh
@@ -655,7 +695,7 @@ make px4_fmu-v6c_default</code>
                                 </li>
                             </ul>
                         </div>
-                        <div class="bg-slate-950 p-4 rounded border border-slate-700">
+                        <div class="bg-slate-900 p-4 rounded border border-slate-700">
                             <strong class="text-rose-400 text-xs block mb-2">安裝與編譯 (Ubuntu 22.04+):</strong>
                             <code class="text-xs text-slate-400 block whitespace-pre">git clone https://github.com/ArduPilot/ardupilot.git
 Tools/environment_install/install-prereqs-ubuntu.sh -y
@@ -766,10 +806,10 @@ void setup() {
         <section id="section-resources" class="mb-16 hidden animate-section relative">
             <i class="fa-regular fa-bookmark bookmark-badge" data-bookmark="section-resources"></i>
             <header class="mb-8 border-b border-slate-800 pb-4">
-                <h2 class="text-3xl font-bold text-slate-100 mb-2">資源與成本估算 (Resources & Cost)</h2>
+                <h2 class="text-3xl font-bold text-slate-100 mb-2">資源與術語 (Resources & Glossary)</h2>
             </header>
             
-            <!-- Battery Spec (NEW) -->
+            <!-- Battery Spec -->
             <div class="bg-slate-900 p-6 rounded-xl border border-slate-800 mb-8">
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="text-lg font-bold text-rose-400"><i class="fa-solid fa-car-battery mr-2"></i>4S LiPo 電池技術規範</h3>
@@ -805,6 +845,51 @@ void setup() {
                     </div>
                     <div class="bg-slate-800 p-3 rounded text-slate-300 border-l-4 border-rose-500">
                         <strong>BMS 邏輯:</strong> 警報 (Alarm) 設為 3.5V/cell，強制切斷 (Cut-off) 設為 3.2V/cell。
+                    </div>
+                </div>
+            </div>
+
+            <!-- Engineering Glossary (NEW) -->
+            <div class="bg-slate-900 p-6 rounded-xl border border-slate-800 mb-8">
+                <h3 class="text-lg font-bold text-violet-400 mb-4"><i class="fa-solid fa-book-atlas mr-2"></i>工程術語手冊 (Engineering Glossary)</h3>
+                
+                <div class="space-y-6">
+                    <!-- Controls -->
+                    <div>
+                        <h4 class="text-sm font-bold text-slate-300 border-l-4 border-sky-500 pl-2 mb-2">1. 飛行控制 (Controls)</h4>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-xs text-left text-slate-400">
+                                <thead class="bg-slate-950 uppercase"><tr><th class="p-2">術語 (代號)</th><th class="p-2">定義</th><th class="p-2">功能</th></tr></thead>
+                                <tbody class="divide-y divide-slate-800">
+                                    <tr><td class="p-2 font-bold text-white">Throttle (THR)</td><td>油門</td><td>控制高度 (Multicopter) 或速度 (Fixed-wing)。</td></tr>
+                                    <tr><td class="p-2 font-bold text-white">Yaw (RUD)</td><td>偏航</td><td>機頭左右轉向 (自轉)。</td></tr>
+                                    <tr><td class="p-2 font-bold text-white">Pitch (ELE)</td><td>俯仰</td><td>機頭上下傾斜 (前進/後退)。</td></tr>
+                                    <tr><td class="p-2 font-bold text-white">Roll (AIL)</td><td>橫滾</td><td>機身左右傾斜 (平移)。</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- QGC Config -->
+                    <div>
+                        <h4 class="text-sm font-bold text-slate-300 border-l-4 border-emerald-500 pl-2 mb-2">2. QGC 設定 (Configuration)</h4>
+                        <div class="grid grid-cols-2 gap-4 text-xs text-slate-400">
+                            <div class="bg-slate-950 p-2 rounded"><strong>Airframe:</strong> 機架選擇 (Quadrotor X, Hexacopter)。</div>
+                            <div class="bg-slate-950 p-2 rounded"><strong>Sensors:</strong> 感測器校正 (Accel, Gyro, Mag, Level)。</div>
+                            <div class="bg-slate-950 p-2 rounded"><strong>Radio:</strong> 遙控器通道映射與校正。</div>
+                            <div class="bg-slate-950 p-2 rounded"><strong>Actuators:</strong> 馬達輸出與轉向設定 (PX4 v1.14+)。</div>
+                        </div>
+                    </div>
+
+                    <!-- Flight Modes -->
+                    <div>
+                        <h4 class="text-sm font-bold text-slate-300 border-l-4 border-amber-500 pl-2 mb-2">3. 飛行模式 (Flight Modes)</h4>
+                        <ul class="text-xs text-slate-400 space-y-1">
+                            <li><span class="text-white font-bold w-20 inline-block">Stabilized:</span> 自穩模式。純手動，無 GPS，僅維持水平。</li>
+                            <li><span class="text-white font-bold w-20 inline-block">Position:</span> 定點模式。GPS 輔助懸停 (Loiter)。</li>
+                            <li><span class="text-white font-bold w-20 inline-block">RTL:</span> 返航模式 (Return To Launch)。</li>
+                            <li><span class="text-white font-bold w-20 inline-block">Offboard:</span> 外部控制。由 Companion Computer (ROS 2) 控制。</li>
+                        </ul>
                     </div>
                 </div>
             </div>
@@ -850,7 +935,7 @@ void setup() {
         const searchData = [
             { title: '技術路線圖', section: 'section-roadmap', keywords: ['roadmap', 'imx', 'rt1176', 'pab', 'rtk'] },
             { title: 'X500 硬體拆解', section: 'section-teardown', keywords: ['x500', 'teardown', 'pixhawk', '6c'] },
-            { title: '專案實作日誌', section: 'section-logs', keywords: ['log', 'build', 'config', 'qgc', 'calibration'] },
+            { title: '專案實作日誌', section: 'section-logs', keywords: ['log', 'build', 'config', 'qgc', 'calibration', 'sop'] },
             { title: 'MCU 架構詳解', section: 'section-mcu', keywords: ['mcu', 'stm32', 'h7', 'f103', 'io'] },
             { title: '自製硬體指南', section: 'section-design', keywords: ['design', 'diy', 'pinout'] },
             { title: 'Pixhawk 6X/6C', section: 'section-pixhawk', keywords: ['pixhawk', '6x', '6c'] },
@@ -863,7 +948,7 @@ void setup() {
             { title: '軟體棧 (PX4/ArduPilot)', section: 'section-software', keywords: ['software', 'stack', 'px4', 'ardupilot', 'uorb'] },
             { title: 'AIoT 與 ROS 2', section: 'section-aiot', keywords: ['aiot', 'ros2', 'esp32', 'micro-ros', 'humble'] },
             { title: '故障診斷', section: 'section-maint', keywords: ['debug', 'troubleshooting', 'ubuntu', 'sitl', 'accel', 'motor'] },
-            { title: '資源與成本', section: 'section-resources', keywords: ['cost', 'bom', 'price', 'community', 'battery', 'lipo'] }
+            { title: '資源與術語', section: 'section-resources', keywords: ['cost', 'bom', 'price', 'community', 'battery', 'lipo', 'glossary', 'throttle', 'yaw', 'pitch', 'roll'] }
         ];
 
         // ==================== 初始化 ====================
@@ -924,13 +1009,21 @@ void setup() {
             document.getElementById('tab-ardupilot').className = id === 'ardupilot' ? 'flex-1 py-4 font-bold text-rose-400 bg-slate-900 transition' : 'flex-1 py-4 font-bold text-slate-500 bg-slate-950 transition';
         }
 
-        // ==================== 設計指南切換 ====================
+        // ==================== 設計指南與日誌切換 (更新) ====================
         function showDesignTab(tabId) {
             document.getElementById('content-modules').classList.add('hidden');
             document.getElementById('content-pinout').classList.add('hidden');
             document.getElementById(`content-${tabId}`).classList.remove('hidden');
             document.getElementById('tab-modules').className = tabId === 'modules' ? "px-6 py-4 text-sm font-bold text-pink-400 bg-slate-900 border-r border-slate-800 transition whitespace-nowrap" : "px-6 py-4 text-sm font-bold text-slate-500 bg-slate-950 transition whitespace-nowrap";
             document.getElementById('tab-pinout').className = tabId === 'pinout' ? "px-6 py-4 text-sm font-bold text-pink-400 bg-slate-900 border-l border-slate-800 transition whitespace-nowrap" : "px-6 py-4 text-sm font-bold text-slate-500 bg-slate-950 transition whitespace-nowrap";
+        }
+
+        function switchLogsTab(tabId) {
+            document.getElementById('content-logs-status').classList.add('hidden');
+            document.getElementById('content-logs-sop').classList.add('hidden');
+            document.getElementById(`content-logs-${tabId}`).classList.remove('hidden');
+            document.getElementById('tab-log-status').className = tabId === 'status' ? "px-6 py-4 text-sm font-bold text-amber-400 bg-slate-900 border-r border-slate-800 transition whitespace-nowrap" : "px-6 py-4 text-sm font-bold text-slate-500 bg-slate-950 transition whitespace-nowrap";
+            document.getElementById('tab-log-sop').className = tabId === 'sop' ? "px-6 py-4 text-sm font-bold text-amber-400 bg-slate-900 border-l border-slate-800 transition whitespace-nowrap" : "px-6 py-4 text-sm font-bold text-slate-500 bg-slate-950 transition whitespace-nowrap";
         }
 
         // ==================== 故障診斷 (更新) ====================

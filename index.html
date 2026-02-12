@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UAS R&D Hub (繁體中文工程版)</title>
+    <title>UAS R&D Hub (繁體中文工程版 V2.5)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
@@ -12,99 +12,101 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=JetBrains+Mono:wght@400;700&display=swap');
         
-        body {
-            font-family: 'Noto Sans TC', sans-serif;
-            background-color: #020617;
-            color: #cbd5e1;
+        body { 
+            font-family: 'Noto Sans TC', sans-serif; 
+            background-color: #020617; 
+            color: #cbd5e1; 
         }
-
         .mono-font { font-family: 'JetBrains Mono', monospace; }
-
+        
         /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: #0f172a; }
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #475569; }
 
-        /* ==================== 功能樣式 ==================== */
-        
-        #reading-progress { position: fixed; top: 0; left: 0; height: 3px; background: linear-gradient(90deg, #38bdf8, #10b981); z-index: 9999; transition: width 0.2s ease; width: 0%; }
-
-        #back-to-top { position: fixed; bottom: 2rem; right: 2rem; width: 3rem; height: 3rem; background: #0ea5e9; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; opacity: 0; transform: translateY(100px); transition: all 0.3s ease; z-index: 1000; box-shadow: 0 4px 12px rgba(14, 165, 233, 0.4); }
+        /* UI Components */
+        #reading-progress { 
+            position: fixed; top: 0; left: 0; height: 3px; 
+            background: linear-gradient(90deg, #38bdf8, #10b981); 
+            z-index: 9999; transition: width 0.2s ease; width: 0%; 
+        }
+        #back-to-top { 
+            position: fixed; bottom: 2rem; right: 2rem; width: 3rem; height: 3rem; 
+            background: #0ea5e9; color: white; border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center; 
+            cursor: pointer; opacity: 0; transform: translateY(100px); 
+            transition: all 0.3s ease; z-index: 1000; box-shadow: 0 4px 12px rgba(14, 165, 233, 0.4); 
+        }
         #back-to-top.visible { opacity: 1; transform: translateY(0); }
-        #back-to-top.visible:hover { background: #0284c7; transform: translateY(-4px); }
+        #back-to-top:hover { background: #0284c7; transform: translateY(-4px); }
 
         .search-container { position: relative; }
-        .search-results { position: absolute; top: 100%; left: 0; right: 0; background: #1e293b; border: 1px solid #334155; border-radius: 0.5rem; margin-top: 0.5rem; max-height: 400px; overflow-y: auto; z-index: 50; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5); }
+        .search-results { 
+            position: absolute; top: 100%; left: 0; right: 0; 
+            background: #1e293b; border: 1px solid #334155; border-radius: 0.5rem; 
+            margin-top: 0.5rem; max-height: 400px; overflow-y: auto; z-index: 50; 
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5); 
+        }
         .search-result-item { padding: 0.75rem 1rem; border-bottom: 1px solid #334155; cursor: pointer; transition: all 0.2s; }
         .search-result-item:hover { background: #334155; padding-left: 1.5rem; }
-        .search-highlight { background: rgba(56, 189, 248, 0.3); padding: 2px 4px; border-radius: 2px; }
 
-        .bookmark-badge { position: absolute; top: 1rem; right: 1rem; cursor: pointer; font-size: 1.5rem; color: #64748b; transition: all 0.2s; z-index: 10; }
-        .bookmark-badge:hover { color: #fbbf24; transform: scale(1.2); }
+        .bookmark-badge { 
+            position: absolute; top: 1rem; right: 1rem; cursor: pointer; 
+            font-size: 1.5rem; color: #64748b; transition: all 0.2s; z-index: 10; 
+        }
         .bookmark-badge.bookmarked { color: #fbbf24; }
 
+        .nav-item.active { background-color: rgba(14, 165, 233, 0.15); color: #38bdf8; border-left: 3px solid #38bdf8; }
+        
+        .interactive-card, .port-connector, .topo-block, .tool-card { 
+            transition: all 0.2s ease; cursor: pointer; border: 1px solid #334155; min-height: 44px; 
+        }
+        .interactive-card:hover, .port-connector:hover, .topo-block:hover, .tool-card:hover { 
+            transform: translateY(-2px); box-shadow: 0 0 15px rgba(56, 189, 248, 0.15); 
+            border-color: #38bdf8; background-color: rgba(30, 41, 59, 0.8); 
+        }
+
+        .voltage-tag { padding: 2px 6px; border-radius: 4px; font-size: 0.65rem; font-weight: bold; margin-right: 4px; display: inline-block;}
+        .v-5 { background: rgba(244, 63, 94, 0.15); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.3); }
+        .v-33 { background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); }
+        
+        .source-badge { display: inline-flex; align-items: center; padding: 0.125rem 0.5rem; border-radius: 9999px; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+        .badge-datasheet { background-color: rgba(168, 85, 247, 0.1); border: 1px solid rgba(168, 85, 247, 0.3); color: #c084fc; }
+        .badge-procurement { background-color: rgba(236, 72, 153, 0.1); border: 1px solid rgba(236, 72, 153, 0.3); color: #f472b6; }
+        .badge-protocol { background-color: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); color: #60a5fa; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-in { animation: fadeIn 0.3s ease; }
+
+        /* Topology Diagram Styles */
+        .topo-container { display: flex; flex-direction: column; gap: 1rem; }
+        .topo-box { flex: 1; background: #0f172a; border: 1px solid #334155; padding: 1rem; border-radius: 0.5rem; position: relative; }
+        .border-l-accent { border-left: 3px solid; }
+
+        .foc-step { position: relative; }
+        .foc-step::after { content: '➜'; position: absolute; right: -20px; top: 50%; transform: translateY(-50%); color: #475569; font-size: 1.2rem; }
+        .foc-step:last-child::after { display: none; }
+        @media (max-width: 768px) { .foc-step::after { right: 50%; top: auto; bottom: -25px; transform: translateX(50%) rotate(90deg); } }
+        
+        .pin-table th { text-align: left; padding: 0.5rem; color: #94a3b8; font-size: 0.7rem; text-transform: uppercase; border-bottom: 1px solid #334155; }
+        .pin-table td { padding: 0.5rem; border-bottom: 1px solid #1e293b; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: #cbd5e1; }
+        .chart-container { position: relative; width: 100%; height: 300px; max-height: 400px; }
+
+        /* Theme Toggle */
         .theme-toggle { width: 3rem; height: 1.5rem; background: #334155; border-radius: 9999px; position: relative; cursor: pointer; transition: background 0.3s; }
         .theme-toggle.active { background: #0ea5e9; }
         .theme-toggle-slider { position: absolute; top: 2px; left: 2px; width: 1.25rem; height: 1.25rem; background: white; border-radius: 50%; transition: transform 0.3s; }
         .theme-toggle.active .theme-toggle-slider { transform: translateX(1.5rem); }
 
+        /* Tour Overlay */
         .tour-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.7); z-index: 9998; display: none; }
         .tour-overlay.active { display: block; }
         .tour-tooltip { position: fixed; background: #1e293b; border: 2px solid #38bdf8; border-radius: 8px; padding: 1.5rem; max-width: 350px; z-index: 10000; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5); }
         .tour-btn { padding: 0.5rem 1rem; border-radius: 0.375rem; font-size: 0.875rem; font-weight: 600; cursor: pointer; transition: all 0.2s; border: none; }
         .tour-btn-primary { background: #0ea5e9; color: white; }
         .tour-btn-secondary { background: #334155; color: #cbd5e1; }
-
-        /* ==================== 組件樣式 ==================== */
-        .chart-container { position: relative; width: 100%; height: 300px; max-height: 400px; }
-        .nav-item.active { background-color: rgba(14, 165, 233, 0.15); color: #38bdf8; border-left: 3px solid #38bdf8; }
-        
-        .interactive-card, .port-connector, .topo-block, .tool-card { transition: all 0.2s ease; cursor: pointer; border: 1px solid #334155; min-height: 44px; }
-        .interactive-card:hover, .port-connector:hover, .topo-block:hover, .tool-card:hover { transform: translateY(-2px); box-shadow: 0 0 15px rgba(56, 189, 248, 0.15); border-color: #38bdf8; background-color: rgba(30, 41, 59, 0.8); }
-
-        .hw-block { border: 1px solid #334155; transition: all 0.2s ease; }
-        .hw-block:hover { border-color: #38bdf8; box-shadow: 0 0 20px rgba(56, 189, 248, 0.1); transform: translateY(-2px); }
-
-        .pin-table th { text-align: left; padding: 0.5rem; color: #94a3b8; font-size: 0.7rem; text-transform: uppercase; border-bottom: 1px solid #334155; }
-        .pin-table td { padding: 0.5rem; border-bottom: 1px solid #1e293b; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: #cbd5e1; }
-        
-        .voltage-tag { padding: 2px 6px; border-radius: 4px; font-size: 0.65rem; font-weight: bold; margin-right: 4px; display: inline-block;}
-        .v-5 { background: rgba(244, 63, 94, 0.15); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.3); }
-        .v-33 { background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); }
-        .v-gnd { background: rgba(148, 163, 184, 0.15); color: #94a3b8; border: 1px solid rgba(148, 163, 184, 0.3); }
-
-        .bit-box { transition: all 0.2s; }
-        .bit-box:hover { transform: scale(1.15); z-index: 10; box-shadow: 0 0 10px currentColor; }
-
-        .roadmap-item { position: relative; padding-left: 2rem; padding-bottom: 2rem; border-left: 2px solid #334155; }
-        .roadmap-item:last-child { border-left: 2px solid transparent; }
-        .roadmap-dot { position: absolute; left: -0.55rem; top: 0; width: 1rem; height: 1rem; border-radius: 50%; background-color: #0f172a; border: 2px solid #38bdf8; }
-
-        .foc-step { position: relative; }
-        .foc-step::after { content: '➜'; position: absolute; right: -20px; top: 50%; transform: translateY(-50%); color: #475569; font-size: 1.2rem; }
-        .foc-step:last-child::after { display: none; }
-        @media (max-width: 768px) { .foc-step::after { right: 50%; top: auto; bottom: -25px; transform: translateX(50%) rotate(90deg); } }
-
-        .source-badge { display: inline-flex; align-items: center; padding: 0.125rem 0.5rem; border-radius: 9999px; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
-        .badge-holybro { background-color: rgba(234, 88, 12, 0.1); border: 1px solid rgba(234, 88, 12, 0.3); color: #fb923c; }
-        .badge-teardown { background-color: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); color: #34d399; }
-        .badge-standard { background-color: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); color: #60a5fa; }
-        .badge-datasheet { background-color: rgba(168, 85, 247, 0.1); border: 1px solid rgba(168, 85, 247, 0.3); color: #c084fc; }
-        .badge-design { background-color: rgba(236, 72, 153, 0.1); border: 1px solid rgba(236, 72, 153, 0.3); color: #f472b6; }
-        .badge-software { background-color: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.3); color: #818cf8; }
-        .badge-aiot { background-color: rgba(139, 92, 246, 0.1); border: 1px solid rgba(139, 92, 246, 0.3); color: #a78bfa; }
-        .badge-log { background-color: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); color: #fbbf24; }
-
-        .chip-pkg { position: relative; background: #1e293b; border: 2px solid #475569; border-radius: 4px; }
-        .chip-pin { width: 6px; height: 2px; background: #64748b; position: absolute; }
-        
-        .io-flow-container { position: relative; display: flex; align-items: center; justify-content: space-between; font-size: 0.75rem; }
-        .io-box { padding: 0.5rem; border-radius: 4px; border: 1px solid #475569; background: #1e293b; text-align: center; font-weight: bold; width: 22%; }
-        .io-arrow { color: #64748b; font-size: 1rem; }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        .animate-fade-in { animation: fadeIn 0.3s ease; }
+        .tour-highlight { position: relative; z-index: 9999 !important; box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.5); background-color: #1e293b; border-radius: 0.5rem; }
     </style>
 </head>
 <body class="flex flex-col md:flex-row min-h-screen">
@@ -120,17 +122,14 @@
     </div>
 
     <!-- Sidebar -->
-    <nav id="sidebar" class="hidden md:flex flex-col w-64 bg-slate-900 border-r border-slate-800 h-screen sticky top-0 z-40 overflow-y-auto">
+    <nav id="sidebar" class="hidden md:flex flex-col w-64 bg-slate-900 border-r border-slate-800 h-screen sticky top-0 z-40 overflow-y-auto" data-tour="sidebar">
         <div class="p-6 border-b border-slate-800">
             <h1 class="text-xl font-bold text-slate-100 tracking-tight mono-font">UAS<span class="text-sky-500">_Dev</span></h1>
-            <p class="text-xs text-slate-500 mt-1">繁體中文工程版 (TC Edition)</p>
+            <p class="text-xs text-slate-500 mt-1">繁體中文工程版 V2.5</p>
         </div>
 
-        <div class="p-4 border-b border-slate-800 search-container">
-            <div class="relative">
-                <input type="text" id="search-input" placeholder="搜尋技術文件..." class="w-full bg-slate-800 border border-slate-700 rounded px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-sky-500 transition">
-                <i class="fa-solid fa-search absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm"></i>
-            </div>
+        <div class="p-4 border-b border-slate-800 search-container" data-tour="search">
+            <input type="text" id="search-input" placeholder="搜尋 (Ctrl+K)..." class="w-full bg-slate-800 border border-slate-700 rounded px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-sky-500 transition">
             <div id="search-results" class="search-results hidden"></div>
         </div>
 
@@ -139,95 +138,137 @@
             <div class="theme-toggle active" id="theme-toggle"><div class="theme-toggle-slider"></div></div>
         </div>
 
-        <div class="px-4 py-3 border-b border-slate-800">
+        <div class="px-4 py-3 border-b border-slate-800" data-tour="bookmarks">
             <div class="flex items-center justify-between mb-2">
-                <span class="text-xs font-bold text-slate-500 uppercase">我的書籤</span>
+                <span class="text-xs font-bold text-slate-500 uppercase">書籤</span>
                 <span id="bookmark-count" class="text-xs text-sky-400">0</span>
             </div>
             <div id="bookmark-list" class="space-y-1 text-xs"></div>
         </div>
 
         <div class="flex-1 py-4 space-y-1">
+            
             <!-- Strategic -->
             <div class="px-4 py-2 text-xs font-bold text-slate-600 uppercase tracking-wider">戰略規劃 (Strategic)</div>
-            <a href="#" data-section="section-roadmap" class="nav-item block px-6 py-3 text-sm font-medium text-orange-400 hover:bg-slate-800 hover:text-orange-200 border-l-4 border-transparent transition-colors active bg-orange-900/10"><i class="fa-solid fa-chess-knight mr-2 w-4"></i>技術路線圖 (Roadmap)</a>
-            <a href="#" data-section="section-teardown" class="nav-item block px-6 py-3 text-sm font-medium text-emerald-400 hover:bg-slate-800 hover:text-emerald-200 border-l-4 border-transparent transition-colors"><i class="fa-solid fa-box-open mr-2 w-4"></i>X500 硬體拆解 (Ref)</a>
-            <a href="#" data-section="section-logs" class="nav-item block px-6 py-3 text-sm font-medium text-amber-400 hover:bg-slate-800 hover:text-amber-200 border-l-4 border-transparent transition-colors"><i class="fa-solid fa-clipboard-list mr-2 w-4"></i>專案實作日誌 (Logs)</a>
+            <a href="#" data-section="section-roadmap" class="nav-item block px-6 py-3 text-sm font-medium text-orange-400 hover:bg-slate-800 hover:text-orange-200 border-l-4 border-transparent transition-colors active bg-orange-900/10">
+                <i class="fa-solid fa-chess-knight mr-2 w-4"></i>技術路線圖 (Roadmap)
+            </a>
+            <a href="#" data-section="section-teardown" class="nav-item block px-6 py-3 text-sm font-medium text-emerald-400 hover:bg-slate-800 hover:text-emerald-200 border-l-4 border-transparent transition-colors">
+                <i class="fa-solid fa-box-open mr-2 w-4"></i>X500 硬體拆解 (Ref)
+            </a>
+            <a href="#" data-section="section-build-aiot" class="nav-item block px-6 py-3 text-sm font-medium text-pink-400 hover:bg-slate-800 hover:text-pink-200 border-l-4 border-transparent transition-colors">
+                <i class="fa-solid fa-cart-shopping mr-2 w-4"></i>X500 AIoT 建置 (Build)
+            </a>
+            <a href="#" data-section="section-logs" class="nav-item block px-6 py-3 text-sm font-medium text-amber-400 hover:bg-slate-800 hover:text-amber-200 border-l-4 border-transparent transition-colors">
+                <i class="fa-solid fa-clipboard-list mr-2 w-4"></i>專案實作日誌 (SOP)
+            </a>
 
-            <!-- Hardware Deep Dive -->
+            <!-- Hardware -->
             <div class="px-4 py-2 mt-4 text-xs font-bold text-slate-600 uppercase tracking-wider">硬體工程 (Hardware)</div>
-            <a href="#" data-section="section-mcu" class="nav-item block px-6 py-3 text-sm font-medium text-purple-400 hover:bg-slate-800 hover:text-purple-200 border-l-4 border-transparent transition-colors"><i class="fa-solid fa-microchip mr-2 w-4"></i>MCU 架構詳解 (Chips)</a>
-            <a href="#" data-section="section-design" class="nav-item block px-6 py-3 text-sm font-medium text-pink-400 hover:bg-slate-800 hover:text-pink-200 border-l-4 border-transparent transition-colors"><i class="fa-solid fa-compass-drafting mr-2 w-4"></i>自製硬體指南 (Design)</a>
-            <a href="#" data-section="section-pixhawk" class="nav-item block px-6 py-3 text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-slate-200 border-l-4 border-transparent transition-colors"><i class="fa-solid fa-server mr-2 w-4"></i>Pixhawk 6X vs 6C</a>
-            <a href="#" data-section="section-bldc" class="nav-item block px-6 py-3 text-sm font-medium text-sky-400 hover:bg-slate-800 hover:text-sky-200 border-l-4 border-transparent transition-colors"><i class="fa-solid fa-bolt mr-2 w-4"></i>BLDC 馬達實驗室 (Full)</a>
-            <a href="#" data-section="section-hardware" class="nav-item block px-6 py-3 text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-slate-200 border-l-4 border-transparent transition-colors"><i class="fa-solid fa-dna mr-2 w-4"></i>硬體解剖 (Anatomy)</a>
+            <a href="#" data-section="section-mcu" class="nav-item block px-6 py-3 text-sm font-medium text-purple-400 hover:bg-slate-800 hover:text-purple-200 border-l-4 border-transparent transition-colors">
+                <i class="fa-solid fa-brain mr-2 w-4"></i>MCU 架構詳解 (Chips)
+            </a>
+            <a href="#" data-section="section-hardware" class="nav-item block px-6 py-3 text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-slate-200 border-l-4 border-transparent transition-colors">
+                <i class="fa-solid fa-dna mr-2 w-4"></i>硬體解剖 (Anatomy)
+            </a>
+            <a href="#" data-section="section-pixhawk" class="nav-item block px-6 py-3 text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-slate-200 border-l-4 border-transparent transition-colors">
+                <i class="fa-solid fa-server mr-2 w-4"></i>Pixhawk 6X vs 6C
+            </a>
+            <a href="#" data-section="section-design" class="nav-item block px-6 py-3 text-sm font-medium text-pink-400 hover:bg-slate-800 hover:text-pink-200 border-l-4 border-transparent transition-colors">
+                <i class="fa-solid fa-compass-drafting mr-2 w-4"></i>自製載板指南 (Design)
+            </a>
+            <a href="#" data-section="section-bldc" class="nav-item block px-6 py-3 text-sm font-medium text-sky-400 hover:bg-slate-800 hover:text-sky-200 border-l-4 border-transparent transition-colors">
+                <i class="fa-solid fa-bolt mr-2 w-4"></i>BLDC 馬達實驗室 (Full)
+            </a>
             
-            <!-- System & Logic -->
+            <!-- Logic -->
             <div class="px-4 py-2 mt-4 text-xs font-bold text-slate-600 uppercase tracking-wider">控制與邏輯 (Logic)</div>
-            <a href="#" data-section="section-intro" class="nav-item block px-6 py-3 text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-slate-200 border-l-4 border-transparent transition-colors"><i class="fa-solid fa-chart-pie mr-2 w-4"></i>系統概觀 (Physics)</a>
-            <a href="#" data-section="section-protocols" class="nav-item block px-6 py-3 text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-slate-200 border-l-4 border-transparent transition-colors"><i class="fa-solid fa-wave-square mr-2 w-4"></i>DShot 通訊時序</a>
-            <a href="#" data-section="section-pid" class="nav-item block px-6 py-3 text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-slate-200 border-l-4 border-transparent transition-colors"><i class="fa-solid fa-arrow-trend-up mr-2 w-4"></i>PID 控制理論</a>
+            <a href="#" data-section="section-intro" class="nav-item block px-6 py-3 text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-slate-200 border-l-4 border-transparent transition-colors">
+                <i class="fa-solid fa-chart-pie mr-2 w-4"></i>系統概觀 (Physics)
+            </a>
+            <a href="#" data-section="section-protocols" class="nav-item block px-6 py-3 text-sm font-medium text-blue-400 hover:bg-slate-800 hover:text-blue-200 border-l-4 border-transparent transition-colors">
+                <i class="fa-solid fa-wave-square mr-2 w-4"></i>通訊協定 (PWM/DShot)
+            </a>
+            <a href="#" data-section="section-pid" class="nav-item block px-6 py-3 text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-slate-200 border-l-4 border-transparent transition-colors">
+                <i class="fa-solid fa-arrow-trend-up mr-2 w-4"></i>PID 控制理論
+            </a>
             
-            <!-- Ops & Soft -->
+            <!-- Soft & Ops -->
             <div class="px-4 py-2 mt-4 text-xs font-bold text-slate-600 uppercase tracking-wider">軟體與營運 (Soft & Ops)</div>
-            <a href="#" data-section="section-devenv" class="nav-item block px-6 py-3 text-sm font-medium text-indigo-400 hover:bg-slate-800 hover:text-indigo-200 border-l-4 border-transparent transition-colors"><i class="fa-solid fa-laptop-code mr-2 w-4"></i>開發環境 (Dev Env)</a>
-            <a href="#" data-section="section-software" class="nav-item block px-6 py-3 text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-slate-200 border-l-4 border-transparent transition-colors"><i class="fa-brands fa-git-alt mr-2 w-4"></i>軟體棧 (Stack)</a>
-            <a href="#" data-section="section-aiot" class="nav-item block px-6 py-3 text-sm font-medium text-violet-400 hover:bg-slate-800 hover:text-violet-200 border-l-4 border-transparent transition-colors"><i class="fa-solid fa-network-wired mr-2 w-4"></i>AIoT 與 ROS 2</a>
-            <a href="#" data-section="section-maint" class="nav-item block px-6 py-3 text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-slate-200 border-l-4 border-transparent transition-colors"><i class="fa-solid fa-wrench mr-2 w-4"></i>故障診斷 (Debug)</a>
-            <a href="#" data-section="section-resources" class="nav-item block px-6 py-3 text-sm font-medium text-teal-400 hover:bg-slate-800 hover:text-teal-200 border-l-4 border-transparent transition-colors"><i class="fa-solid fa-coins mr-2 w-4"></i>資源與術語 (Resources)</a>
+            <a href="#" data-section="section-devenv" class="nav-item block px-6 py-3 text-sm font-medium text-indigo-400 hover:bg-slate-800 hover:text-indigo-200 border-l-4 border-transparent transition-colors">
+                <i class="fa-solid fa-laptop-code mr-2 w-4"></i>開發環境 (Dev Env)
+            </a>
+            <a href="#" data-section="section-software" class="nav-item block px-6 py-3 text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-slate-200 border-l-4 border-transparent transition-colors">
+                <i class="fa-brands fa-git-alt mr-2 w-4"></i>軟體棧 (Stack)
+            </a>
+            <a href="#" data-section="section-aiot" class="nav-item block px-6 py-3 text-sm font-medium text-violet-400 hover:bg-slate-800 hover:text-violet-200 border-l-4 border-transparent transition-colors">
+                <i class="fa-solid fa-network-wired mr-2 w-4"></i>AIoT 與 ROS 2
+            </a>
+            <a href="#" data-section="section-maint" class="nav-item block px-6 py-3 text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-slate-200 border-l-4 border-transparent transition-colors">
+                <i class="fa-solid fa-wrench mr-2 w-4"></i>故障診斷 (Debug)
+            </a>
+            <!-- 恢復資源與術語到最下方 -->
+            <a href="#" data-section="section-resources" class="nav-item block px-6 py-3 text-sm font-medium text-teal-400 hover:bg-slate-800 hover:text-teal-200 border-l-4 border-transparent transition-colors">
+                <i class="fa-solid fa-book-atlas mr-2 w-4"></i>資源與術語 (Resources)
+            </a>
         </div>
 
         <div class="p-4 border-t border-slate-800">
-            <button onclick="startTour()" class="w-full bg-sky-600 hover:bg-sky-500 text-white py-2 rounded text-sm font-bold transition"><i class="fa-solid fa-route mr-2"></i>開始導覽</button>
+            <button onclick="startTour()" class="w-full bg-sky-600 hover:bg-sky-500 text-white py-2 rounded text-sm font-bold transition">
+                <i class="fa-solid fa-route mr-2"></i>開始導覽
+            </button>
         </div>
-        <div class="p-4 bg-slate-950 border-t border-slate-800 text-xs text-slate-500">Engineer: Marlon</div>
+        <div class="p-4 bg-slate-950 border-t border-slate-800 text-xs text-slate-500">Engineer: Marlon | V2.5 Full Restore</div>
     </nav>
 
     <!-- Main Content -->
     <main class="flex-1 p-4 md:p-10 overflow-x-hidden">
 
-        <!-- 1. Roadmap -->
+        <!-- ==================== 1. Roadmap ==================== -->
         <section id="section-roadmap" class="mb-16 animate-section relative">
             <i class="fa-regular fa-bookmark bookmark-badge" data-bookmark="section-roadmap"></i>
             <header class="mb-8 border-b border-slate-800 pb-4">
                 <h2 class="text-3xl font-bold text-slate-100 mb-2">技術前瞻 (Tech Roadmap)</h2>
                 <div class="flex items-center gap-2 text-slate-400 text-sm">
-                    <span class="source-badge badge-holybro">官方來源</span><span>Holybro CTO @ PX4 Summit</span>
+                    <span class="source-badge badge-holybro">Official</span>
+                    <span>Holybro CTO @ PX4 Summit</span>
                 </div>
             </header>
             <div class="grid lg:grid-cols-2 gap-8">
                 <div class="bg-slate-950 p-6 rounded-xl border border-slate-800">
-                    <h3 class="text-lg font-bold text-slate-200 mb-6 flex items-center"><i class="fa-solid fa-timeline mr-2 text-orange-500"></i>次世代航電架構</h3>
+                    <h3 class="text-lg font-bold text-slate-200 mb-6 flex items-center">
+                        <i class="fa-solid fa-timeline mr-2 text-orange-500"></i>次世代架構
+                    </h3>
                     <div class="pl-2 space-y-6 border-l-2 border-slate-800 ml-2">
                         <div class="roadmap-item">
                             <div class="roadmap-dot border-orange-500"></div>
                             <h4 class="text-base font-bold text-orange-400">FMURT7 (i.MX RT1176)</h4>
-                            <p class="text-sm text-slate-400 mt-1">1GHz 雙核心 (Cortex-M7/M4)。突破 STM32 的效能瓶頸,原生支援乙太網 (Ethernet),適合邊緣 AI 計算。</p>
+                            <p class="text-sm text-slate-400 mt-1">1GHz 雙核心 MCU (Cortex-M7/M4)。突破 STM32 頻寬瓶頸，原生支援 Gigabit Ethernet，適合邊緣 AI 計算。</p>
                         </div>
                         <div class="roadmap-item">
                             <div class="roadmap-dot border-sky-500"></div>
                             <h4 class="text-base font-bold text-sky-400">PAB 標準 (Pixhawk Autopilot Bus)</h4>
-                            <p class="text-sm text-slate-400 mt-1">模組化設計標準。將「飛控核心 (Core)」與「載板 (Baseboard)」分離,實現硬體熱插拔升級。</p>
+                            <p class="text-sm text-slate-400 mt-1">模組化標準 (DS-010)。將「飛控核心」與「載板」分離，實現硬體熱插拔升級，降低載板設計門檻。</p>
                         </div>
                     </div>
                 </div>
                 <div class="bg-slate-900 p-6 rounded-xl border border-slate-800 shadow-lg">
-                    <h4 class="font-bold text-slate-200 mb-3 text-sm uppercase tracking-wider">高階周邊設備</h4>
+                    <h4 class="font-bold text-slate-200 mb-3 text-sm uppercase tracking-wider">關鍵周邊升級</h4>
                     <div class="space-y-3">
                         <div class="bg-slate-950 p-3 rounded border border-slate-700">
                             <strong class="text-slate-300 text-sm block">Unicore UM982 (雙天線 RTK)</strong>
-                            <p class="text-xs text-slate-500 mt-1">支援 GPS Heading (雙天線定航向)。在高壓電塔或大型金屬結構旁,可完全免疫磁羅盤干擾。</p>
+                            <p class="text-xs text-slate-500 mt-1">支援 GPS Heading (雙天線定航向)。取代傳統磁羅盤，解決高壓電塔/橋樑下的磁干擾問題。</p>
                         </div>
                         <div class="bg-slate-950 p-3 rounded border border-slate-700">
-                            <strong class="text-slate-300 text-sm block">PM08D (200A 數位電流計)</strong>
-                            <p class="text-xs text-slate-500 mt-1">I2C 數位傳輸。專為 14S 高壓農業機與物流無人機設計。</p>
+                            <strong class="text-slate-300 text-sm block">PM08D (數位電源模組)</strong>
+                            <p class="text-xs text-slate-500 mt-1">I2C 通訊 (INA226)。支援 14S 高壓 (60V) 與 200A 大電流，專為物流機設計。</p>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- 2. Teardown -->
+        <!-- ==================== 2. Teardown (還原) ==================== -->
         <section id="section-teardown" class="mb-16 hidden animate-section relative">
             <i class="fa-regular fa-bookmark bookmark-badge" data-bookmark="section-teardown"></i>
             <header class="mb-8 border-b border-slate-800 pb-4">
@@ -239,38 +280,209 @@
             </header>
             <div class="grid md:grid-cols-2 gap-6 mb-8">
                 <div class="bg-slate-900 p-6 rounded-xl border border-slate-800">
-                    <h3 class="text-xl font-bold text-emerald-400 mb-4 flex items-center"><i class="fa-solid fa-microchip mr-2"></i>飛控系統</h3>
+                    <h3 class="text-xl font-bold text-emerald-400 mb-4 flex items-center">
+                        <i class="fa-solid fa-microchip mr-2"></i>飛控系統
+                    </h3>
                     <div class="space-y-3 text-sm text-slate-300">
-                        <div class="flex justify-between py-2 border-b border-slate-800"><span class="text-slate-500">飛控:</span><span class="font-bold">Pixhawk 6C</span></div>
-                        <div class="flex justify-between py-2 border-b border-slate-800"><span class="text-slate-500">MCU:</span><span class="font-mono text-xs">STM32H743 @ 480MHz</span></div>
-                        <div class="flex justify-between py-2 border-b border-slate-800"><span class="text-slate-500">IMU:</span><span>ICM-42688-P + BMI088</span></div>
-                        <div class="flex justify-between py-2"><span class="text-slate-500">GPS:</span><span>M9N (u-blox)</span></div>
+                        <div class="flex justify-between py-2 border-b border-slate-800">
+                            <span class="text-slate-500">飛控:</span>
+                            <span class="font-bold">Pixhawk 6C</span>
+                        </div>
+                        <div class="flex justify-between py-2 border-b border-slate-800">
+                            <span class="text-slate-500">MCU:</span>
+                            <span class="font-mono text-xs">STM32H743 @ 480MHz</span>
+                        </div>
+                        <div class="flex justify-between py-2 border-b border-slate-800">
+                            <span class="text-slate-500">IMU:</span>
+                            <span>ICM-42688-P + BMI088</span>
+                        </div>
+                        <div class="flex justify-between py-2">
+                            <span class="text-slate-500">GPS:</span>
+                            <span>M9N (u-blox)</span>
+                        </div>
                     </div>
                 </div>
                 <div class="bg-slate-900 p-6 rounded-xl border border-slate-800">
-                    <h3 class="text-xl font-bold text-sky-400 mb-4 flex items-center"><i class="fa-solid fa-bolt mr-2"></i>動力系統</h3>
+                    <h3 class="text-xl font-bold text-sky-400 mb-4 flex items-center">
+                        <i class="fa-solid fa-bolt mr-2"></i>動力系統
+                    </h3>
                     <div class="space-y-3 text-sm text-slate-300">
-                        <div class="flex justify-between py-2 border-b border-slate-800"><span class="text-slate-500">馬達:</span><span class="font-bold">2216 KV880</span></div>
-                        <div class="flex justify-between py-2 border-b border-slate-800"><span class="text-slate-500">ESC:</span><span>BLHeli_S 20A (DShot)</span></div>
-                        <div class="flex justify-between py-2 border-b border-slate-800"><span class="text-slate-500">螺旋槳:</span><span>10" 碳纖維</span></div>
-                        <div class="flex justify-between py-2"><span class="text-slate-500">電池:</span><span>4S 5200mAh LiPo</span></div>
+                        <div class="flex justify-between py-2 border-b border-slate-800">
+                            <span class="text-slate-500">馬達:</span>
+                            <span class="font-bold">2216 KV880</span>
+                        </div>
+                        <div class="flex justify-between py-2 border-b border-slate-800">
+                            <span class="text-slate-500">ESC:</span>
+                            <span>BLHeli_S 20A (DShot)</span>
+                        </div>
+                        <div class="flex justify-between py-2 border-b border-slate-800">
+                            <span class="text-slate-500">螺旋槳:</span>
+                            <span>10" 碳纖維</span>
+                        </div>
+                        <div class="flex justify-between py-2">
+                            <span class="text-slate-500">電池:</span>
+                            <span>4S 5200mAh LiPo</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-slate-950 p-6 rounded-xl border border-slate-800">
+                <h3 class="text-lg font-bold text-slate-200 mb-4">
+                    <i class="fa-solid fa-weight-hanging mr-2 text-amber-500"></i>重量分析
+                </h3>
+                <div class="grid md:grid-cols-3 gap-4">
+                    <div class="bg-slate-900 p-4 rounded border border-slate-700 text-center">
+                        <div class="text-2xl font-bold text-emerald-400">1.3 kg</div>
+                        <div class="text-xs text-slate-500 mt-1">機架 + 飛控</div>
+                    </div>
+                    <div class="bg-slate-900 p-4 rounded border border-slate-700 text-center">
+                        <div class="text-2xl font-bold text-sky-400">0.6 kg</div>
+                        <div class="text-xs text-slate-500 mt-1">動力系統</div>
+                    </div>
+                    <div class="bg-slate-900 p-4 rounded border border-slate-700 text-center">
+                        <div class="text-2xl font-bold text-amber-400">0.5 kg</div>
+                        <div class="text-xs text-slate-500 mt-1">電池</div>
+                    </div>
+                </div>
+                <div class="mt-4 p-4 bg-slate-800 rounded border-l-4 border-emerald-500">
+                    <strong class="text-emerald-400">總重:</strong>
+                    <span class="text-slate-300 ml-2">約 2.4 kg (空載)</span>
+                    <span class="text-slate-500 text-xs ml-4">| 最大起飛重量: 3.5 kg</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== 3. X500-AIoT Build ==================== -->
+        <section id="section-build-aiot" class="mb-16 hidden animate-section relative">
+            <i class="fa-regular fa-bookmark bookmark-badge" data-bookmark="section-build-aiot"></i>
+            <header class="mb-8 border-b border-slate-800 pb-4">
+                <h2 class="text-3xl font-bold text-slate-100 mb-2">X500-AIoT-V1 硬體採購與架構 (Procurement)</h2>
+                <div class="flex items-center gap-2 text-slate-400 text-sm">
+                    <span class="source-badge badge-procurement">Project Spec</span>
+                    <span>2026/02/12 Updated</span>
+                </div>
+            </header>
+
+            <div class="grid lg:grid-cols-3 gap-8">
+                <!-- Left: BOM -->
+                <div class="lg:col-span-2 space-y-8">
+                    <!-- Flight Platform -->
+                    <div class="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden">
+                        <div class="px-6 py-4 bg-slate-950 border-b border-slate-800 flex justify-between">
+                            <h3 class="font-bold text-sky-400">1. 核心飛行平台 (Flight Platform)</h3>
+                            <span class="text-xs text-slate-500">底層控制與動力</span>
+                        </div>
+                        <table class="w-full text-sm text-left text-slate-400">
+                            <tbody class="divide-y divide-slate-800">
+                                <tr>
+                                    <td class="p-4"><strong class="text-white block">Holybro X500 V2 ARF</strong><span class="text-xs">含馬達 2216/920KV, 電變 20A, PDB</span></td>
+                                    <td class="p-4 text-right">ARF 預焊版節省佈線時間。</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-4"><strong class="text-white block">Pixhawk 6C (Alu Case)</strong><span class="text-xs">STM32H743 + F103</span></td>
+                                    <td class="p-4 text-right">鋁殼版抗 EMI 干擾能力較佳。</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-4"><strong class="text-white block">Holybro M10 GPS</strong><span class="text-xs">u-blox M10 Chip</span></td>
+                                    <td class="p-4 text-right">多星系定位，冷啟動快。</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-4"><strong class="text-white block">RadioMaster RP1</strong><span class="text-xs">ELRS 2.4GHz</span></td>
+                                    <td class="p-4 text-right">CRSF 協定，低延遲控制。</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Edge AI -->
+                    <div class="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden">
+                        <div class="px-6 py-4 bg-slate-950 border-b border-slate-800 flex justify-between">
+                            <h3 class="font-bold text-violet-400">2. 邊緣運算與視覺 (Edge AI)</h3>
+                            <span class="text-xs text-slate-500">YOLOv8 / VSLAM</span>
+                        </div>
+                        <table class="w-full text-sm text-left text-slate-400">
+                            <tbody class="divide-y divide-slate-800">
+                                <tr>
+                                    <td class="p-4"><strong class="text-white block">Raspberry Pi 5 (8GB)</strong><span class="text-xs">Cortex-A76 Quad</span></td>
+                                    <td class="p-4 text-right">8GB 適合跑 YOLOv8 Nano/Small。</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-4"><strong class="text-white block">Active Cooler</strong><span class="text-xs">原廠主動散熱</span></td>
+                                    <td class="p-4 text-right">防止 AI 全速運算時熱降頻。</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-4"><strong class="text-white block">Global Shutter Cam</strong><span class="text-xs">Raspberry Pi GS / OAK-D</span></td>
+                                    <td class="p-4 text-right">全域快門消除飛行果凍效應 (Jello)。</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-4 border-l-4 border-rose-500 bg-rose-900/10"><strong class="text-rose-300 block">UBEC 5.1V/5A (Low Noise)</strong><span class="text-xs">Matek/Mauch 等級</span></td>
+                                    <td class="p-4 text-right text-rose-300">Pi 5 需獨立低壓降供電，不可吃飛控電源！</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Right: Topology & Notes -->
+                <div class="space-y-8">
+                    <!-- Topology Visualized -->
+                    <div class="bg-slate-900 p-6 rounded-xl border border-slate-800">
+                        <h3 class="font-bold text-emerald-400 mb-4"><i class="fa-solid fa-sitemap mr-2"></i>系統整合架構</h3>
+                        <div class="topo-container text-xs">
+                            <div class="topo-box border-l-accent border-rose-500">
+                                <h4 class="text-rose-400">⚡ 電源層 (Power)</h4>
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="bg-slate-800 px-2 py-1 rounded">LiPo 4S</span>
+                                    <i class="fa-solid fa-arrow-right text-slate-600"></i>
+                                    <span class="bg-slate-800 px-2 py-1 rounded">PDB</span>
+                                </div>
+                                <div class="space-y-1 pl-2 border-l border-slate-700">
+                                    <div class="flex justify-between"><span>➡ Power Module</span> <span class="text-sky-400">Pixhawk</span></div>
+                                    <div class="flex justify-between"><span>➡ XT30/UBEC</span> <span class="text-violet-400">RPi 5</span></div>
+                                </div>
+                            </div>
+                            <div class="topo-box border-l-accent border-sky-500">
+                                <h4 class="text-sky-400">🎮 控制層 (Control)</h4>
+                                <div class="flex justify-between">
+                                    <span class="bg-slate-800 px-2 py-1 rounded">Pixhawk 6C</span>
+                                    <span class="text-slate-500 text-center">TELEM2<br>921600</span>
+                                    <span class="bg-slate-800 px-2 py-1 rounded">RPi 5</span>
+                                </div>
+                            </div>
+                            <div class="topo-box border-l-accent border-violet-500">
+                                <h4 class="text-violet-400">🧠 AI 層 (Vision)</h4>
+                                <div class="flex flex-col gap-2">
+                                    <div class="flex justify-between"><span>RPi 5</span> <i class="fa-solid fa-link"></i> <span>Global Cam</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tech Notes -->
+                    <div class="bg-slate-900 p-6 rounded-xl border border-slate-800">
+                        <h3 class="font-bold text-amber-400 mb-4"><i class="fa-solid fa-user-graduate mr-2"></i>工程師筆記</h3>
+                        <ul class="text-sm text-slate-300 space-y-3 list-disc list-inside">
+                            <li><strong class="text-white">供電隔離:</strong> Pi 5 運算突波極大，務必使用低壓降 UBEC 調至 5.1V 補償線損。</li>
+                            <li><strong class="text-white">散熱干擾:</strong> Active Cooler 的 PWM 訊號有微弱 EMI，請與 GPS 桅杆保持物理距離。</li>
+                            <li><strong class="text-white">避震:</strong> 全域快門相機仍需矽膠減震球，避免高頻震動影響 IMU/影像。</li>
+                        </ul>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- 3. R&D Logs (Upgraded) -->
+        <!-- ==================== 4. R&D Logs (SOP) ==================== -->
         <section id="section-logs" class="mb-16 hidden animate-section relative">
             <i class="fa-regular fa-bookmark bookmark-badge" data-bookmark="section-logs"></i>
             <header class="mb-8 border-b border-slate-800 pb-4">
-                <h2 class="text-3xl font-bold text-slate-100 mb-2">專案實作日誌 (Project Build Logs)</h2>
+                <h2 class="text-3xl font-bold text-slate-100 mb-2">專案實作日誌與 SOP (Project Logs & SOP)</h2>
                 <div class="flex items-center gap-2 text-slate-400 text-sm">
                     <span class="source-badge badge-log">實作紀錄</span>
-                    <span>2026/02/10 更新 (X500-V2-INT)</span>
+                    <span>2026/02/12 更新 (X500-V2)</span>
                 </div>
             </header>
 
-            <!-- Tabs -->
             <div class="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden mb-8">
                 <div class="flex border-b border-slate-800 bg-slate-950 overflow-x-auto">
                     <button onclick="switchLogsTab('status')" id="tab-log-status" class="px-6 py-4 text-sm font-bold text-amber-400 bg-slate-900 border-r border-slate-800 transition whitespace-nowrap">專案現況 (Status)</button>
@@ -279,7 +491,7 @@
 
                 <!-- Tab 1: Status -->
                 <div id="content-logs-status" class="p-6 md:p-8 animate-fade-in">
-                    <div class="flex justify-between items-center mb-4">
+                    <div class="flex justify-between items-center mb-6">
                         <div>
                             <h3 class="text-xl font-bold text-amber-400"><i class="fa-solid fa-helicopter mr-2"></i>Holybro X500 V2 系統整合</h3>
                             <p class="text-sm text-slate-400 mt-1">Pixhawk 6C / PX4 v1.14.x / Operator: Marlon</p>
@@ -294,18 +506,20 @@
                             <ul class="text-sm text-slate-300 space-y-2">
                                 <li><i class="fa-solid fa-check text-emerald-500 mr-2"></i><strong>機架:</strong> Holybro X500 V2 (Quad X)</li>
                                 <li><i class="fa-solid fa-check text-emerald-500 mr-2"></i><strong>感測器:</strong> Accel, Gyro, Mag, Level 校正完成</li>
-                                <li><i class="fa-solid fa-check text-emerald-500 mr-2"></i><strong>動力:</strong> 馬達轉向 (CW/CCW) 驗證通過</li>
+                                <li><i class="fa-solid fa-check text-emerald-500 mr-2"></i><strong>動力:</strong> 馬達轉向驗證通過 (1000-2000us PWM)</li>
                                 <li><i class="fa-regular fa-square text-slate-500 mr-2"></i><strong>遙控:</strong> 待 R81 接收機安裝校正</li>
                             </ul>
                         </div>
                         <div class="bg-slate-950 p-4 rounded border border-slate-700">
-                            <strong class="text-amber-400 block mb-2">決策分析：IO PWM vs DShot</strong>
+                            <strong class="text-amber-400 block mb-2">架構操作定義</strong>
                             <table class="w-full text-xs text-left text-slate-400">
-                                <thead><tr><th class="pb-1">特性</th><th class="pb-1 text-emerald-400">IO PWM</th><th class="pb-1 text-slate-500">FMU DShot</th></tr></thead>
+                                <thead>
+                                    <tr><th class="pb-1">組件</th><th class="pb-1">連線</th><th class="pb-1">功能定義</th></tr>
+                                </thead>
                                 <tbody class="divide-y divide-slate-800">
-                                    <tr><td class="py-1">接口</td><td>MAIN Out (F103)</td><td>AUX Out (H7)</td></tr>
-                                    <tr><td class="py-1">安全</td><td class="text-emerald-400">獨立 Failsafe</td><td>依賴主核</td></tr>
-                                    <tr><td class="py-1">雙向</td><td>否 (無 RPM)</td><td>是</td></tr>
+                                    <tr><td class="py-1">QGC (PC)</td><td>USB</td><td>工廠配置、韌體更新</td></tr>
+                                    <tr><td class="py-1">QGC (PC)</td><td>433MHz</td><td>地面站監控 (Telemetry)</td></tr>
+                                    <tr><td class="py-1">RC (TX16S)</td><td>2.4GHz</td><td>即時姿態控制 (Real-time)</td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -314,54 +528,44 @@
 
                 <!-- Tab 2: SOP -->
                 <div id="content-logs-sop" class="hidden p-6 md:p-8 animate-fade-in">
-                    <div class="space-y-8">
-                        <div>
-                            <h4 class="text-lg font-bold text-slate-200 mb-3 border-l-4 border-sky-500 pl-3">1. 硬體環境 (Environment)</h4>
-                            <ul class="grid md:grid-cols-2 gap-4 text-sm text-slate-400">
-                                <li class="bg-slate-950 p-3 rounded"><strong>TX:</strong> RadioMaster TX16S (EdgeTX)</li>
-                                <li class="bg-slate-950 p-3 rounded"><strong>RX:</strong> RadioMaster R1 V2 Mini (FrSkyX2/D16)</li>
-                                <li class="bg-slate-950 p-3 rounded"><strong>Battery:</strong> 4S LiPo (Power Module)</li>
-                                <li class="bg-slate-950 p-3 rounded"><strong>GCS:</strong> QGroundControl</li>
-                            </ul>
+                    <div class="space-y-6">
+                        <div class="bg-slate-950 p-4 rounded border border-slate-800">
+                            <h4 class="text-lg font-bold text-emerald-400 mb-3 border-l-4 border-emerald-500 pl-3">1. 感測器校正 (Calibration)</h4>
+                            <p class="text-sm text-slate-300 mb-2"><strong>加速度計:</strong> 依序放置 6 個面向，靜止直到黃條跑完。驗證 Z 軸 ≈ 9.8 m/s²。<br><strong>羅盤:</strong> 旋轉機身 6 面。若報錯 "Inconsistent"，需重啟或遠離磁干擾。</p>
+                            <p class="text-xs text-slate-500 italic">*校正後務必斷電重啟以更新 EKF。</p>
                         </div>
-
-                        <div>
-                            <h4 class="text-lg font-bold text-slate-200 mb-3 border-l-4 border-emerald-500 pl-3">2. 感測器校正 (Calibration)</h4>
-                            <div class="bg-slate-950 p-4 rounded text-sm text-slate-300 space-y-2">
-                                <p><strong class="text-emerald-400">加速度計:</strong> 依序放置 6 個面向，靜止直到黃條跑完。驗證 Z 軸 ≈ 9.8 m/s²。</p>
-                                <p><strong class="text-emerald-400">羅盤:</strong> 旋轉機身 6 面。若報錯 "Inconsistent"，需重啟或遠離磁干擾。</p>
-                                <p class="text-xs text-slate-500 italic mt-2">*校正後務必斷電重啟以更新 EKF。</p>
-                            </div>
-                        </div>
-
-                        <div>
-                            <h4 class="text-lg font-bold text-slate-200 mb-3 border-l-4 border-rose-500 pl-3">3. 飛行模式 (Flight Modes)</h4>
-                            <table class="w-full text-sm text-left text-slate-400">
-                                <thead class="bg-slate-950 text-xs uppercase"><tr><th class="p-2">開關</th><th class="p-2">模式</th><th class="p-2">特性</th></tr></thead>
-                                <tbody class="divide-y divide-slate-800">
-                                    <tr><td class="p-2">High</td><td class="text-white font-bold">Stabilized</td><td>自穩 (手動)，室內無 GPS 必用。</td></tr>
-                                    <tr><td class="p-2">Mid</td><td class="text-white font-bold">Position</td><td>定點 (Loiter)，戶外標準模式。</td></tr>
-                                    <tr><td class="p-2">Low</td><td class="text-rose-400 font-bold">Return</td><td>自動返航 (RTL)。</td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-
+                        
                         <div class="grid md:grid-cols-2 gap-6">
-                            <div>
-                                <h4 class="text-lg font-bold text-slate-200 mb-3 border-l-4 border-amber-500 pl-3">4. 電源設定</h4>
-                                <ul class="text-sm text-slate-400 space-y-1 bg-slate-950 p-3 rounded">
-                                    <li><strong>Cells:</strong> 4S</li>
-                                    <li><strong>Full:</strong> 4.20V (16.8V)</li>
-                                    <li><strong>Empty:</strong> 3.60V (14.4V)</li>
+                            <div class="bg-slate-950 p-4 rounded border border-slate-800">
+                                <h4 class="text-lg font-bold text-sky-400 mb-3 border-l-4 border-sky-500 pl-3">2. 遙控器對頻與配置</h4>
+                                <ul class="text-sm text-slate-300 space-y-1">
+                                    <li><strong>TX16S:</strong> Mode 2 (左手油門)</li>
+                                    <li><strong>Internal RF:</strong> FrSkyX2 (D16)</li>
+                                    <li><strong>通道驗證:</strong> 右手搖桿向右 &rarr; QGC Roll 數值增加。</li>
                                 </ul>
                             </div>
-                            <div>
-                                <h4 class="text-lg font-bold text-slate-200 mb-3 border-l-4 border-violet-500 pl-3">5. 動力驗證 (Props OFF)</h4>
-                                <ul class="text-sm text-slate-400 space-y-1 bg-slate-950 p-3 rounded">
-                                    <li><strong>解鎖:</strong> 左手油門最低 + 方向舵最右。</li>
-                                    <li><strong>M1/M2:</strong> CCW (銀帽)</li>
-                                    <li><strong>M3/M4:</strong> CW (黑帽)</li>
+                            <div class="bg-slate-950 p-4 rounded border border-slate-800">
+                                <h4 class="text-lg font-bold text-rose-400 mb-3 border-l-4 border-rose-500 pl-3">3. 飛行模式 (Flight Modes)</h4>
+                                <ul class="text-sm text-slate-300 space-y-1">
+                                    <li><strong>High (上):</strong> Stabilized (自穩，室內無 GPS 必用)</li>
+                                    <li><strong>Mid (中):</strong> Position (定點，戶外標準)</li>
+                                    <li><strong>Low (下):</strong> Return (自動返航 RTL)</li>
                                 </ul>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-950 p-4 rounded border border-slate-800">
+                            <h4 class="text-lg font-bold text-amber-400 mb-3 border-l-4 border-amber-500 pl-3">4. 動力與解鎖驗證 (Props OFF)</h4>
+                            <div class="grid grid-cols-2 gap-4 text-sm text-slate-300">
+                                <div>
+                                    <strong>解鎖指令 (Arming):</strong><br>
+                                    油門置於最低，並向右下角 (Yaw Right) 保持 3 秒。
+                                </div>
+                                <div>
+                                    <strong>轉向驗證 (Quad-X):</strong><br>
+                                    M1(右上)/M2(左下): CCW (銀帽)<br>
+                                    M3(左上)/M4(右下): CW (黑帽)
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -369,7 +573,7 @@
             </div>
         </section>
 
-        <!-- 4. MCU Deep Dive -->
+        <!-- ==================== 5. MCU Deep Dive ==================== -->
         <section id="section-mcu" class="mb-16 hidden animate-section relative">
             <i class="fa-regular fa-bookmark bookmark-badge" data-bookmark="section-mcu"></i>
             <header class="mb-8 border-b border-slate-800 pb-4">
@@ -379,19 +583,31 @@
                     <span>STM32H753 / H743 / F103</span>
                 </div>
             </header>
+            
             <div class="grid lg:grid-cols-2 gap-8 mb-8">
                 <div class="bg-slate-900 p-6 rounded-xl border border-slate-800">
-                    <h3 class="text-xl font-bold text-white mb-4 flex items-center"><i class="fa-solid fa-brain mr-2 text-purple-500"></i>主飛控核心 (FMU): H7 系列</h3>
+                    <h3 class="text-xl font-bold text-white mb-4 flex items-center">
+                        <i class="fa-solid fa-brain mr-2 text-purple-500"></i>
+                        主飛控核心 (FMU): H7 系列
+                    </h3>
                     <div class="space-y-6">
                         <div class="bg-slate-950 p-4 rounded-lg border border-slate-700">
                             <div class="grid grid-cols-2 gap-4 border-b border-slate-800 pb-2 mb-2">
-                                <div><h4 class="text-emerald-400 font-bold">STM32H753</h4><span class="text-xs text-slate-500">Pixhawk 6X (企業級)</span></div>
-                                <div><h4 class="text-sky-400 font-bold">STM32H743</h4><span class="text-xs text-slate-500">Pixhawk 6C (標準級)</span></div>
+                                <div>
+                                    <h4 class="text-emerald-400 font-bold">STM32H753</h4>
+                                    <span class="text-xs text-slate-500">Pixhawk 6X (企業級)</span>
+                                </div>
+                                <div>
+                                    <h4 class="text-sky-400 font-bold">STM32H743</h4>
+                                    <span class="text-xs text-slate-500">Pixhawk 6C (標準級)</span>
+                                </div>
                             </div>
                             <ul class="text-sm text-slate-300 space-y-2 list-disc list-inside">
                                 <li><strong>運算核心:</strong> Cortex-M7 @ 480MHz (2144 CoreMark)。</li>
                                 <li><strong>AXI Bus Matrix:</strong> 確保 RAM 與週邊 (Ethernet/SDMMC) 的併發存取不塞車。</li>
-                                <li><strong>差異點 (Security):</strong> <br><span class="text-emerald-400">H753</span> 獨有硬體加密引擎 (Crypto/Hash),支援高強度 Secure Boot 防篡改。</li>
+                                <li><strong>差異點 (Security):</strong> <br>
+                                    <span class="text-emerald-400">H753</span> 獨有硬體加密引擎 (Crypto/Hash),支援高強度 Secure Boot 防篡改。
+                                </li>
                             </ul>
                         </div>
                         <div class="bg-slate-800 p-3 rounded text-xs text-slate-400 border-l-4 border-purple-500">
@@ -399,8 +615,12 @@
                         </div>
                     </div>
                 </div>
+
                 <div class="bg-slate-900 p-6 rounded-xl border border-slate-800">
-                    <h3 class="text-xl font-bold text-white mb-4 flex items-center"><i class="fa-solid fa-shield-halved mr-2 text-rose-500"></i>IO 協處理器 (STM32F103)</h3>
+                    <h3 class="text-xl font-bold text-white mb-4 flex items-center">
+                        <i class="fa-solid fa-shield-halved mr-2 text-rose-500"></i>
+                        IO 協處理器 (STM32F103)
+                    </h3>
                     <div class="bg-slate-950 p-4 rounded-lg border border-slate-700 h-full">
                         <div class="mb-4 pb-2 border-b border-slate-800">
                             <h4 class="text-rose-400 font-bold">PX4IO 架構 (Safety Island)</h4>
@@ -417,9 +637,18 @@
                             <div>
                                 <strong class="text-white block mb-1">關鍵功能:</strong>
                                 <ul class="list-none space-y-3 mt-2">
-                                    <li class="relative pl-4 border-l-2 border-emerald-500"><strong class="text-emerald-300 text-xs uppercase block">1. RC Decoding</strong> 負責繁重的中斷解碼,減輕 H7 負擔。</li>
-                                    <li class="relative pl-4 border-l-2 border-rose-500"><strong class="text-rose-300 text-xs uppercase block">2. Failsafe Mux</strong> 若 H7 心跳停止,IO 自動切換 RC 直通模式 (Manual Override)。</li>
-                                    <li class="relative pl-4 border-l-2 border-amber-500"><strong class="text-amber-300 text-xs uppercase block">3. FMU Link (1.5Mbps)</strong> 專用二進制協議,CRC 校驗,500ms Watchdog 機制。</li>
+                                    <li class="relative pl-4 border-l-2 border-emerald-500">
+                                        <strong class="text-emerald-300 text-xs uppercase block">1. RC Decoding</strong> 
+                                        負責繁重的中斷解碼,減輕 H7 負擔。
+                                    </li>
+                                    <li class="relative pl-4 border-l-2 border-rose-500">
+                                        <strong class="text-rose-300 text-xs uppercase block">2. Failsafe Mux</strong> 
+                                        若 H7 心跳停止,IO 自動切換 RC 直通模式 (Manual Override)。
+                                    </li>
+                                    <li class="relative pl-4 border-l-2 border-amber-500">
+                                        <strong class="text-amber-300 text-xs uppercase block">3. FMU Link (1.5Mbps)</strong> 
+                                        專用二進制協議,CRC 校驗,500ms Watchdog 機制。
+                                    </li>
                                 </ul>
                             </div>
                         </div>
@@ -428,11 +657,85 @@
             </div>
         </section>
 
-        <!-- 5. Design Guide -->
+        <!-- ==================== 6. Hardware Anatomy ==================== -->
+        <section id="section-hardware" class="mb-16 hidden animate-section relative">
+            <i class="fa-regular fa-bookmark bookmark-badge" data-bookmark="section-hardware"></i>
+            <header class="mb-8 border-b border-slate-800 pb-4">
+                <h2 class="text-3xl font-bold text-slate-100 mb-2">硬體解剖學 (Hardware Anatomy)</h2>
+                <div class="flex items-center gap-2 text-slate-400 text-sm">
+                    <span class="source-badge badge-teardown">硬體模組架構</span>
+                </div>
+            </header>
+            <div class="grid md:grid-cols-4 gap-4" id="anatomy-grid"></div>
+            <div id="anatomy-detail" class="mt-6 bg-slate-800/50 border border-slate-700 p-6 rounded-xl shadow-lg hidden">
+                <h3 id="detail-title" class="text-xl font-bold text-sky-400 mb-2"></h3>
+                <p id="detail-desc" class="text-slate-300 mb-4"></p>
+                <div class="bg-slate-950 p-4 rounded border border-slate-800">
+                    <h4 class="text-xs text-slate-500 uppercase font-bold mb-2">技術規格 (Technical Specs)</h4>
+                    <ul class="space-y-2 text-sm text-emerald-400 mono-font" id="detail-specs"></ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== 7. Pixhawk 6X vs 6C ==================== -->
+        <section id="section-pixhawk" class="mb-16 hidden animate-section relative">
+            <i class="fa-regular fa-bookmark bookmark-badge" data-bookmark="section-pixhawk"></i>
+            <header class="mb-8 border-b border-slate-800 pb-4">
+                <h2 class="text-3xl font-bold text-slate-100 mb-2">Pixhawk 6X/6C 接口定義 (Pinouts)</h2>
+                <div class="flex items-center gap-2 text-slate-400 text-sm">
+                    <span class="source-badge badge-standard">DS-012/018</span>
+                    <span>規格已驗證</span>
+                </div>
+            </header>
+
+            <div class="grid lg:grid-cols-3 gap-6">
+                <div class="lg:col-span-2 bg-slate-900 p-6 rounded-xl border border-slate-800">
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        <div class="port-connector bg-slate-900/50 p-3 rounded text-center" data-port="power">
+                            <div class="port-label text-rose-400">POWER 1/2</div>
+                            <i class="fa-solid fa-battery-full text-xl text-rose-500 my-2"></i>
+                        </div>
+                        <div class="port-connector bg-slate-900/50 p-3 rounded text-center" data-port="gps">
+                            <div class="port-label text-emerald-400">GPS 1/2</div>
+                            <i class="fa-solid fa-satellite text-xl text-emerald-500 my-2"></i>
+                        </div>
+                        <div class="port-connector bg-slate-900/50 p-3 rounded text-center" data-port="telem">
+                            <div class="port-label text-sky-400">TELEM 1-3</div>
+                            <i class="fa-solid fa-wifi text-xl text-sky-500 my-2"></i>
+                        </div>
+                        <div class="port-connector bg-slate-900/50 p-3 rounded text-center" data-port="fmu_pwm">
+                            <div class="port-label text-amber-400">FMU PWM</div>
+                            <i class="fa-solid fa-fan text-xl text-amber-500 my-2"></i>
+                        </div>
+                        <div class="port-connector bg-slate-900/50 p-3 rounded text-center" data-port="io_pwm">
+                            <div class="port-label text-slate-300">IO PWM</div>
+                            <i class="fa-solid fa-gears text-xl text-slate-400 my-2"></i>
+                        </div>
+                        <div class="port-connector bg-slate-900/50 p-3 rounded text-center" data-port="can">
+                            <div class="port-label text-indigo-400">CAN 1/2</div>
+                            <i class="fa-solid fa-network-wired text-xl text-indigo-500 my-2"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="lg:col-span-1">
+                    <div id="port-detail-panel" class="bg-slate-900 border border-slate-700 h-full rounded-xl p-6 shadow-lg animate-fade-in flex flex-col">
+                        <div class="flex items-center mb-4 pb-4 border-b border-slate-800">
+                            <div id="port-icon" class="text-2xl mr-3"></div>
+                            <div><h4 id="port-title" class="text-xl font-bold text-white">請選擇接口</h4></div>
+                        </div>
+                        <div id="port-content" class="text-sm text-slate-400 flex-1 overflow-y-auto">
+                            <p class="italic opacity-70">點擊左側圖表查看電流限制與邏輯電平。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== 8. Design Guide ==================== -->
         <section id="section-design" class="mb-16 hidden animate-section relative">
             <i class="fa-regular fa-bookmark bookmark-badge" data-bookmark="section-design"></i>
             <header class="mb-8 border-b border-slate-800 pb-4">
-                <h2 class="text-3xl font-bold text-slate-100 mb-2">自製硬體指南 (Hardware Design Guide)</h2>
+                <h2 class="text-3xl font-bold text-slate-100 mb-2">自製載板指南 (Hardware Design Guide)</h2>
                 <div class="flex items-center gap-2 text-slate-400 text-sm">
                     <span class="source-badge badge-design">Reference Design</span>
                     <span>相容 FMUv6C 標準</span>
@@ -442,15 +745,19 @@
                 <i class="fa-solid fa-circle-exclamation text-amber-500 mt-1 mr-3"></i>
                 <div class="text-sm text-slate-300">
                     <strong class="text-amber-400 block mb-1">關於 Pixhawk 6C 原理圖</strong>
-                    <p>Holybro 官方並未公開 6C 的完整原理圖 (SCH)。建議採用 <strong>FMUv6C 標準 + 開源參考設計 (如 Pix32 v6)</strong> 的策略。下方提供實作導向的模組拆解。</p>
+                    <p>官方並未公開 6C 原理圖 (SCH)。建議採用 <strong>FMUv6C 標準 + 開源設計 (如 Pix32 v6)</strong> 的策略。下方提供實作導向的模組拆解與 H743 Pin Mapping。</p>
                 </div>
             </div>
+            
+            <!-- Tab Navigation for Design -->
             <div class="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden mb-8">
                 <div class="flex border-b border-slate-800 bg-slate-950 overflow-x-auto">
-                    <button onclick="showDesignTab('modules')" id="tab-modules" class="px-6 py-4 text-sm font-bold text-pink-400 bg-slate-900 border-r border-slate-800 transition whitespace-nowrap">模組拆解清單</button>
-                    <button onclick="showDesignTab('pinout')" id="tab-pinout" class="px-6 py-4 text-sm font-bold text-slate-500 bg-slate-950 transition whitespace-nowrap">H743 Pin Mapping (一體板)</button>
+                    <button onclick="showDesignTab('modules')" id="tab-design-modules" class="px-6 py-4 text-sm font-bold text-pink-400 bg-slate-900 border-r border-slate-800 transition whitespace-nowrap">模組拆解清單</button>
+                    <button onclick="showDesignTab('pinout')" id="tab-design-pinout" class="px-6 py-4 text-sm font-bold text-slate-500 bg-slate-950 transition whitespace-nowrap">H743 Pin Mapping</button>
                 </div>
-                <div id="content-modules" class="p-6 md:p-8 animate-fade-in">
+                
+                <!-- Content: Modules -->
+                <div id="content-design-modules" class="p-6 md:p-8 animate-fade-in">
                     <div class="grid md:grid-cols-2 gap-8">
                         <div>
                             <h4 class="text-sky-400 font-bold mb-3 border-b border-sky-900 pb-2">1. 核心與 IO (Core)</h4>
@@ -469,7 +776,7 @@
                             <h4 class="text-rose-400 font-bold mb-3 border-b border-rose-900 pb-2">3. 電源架構 (Power)</h4>
                             <ul class="space-y-3 text-sm text-slate-400">
                                 <li><strong class="text-white">輸入冗餘:</strong> POWER1 / POWER2 / USB 三路輸入 (Ideal Diode OR-ing)。</li>
-                                <li><strong class="text-white">電壓軌:</strong> 5V (主供電), 3.3V_FMU, 3.3V_SENSORS (分開 LDO)。</li>
+                                <li><strong class="text-white">電壓軌:</strong> 5V (主供電), 3.3V_FMU, 3.3V_SENSORS (分開 LDO 減少雜訊)。</li>
                             </ul>
                             <h4 class="text-amber-400 font-bold mb-3 mt-6 border-b border-amber-900 pb-2">4. 通訊與接口 (Comms)</h4>
                             <ul class="space-y-3 text-sm text-slate-400">
@@ -479,15 +786,56 @@
                         </div>
                     </div>
                 </div>
-                <div id="content-pinout" class="hidden p-6 md:p-8 animate-fade-in">
+
+                <!-- Content: Pinout -->
+                <div id="content-design-pinout" class="hidden p-6 md:p-8 animate-fade-in">
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse text-sm">
-                            <thead><tr class="bg-slate-800 text-slate-200"><th class="p-3 border-b border-slate-700">Port Name</th><th class="p-3 border-b border-slate-700">MCU Pin</th><th class="p-3 border-b border-slate-700">STM32 Function</th><th class="p-3 border-b border-slate-700">Connector (JST-GH)</th></tr></thead>
+                            <thead>
+                                <tr class="bg-slate-800 text-slate-200">
+                                    <th class="p-3 border-b border-slate-700">Port Name (Function)</th>
+                                    <th class="p-3 border-b border-slate-700">MCU Pin</th>
+                                    <th class="p-3 border-b border-slate-700">STM32 Function</th>
+                                    <th class="p-3 border-b border-slate-700">Connector (JST-GH)</th>
+                                </tr>
+                            </thead>
                             <tbody class="text-slate-400 font-mono">
-                                <tr class="border-b border-slate-800 hover:bg-slate-800/50"><td class="p-3 text-emerald-400 font-bold">GPS 1</td><td class="p-3">PA9 / PA10</td><td class="p-3">USART1_TX / RX</td><td class="p-3">10-Pin</td></tr>
-                                <tr class="border-b border-slate-800 hover:bg-slate-800/50"><td class="p-3 text-sky-400 font-bold">TELEM 1</td><td class="p-3">PE7 / PE8</td><td class="p-3">UART7_TX / RX</td><td class="p-3">6-Pin</td></tr>
-                                <tr class="border-b border-slate-800 hover:bg-slate-800/50"><td class="p-3 text-sky-400">TELEM 2</td><td class="p-3">PC12 / PD2</td><td class="p-3">UART5_TX / RX</td><td class="p-3">6-Pin</td></tr>
-                                <tr class="border-b border-slate-800 bg-slate-800/30"><td class="p-3 text-rose-400">IO LINK (Internal)</td><td class="p-3">PC6 / PC7</td><td class="p-3">USART6_TX / RX</td><td class="p-3">To STM32F103</td></tr>
+                                <tr class="border-b border-slate-800 hover:bg-slate-800/50">
+                                    <td class="p-3 text-emerald-400 font-bold">GPS 1</td>
+                                    <td class="p-3">PA9 / PA10</td>
+                                    <td class="p-3">USART1_TX / RX</td>
+                                    <td class="p-3">10-Pin (含 I2C, Safety)</td>
+                                </tr>
+                                <tr class="border-b border-slate-800 hover:bg-slate-800/50">
+                                    <td class="p-3 text-sky-400 font-bold">TELEM 1</td>
+                                    <td class="p-3">PE7 / PE8</td>
+                                    <td class="p-3">UART7_TX / RX</td>
+                                    <td class="p-3">6-Pin (Pin 2/3)</td>
+                                </tr>
+                                <tr class="border-b border-slate-800 hover:bg-slate-800/50">
+                                    <td class="p-3 text-sky-400">TELEM 2</td>
+                                    <td class="p-3">PC12 / PD2</td>
+                                    <td class="p-3">UART5_TX / RX</td>
+                                    <td class="p-3">6-Pin</td>
+                                </tr>
+                                <tr class="border-b border-slate-800 hover:bg-slate-800/50">
+                                    <td class="p-3 text-sky-400">TELEM 3</td>
+                                    <td class="p-3">PA2 / PA3</td>
+                                    <td class="p-3">USART2_TX / RX</td>
+                                    <td class="p-3">4-Pin or 6-Pin</td>
+                                </tr>
+                                <tr class="border-b border-slate-800 bg-slate-800/30">
+                                    <td class="p-3 text-rose-400">IO LINK (Internal)</td>
+                                    <td class="p-3">PC6 / PC7</td>
+                                    <td class="p-3">USART6_TX / RX</td>
+                                    <td class="p-3">To STM32F103</td>
+                                </tr>
+                                <tr class="border-b border-slate-800 hover:bg-slate-800/50">
+                                    <td class="p-3 text-white">USB OTG</td>
+                                    <td class="p-3">PA11 / PA12</td>
+                                    <td class="p-3">USB_DM / DP</td>
+                                    <td class="p-3">Type-C</td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -495,171 +843,288 @@
             </div>
         </section>
 
-        <!-- 6. Pixhawk Comparison -->
-        <section id="section-pixhawk" class="mb-16 hidden animate-section relative">
-            <i class="fa-regular fa-bookmark bookmark-badge" data-bookmark="section-pixhawk"></i>
-            <header class="mb-8 border-b border-slate-800 pb-4">
-                <h2 class="text-3xl font-bold text-slate-100 mb-2">Pixhawk 6X/6C 硬體標準對照</h2>
-                <div class="flex items-center gap-2 text-slate-400 text-sm"><span class="source-badge badge-standard">DS-012/018</span></div>
-            </header>
-            <div class="grid lg:grid-cols-3 gap-6">
-                <div class="lg:col-span-2 bg-slate-900 p-6 rounded-xl border border-slate-800">
-                    <h3 class="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4">Port Pinout (6X 載板參考)</h3>
-                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-                        <div class="port-connector bg-slate-900/50 p-3 rounded text-center" data-port="power"><div class="port-label text-rose-400">POWER 1 & 2</div><i class="fa-solid fa-battery-full text-xl text-rose-500 my-2"></i></div>
-                        <div class="port-connector bg-slate-900/50 p-3 rounded text-center" data-port="gps"><div class="port-label text-emerald-400">GPS 1 & 2</div><i class="fa-solid fa-satellite text-xl text-emerald-500 my-2"></i></div>
-                        <div class="port-connector bg-slate-900/50 p-3 rounded text-center" data-port="telem"><div class="port-label text-sky-400">TELEM 1-3</div><i class="fa-solid fa-wifi text-xl text-sky-500 my-2"></i></div>
-                        <div class="port-connector bg-slate-900/50 p-3 rounded text-center" data-port="fmu_pwm"><div class="port-label text-amber-400">FMU PWM</div><i class="fa-solid fa-fan text-xl text-amber-500 my-2"></i></div>
-                        <div class="port-connector bg-slate-900/50 p-3 rounded text-center" data-port="io_pwm"><div class="port-label text-slate-300">IO PWM</div><i class="fa-solid fa-gears text-xl text-slate-400 my-2"></i></div>
-                        <div class="port-connector bg-slate-900/50 p-3 rounded text-center" data-port="can"><div class="port-label text-indigo-400">CAN 1 & 2</div><i class="fa-solid fa-network-wired text-xl text-indigo-500 my-2"></i></div>
-                    </div>
-                </div>
-                <div class="lg:col-span-1">
-                    <div id="port-detail-panel" class="bg-slate-900 border border-slate-700 h-full rounded-xl p-6 shadow-lg animate-fade-in flex flex-col">
-                        <div class="flex items-center mb-4 pb-4 border-b border-slate-800"><div id="port-icon" class="text-2xl mr-3"></div><div><h4 id="port-title" class="text-xl font-bold text-white">請選擇接口</h4></div></div>
-                        <div id="port-content" class="text-sm text-slate-400 flex-1 overflow-y-auto"><p class="italic opacity-70">點擊左側圖表以查看詳細電氣規格。</p></div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- 7. BLDC -->
+        <!-- ==================== 9. BLDC 馬達控制 ==================== -->
         <section id="section-bldc" class="mb-16 hidden animate-section relative">
             <i class="fa-regular fa-bookmark bookmark-badge" data-bookmark="section-bldc"></i>
             <header class="mb-8 border-b border-slate-800 pb-4">
-                <h2 class="text-3xl font-bold text-slate-100 mb-2">BLDC 馬達控制板實驗室</h2>
-                <div class="flex items-center gap-2 text-slate-400 text-sm"><span class="source-badge badge-datasheet">FOC + DShot</span></div>
+                <h2 class="text-3xl font-bold text-slate-100 mb-2">FOC 馬達控制 (BLDC Lab)</h2>
             </header>
-            <div class="bg-slate-900 p-6 rounded-xl border border-slate-800 shadow-inner mb-8 overflow-x-auto">
+            
+            <div class="bg-slate-950 p-6 rounded-xl border border-slate-800 shadow-inner mb-8 overflow-x-auto">
                 <h3 class="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4">逆變器拓撲 (Inverter Topology)</h3>
                 <div class="flex flex-col md:flex-row gap-4 items-stretch min-w-[700px]">
-                    <div class="topo-block flex-1 bg-slate-900 rounded-lg p-4 cursor-pointer relative" onclick="showBldcDetail('mcu')"><div class="text-center mt-2"><i class="fa-solid fa-microchip text-3xl text-sky-500 mb-2"></i><h4 class="font-bold text-slate-200">STM32 G4</h4></div></div>
-                    <div class="flex items-center justify-center text-slate-600"><i class="fa-solid fa-arrow-right-long text-xl"></i></div>
-                    <div class="topo-block flex-1 bg-slate-900 rounded-lg p-4 cursor-pointer relative" onclick="showBldcDetail('driver')"><div class="text-center mt-2"><i class="fa-solid fa-charging-station text-3xl text-amber-500 mb-2"></i><h4 class="font-bold text-slate-200">Gate Driver</h4></div></div>
-                    <div class="flex items-center justify-center text-slate-600"><i class="fa-solid fa-arrow-right-long text-xl"></i></div>
-                    <div class="topo-block flex-1 bg-slate-900 rounded-lg p-4 cursor-pointer relative" onclick="showBldcDetail('mosfet')"><div class="text-center mt-2"><i class="fa-solid fa-bolt text-3xl text-rose-500 mb-2"></i><h4 class="font-bold text-slate-200">MOSFETs</h4></div></div>
+                    <div class="topo-box flex-1 bg-slate-900 rounded-lg p-4 cursor-pointer hover:border-sky-500 transition" onclick="showBldcDetail('mcu')">
+                        <div class="text-center mt-2">
+                            <i class="fa-solid fa-microchip text-3xl text-sky-500 mb-2"></i>
+                            <h4 class="font-bold text-slate-200">STM32 G4</h4>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-center text-slate-600">
+                        <i class="fa-solid fa-arrow-right-long text-xl"></i>
+                    </div>
+                    <div class="topo-box flex-1 bg-slate-900 rounded-lg p-4 cursor-pointer hover:border-amber-500 transition" onclick="showBldcDetail('driver')">
+                        <div class="text-center mt-2">
+                            <i class="fa-solid fa-charging-station text-3xl text-amber-500 mb-2"></i>
+                            <h4 class="font-bold text-slate-200">Gate Driver</h4>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-center text-slate-600">
+                        <i class="fa-solid fa-arrow-right-long text-xl"></i>
+                    </div>
+                    <div class="topo-box flex-1 bg-slate-900 rounded-lg p-4 cursor-pointer hover:border-rose-500 transition" onclick="showBldcDetail('mosfet')">
+                        <div class="text-center mt-2">
+                            <i class="fa-solid fa-bolt text-3xl text-rose-500 mb-2"></i>
+                            <h4 class="font-bold text-slate-200">MOSFETs</h4>
+                        </div>
+                    </div>
                 </div>
             </div>
+            
             <div id="bldc-detail-box" class="bg-slate-800 border border-slate-700 p-6 rounded-xl shadow-lg mb-8 hidden">
-                <div class="flex items-start"><div class="mr-4 text-3xl" id="bldc-icon"></div><div class="flex-1"><h3 class="text-xl font-bold text-slate-100 mb-2" id="bldc-title"></h3><p class="text-slate-300 mb-4 text-sm" id="bldc-desc"></p><div class="bg-slate-950 p-4 rounded border border-slate-800"><h4 class="text-xs text-sky-500 font-bold uppercase mb-3">選型公式</h4><ul class="text-sm text-slate-400 mono-font space-y-3" id="bldc-specs"></ul></div></div></div>
+                <div class="flex items-start">
+                    <div class="mr-4 text-3xl" id="bldc-icon"></div>
+                    <div class="flex-1">
+                        <h3 class="text-xl font-bold text-slate-100 mb-2" id="bldc-title"></h3>
+                        <p class="text-slate-300 mb-4 text-sm" id="bldc-desc"></p>
+                        <div class="bg-slate-950 p-4 rounded border border-slate-800">
+                            <h4 class="text-xs text-sky-500 font-bold uppercase mb-3">選型公式</h4>
+                            <ul class="text-sm text-slate-400 mono-font space-y-3" id="bldc-specs"></ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-slate-900 p-6 rounded-xl border border-slate-800">
+                <h3 class="text-lg font-bold text-slate-200 mb-6 flex items-center">
+                    <i class="fa-solid fa-wave-square mr-2 text-emerald-500"></i>FOC 控制流程 (Control Loop)
+                </h3>
+                <div class="grid md:grid-cols-4 gap-4 text-center">
+                    <div class="foc-step bg-slate-800 p-4 rounded border border-slate-700">
+                        <h4 class="font-bold text-emerald-400 text-sm">1. ADC 採樣</h4>
+                        <p class="text-xs text-slate-400 mt-2">讀取相電流 Ia, Ib</p>
+                    </div>
+                    <div class="foc-step bg-slate-800 p-4 rounded border border-slate-700">
+                        <h4 class="font-bold text-emerald-400 text-sm">2. 座標變換</h4>
+                        <p class="text-xs text-slate-400 mt-2">Clarke / Park (abc轉dq)</p>
+                    </div>
+                    <div class="foc-step bg-slate-800 p-4 rounded border border-slate-700">
+                        <h4 class="font-bold text-emerald-400 text-sm">3. PID 控制</h4>
+                        <p class="text-xs text-slate-400 mt-2">電流環/速度環計算</p>
+                    </div>
+                    <div class="foc-step bg-slate-800 p-4 rounded border border-slate-700">
+                        <h4 class="font-bold text-emerald-400 text-sm">4. SVPWM</h4>
+                        <p class="text-xs text-slate-400 mt-2">空間向量調變輸出</p>
+                    </div>
+                </div>
             </div>
         </section>
 
-        <!-- 8. Hardware Anatomy -->
-        <section id="section-hardware" class="mb-16 hidden animate-section relative">
-            <i class="fa-regular fa-bookmark bookmark-badge" data-bookmark="section-hardware"></i>
-            <header class="mb-8 border-b border-slate-800 pb-4"><h2 class="text-3xl font-bold text-slate-100 mb-2">硬體解剖 (生理學觀點)</h2></header>
-            <div class="grid md:grid-cols-4 gap-4" id="anatomy-grid"></div>
-            <div id="anatomy-detail" class="mt-6 bg-slate-800/50 border border-slate-700 p-6 rounded-xl shadow-lg hidden">
-                <h3 id="detail-title" class="text-xl font-bold text-sky-400 mb-2"></h3><p id="detail-desc" class="text-slate-300 mb-2"></p><div class="bg-slate-950 p-3 rounded border border-slate-800"><ul class="space-y-1 text-sm text-emerald-400 mono-font" id="detail-specs"></ul></div>
-            </div>
-        </section>
-
-        <!-- 9. Intro / System Overview -->
+        <!-- ==================== 10. 飛行物理與混控 ==================== -->
         <section id="section-intro" class="mb-16 hidden animate-section relative">
             <i class="fa-regular fa-bookmark bookmark-badge" data-bookmark="section-intro"></i>
-            <header class="mb-8 border-b border-slate-800 pb-4"><h2 class="text-3xl font-bold text-slate-100 mb-2">系統概觀 (物理特性)</h2></header>
+            <header class="mb-8 border-b border-slate-800 pb-4">
+                <h2 class="text-3xl font-bold text-slate-100 mb-2">飛行物理與混控 (Physics)</h2>
+            </header>
             <div class="grid lg:grid-cols-2 gap-8">
-                <div class="bg-slate-900 p-6 rounded-xl border border-slate-800 shadow-lg"><div class="chart-container"><canvas id="vehicleChart"></canvas></div></div>
-                <div class="space-y-4">
-                    <div class="bg-slate-950 p-4 rounded border border-slate-800"><strong class="text-sky-400 block mb-1">圓盤負載 (Disk Loading)</strong><p class="text-xs text-slate-400">$$ DL = \frac{Weight}{PropArea} $$</p></div>
-                    <div class="bg-slate-950 p-4 rounded border border-slate-800"><strong class="text-emerald-400 block mb-1">失速速度 (Stall Speed)</strong><p class="text-xs text-slate-400">$$ V_{stall} = \sqrt{\frac{2W}{\rho S C_{L,max}}} $$</p></div>
+                <div class="space-y-6">
+                    <div class="bg-slate-900 p-6 rounded-xl border border-slate-800">
+                        <h3 class="text-lg font-bold text-sky-400 mb-3">推重比 (Thrust-to-Weight Ratio)</h3>
+                        <p class="text-xs text-slate-400 mb-2">決定飛行性能的關鍵指標。X500 V2 建議值為 2.0+。</p>
+                        <div class="bg-slate-950 p-4 rounded text-center border border-slate-700">
+                            <p class="text-slate-200 text-lg mono-font">$$ TWR = \frac{Total Thrust (g)}{AUW (g)} $$</p>
+                        </div>
+                    </div>
+                    <div class="bg-slate-900 p-6 rounded-xl border border-slate-800">
+                        <h3 class="text-lg font-bold text-emerald-400 mb-3">混控矩陣 (Mixer Matrix)</h3>
+                        <p class="text-xs text-slate-400 mb-2">Quad-X 構型的力矩分配原理。</p>
+                        <div class="bg-slate-950 p-4 rounded text-center border border-slate-700 overflow-x-auto">
+                            <p class="text-slate-200 text-xs mono-font whitespace-pre">
+Motor 1 (RR):  -Roll, +Pitch, -Yaw
+Motor 2 (RL):  +Roll, -Pitch, -Yaw
+Motor 3 (FL):  +Roll, +Pitch, +Yaw
+Motor 4 (FR):  -Roll, -Pitch, +Yaw
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-slate-900 p-6 rounded-xl border border-slate-800 shadow-lg">
+                    <div class="chart-container"><canvas id="vehicleChart"></canvas></div>
                 </div>
             </div>
         </section>
 
-        <!-- 10. Protocols -->
+        <!-- ==================== 11. 通訊協定 (PWM/DShot) ==================== -->
         <section id="section-protocols" class="mb-16 hidden animate-section relative">
             <i class="fa-regular fa-bookmark bookmark-badge" data-bookmark="section-protocols"></i>
-            <header class="mb-8 border-b border-slate-800 pb-4"><h2 class="text-3xl font-bold text-slate-100 mb-2">DShot 通訊時序</h2></header>
-            <div class="bg-slate-900 p-8 rounded-xl shadow-lg border border-slate-800">
-                <div class="flex flex-wrap justify-center gap-1 mb-8" id="dshot-bits"></div>
-                <div class="grid md:grid-cols-3 gap-4 text-center text-xs mono-font">
-                    <div class="bg-slate-950 p-3 rounded border border-slate-700"><strong class="text-sky-400 block">DShot150</strong><span>150 kbit/s</span></div>
-                    <div class="bg-slate-950 p-3 rounded border border-slate-700"><strong class="text-sky-400 block">DShot300</strong><span>300 kbit/s</span></div>
-                    <div class="bg-slate-950 p-3 rounded border border-slate-700"><strong class="text-sky-400 block">DShot600</strong><span>600 kbit/s</span></div>
-                </div>
-            </div>
-        </section>
-
-        <!-- 11. PID -->
-        <section id="section-pid" class="mb-16 hidden animate-section relative">
-            <i class="fa-regular fa-bookmark bookmark-badge" data-bookmark="section-pid"></i>
-            <header class="mb-8 border-b border-slate-800 pb-4"><h2 class="text-3xl font-bold text-slate-100 mb-2">PID 控制理論</h2></header>
-            <div class="bg-slate-900 p-6 rounded-xl border border-slate-800">
-                <div class="mb-6 bg-slate-950 p-4 rounded border border-slate-700 text-center"><p class="text-slate-300 text-sm mono-font">$$ u(t) = K_p e(t) + K_i \int_0^t e(\tau)d\tau + K_d \frac{de(t)}{dt} + FF $$</p></div>
-                <div class="chart-container"><canvas id="pidChart"></canvas></div>
-                <div class="flex justify-center gap-4 mt-4">
-                    <button onclick="updatePidChart('balanced')" class="px-3 py-1 bg-emerald-900/30 text-emerald-400 border border-emerald-800 rounded">完美調校</button>
-                    <button onclick="updatePidChart('highP')" class="px-3 py-1 bg-rose-900/30 text-rose-400 border border-rose-800 rounded">P值過高</button>
-                </div>
-            </div>
-        </section>
-
-        <!-- 12. Dev Environment -->
-        <section id="section-devenv" class="mb-16 hidden animate-section relative">
-            <i class="fa-regular fa-bookmark bookmark-badge" data-bookmark="section-devenv"></i>
             <header class="mb-8 border-b border-slate-800 pb-4">
-                <h2 class="text-3xl font-bold text-slate-100 mb-2">開發環境建置 (Development Setup)</h2>
-                <div class="flex items-center gap-2 text-slate-400 text-sm"><span class="source-badge badge-software">分層架構</span><span>Ubuntu 22.04/24.04</span></div>
-            </header>
-
-            <!-- Layer 1: MCU Tools -->
-            <div class="bg-slate-900 p-6 rounded-xl border border-slate-800 mb-8">
-                <h3 class="text-xl font-bold text-indigo-400 mb-4 flex items-center"><i class="fa-solid fa-layer-group mr-2"></i>第 1 層：基礎 MCU 開發工具</h3>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-sm text-slate-400">
-                        <thead class="text-xs text-slate-500 uppercase bg-slate-950">
-                            <tr><th class="px-4 py-2">工具</th><th class="px-4 py-2">用途</th><th class="px-4 py-2">優先度</th></tr>
-                        </thead>
-                        <tbody class="divide-y divide-slate-800">
-                            <tr><td class="px-4 py-3 font-bold text-white">STM32CubeIDE 1.16.1+</td><td>ST 官方調試、雙核 H7 支援</td><td class="text-emerald-400">⭐⭐⭐⭐⭐</td></tr>
-                            <tr><td class="px-4 py-3 font-bold text-white">STM32CubeMX 6.11.1</td><td>圖形化 Pinout 配置、FreeRTOS 生成</td><td class="text-emerald-400">⭐⭐⭐⭐⭐</td></tr>
-                            <tr><td class="px-4 py-3 font-bold text-white">PlatformIO (VSCode)</td><td>輕量級開發、跨平台專案管理</td><td class="text-sky-400">⭐⭐⭐⭐</td></tr>
-                            <tr><td class="px-4 py-3 font-bold text-white">arm-none-eabi-gcc 12.2+</td><td>ARM 交叉編譯器 (基礎 Toolchain)</td><td class="text-emerald-400">⭐⭐⭐⭐⭐</td></tr>
-                        </tbody>
-                    </table>
+                <h2 class="text-3xl font-bold text-slate-100 mb-2">IO PWM 與數位控制協定 (Protocols)</h2>
+                <div class="flex items-center gap-2 text-slate-400 text-sm">
+                    <span class="source-badge badge-protocol">PWM/DShot</span>
+                    <span>Physical Layer & Logic</span>
                 </div>
-            </div>
-
-            <!-- Layer 3: Simulation -->
-            <div class="bg-slate-900 p-6 rounded-xl border border-slate-800 mb-8">
-                <h3 class="text-xl font-bold text-amber-400 mb-4 flex items-center"><i class="fa-solid fa-vr-cardboard mr-2"></i>第 3 層：仿真驗證環境 (SITL)</h3>
-                <div class="grid md:grid-cols-2 gap-6">
-                    <div class="bg-slate-900 p-4 rounded border border-slate-700">
-                        <strong class="text-white block mb-2">Gazebo Ignition (推薦)</strong>
-                        <p class="text-xs text-slate-400 mb-2">高保真物理引擎，支援 ROS 2 整合。</p>
-                        <code class="block bg-slate-900 p-2 rounded text-emerald-400 text-xs">make px4_sitl_default gazebo</code>
-                    </div>
-                    <div class="bg-slate-900 p-4 rounded border border-slate-700">
-                        <strong class="text-white block mb-2">jMAVSim</strong>
-                        <p class="text-xs text-slate-400 mb-2">輕量級，適合快速測試演算法。</p>
-                        <code class="block bg-slate-900 p-2 rounded text-sky-400 text-xs">make px4_sitl_default jmavsim</code>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- 13. Software Stack -->
-        <section id="section-software" class="mb-16 hidden animate-section relative">
-            <i class="fa-regular fa-bookmark bookmark-badge" data-bookmark="section-software"></i>
-            <header class="mb-8 border-b border-slate-800 pb-4">
-                <h2 class="text-3xl font-bold text-slate-100 mb-2">第 2 層：高層飛控軟體框架</h2>
-                <div class="flex items-center gap-2 text-slate-400 text-sm"><span class="source-badge badge-software">PX4 vs ArduPilot</span></div>
             </header>
 
             <div class="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden mb-8">
+                <div class="flex border-b border-slate-800 bg-slate-950 overflow-x-auto">
+                    <button onclick="switchProtoTab('pwm')" id="tab-proto-pwm" class="px-6 py-4 text-sm font-bold text-blue-400 bg-slate-900 border-r border-slate-800 transition whitespace-nowrap">PWM 物理層與韌體</button>
+                    <button onclick="switchProtoTab('dshot')" id="tab-proto-dshot" class="px-6 py-4 text-sm font-bold text-slate-500 bg-slate-950 transition whitespace-nowrap">Pixhawk 6C DShot 實作</button>
+                </div>
+
+                <div id="content-proto-pwm" class="p-6 md:p-8 animate-fade-in">
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div>
+                            <h3 class="text-xl font-bold text-blue-400 mb-4">核心物理層定義 (Physical Layer)</h3>
+                            <ul class="space-y-2 text-sm text-slate-300 bg-slate-950 p-4 rounded border border-slate-700">
+                                <li><strong>基準頻率:</strong> 50Hz (20ms 週期) 至 490Hz。</li>
+                                <li><strong>有效脈寬:</strong> 1000µs (最小/0%) ~ 2000µs (最大/100%)。</li>
+                                <li><strong>中立點:</strong> 1500µs。</li>
+                                <li><strong>死區 (Deadband):</strong> 馬達通常需高於 ~1050µs 才會克服靜摩擦力。</li>
+                            </ul>
+                            
+                            <h3 class="text-xl font-bold text-emerald-400 mt-6 mb-4">轉速映射 (Logic & RPM)</h3>
+                            <div class="bg-slate-950 p-4 rounded text-center border border-slate-700">
+                                <p class="text-slate-200 text-sm mono-font mb-2">$$ Throttle \% = \frac{PulseWidth - 1000}{1000} \times 100\% $$</p>
+                                <p class="text-slate-200 text-sm mono-font">$$ RPM_{theory} = KV \times V_{battery} \times Throttle \% $$</p>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-amber-400 mb-4">協定演進對比 (Evolution)</h3>
+                            <table class="w-full text-sm text-left text-slate-400 mb-6">
+                                <thead class="bg-slate-950 text-xs uppercase text-slate-500">
+                                    <tr><th class="p-2">協定</th><th class="p-2">範圍</th><th class="p-2">特性</th></tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-800">
+                                    <tr><td class="p-2 text-white">Standard PWM</td><td class="p-2">1000-2000µs</td><td>通用性最強，需校準</td></tr>
+                                    <tr><td class="p-2 text-white">OneShot125</td><td class="p-2">125-250µs</td><td>速度快 8 倍，同步 PID</td></tr>
+                                    <tr><td class="p-2 text-sky-400 font-bold">DShot</td><td class="p-2">0-2047 (數位)</td><td>無須校準，支援雙向 RPM</td></tr>
+                                </tbody>
+                            </table>
+
+                            <h3 class="text-xl font-bold text-purple-400 mb-4">韌體實作要點 (Firmware)</h3>
+                            <div class="bg-slate-950 p-4 rounded border border-slate-700 text-sm text-slate-300">
+                                <strong class="text-white">STM32 (C/HAL):</strong>
+                                <ul class="list-disc list-inside ml-2 mt-1 mb-3 text-xs text-slate-400">
+                                    <li>使用 TIMx 的 PWM Mode 1。</li>
+                                    <li>Prescaler 設為 1MHz (1次計數=1µs)。</li>
+                                    <li>針對多通道，建議使用 DMA 更新 CCR 暫存器，確保 Jitter 最小。</li>
+                                </ul>
+                                <strong class="text-white">ESP32 (Arduino/IDF):</strong>
+                                <ul class="list-disc list-inside ml-2 mt-1 text-xs text-slate-400">
+                                    <li>使用 LEDC 或 MCPWM (專為馬達設計)。</li>
+                                    <li>建議解析度設定為 16-bit 以上。</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="content-proto-dshot" class="hidden p-6 md:p-8 animate-fade-in">
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div>
+                            <h3 class="text-xl font-bold text-sky-400 mb-4">DShot 接線與韌體配置 (PX4)</h3>
+                            <div class="bg-slate-950 p-4 rounded border border-slate-700 text-sm text-slate-300 space-y-4">
+                                <div>
+                                    <strong class="text-rose-400 block mb-1">硬體接線變更 (Critical):</strong>
+                                    Pixhawk 6C 若要使用 DShot (讀取 RPM)，ESC 訊號線必須從左側的 <code class="text-emerald-400">I/O PWM OUT (MAIN)</code> 移至右側的 <code class="text-amber-400">FMU PWM OUT (AUX)</code> 接口。
+                                </div>
+                                <div>
+                                    <strong class="text-sky-400 block mb-1">雙向 DShot (Bidirectional):</strong>
+                                    <ul class="list-disc list-inside text-xs text-slate-400">
+                                        <li>需刷入 <code>default-bdshot</code> 韌體版本。</li>
+                                        <li>參數 <code>DSHOT_BIDIR_EN</code> = 1 (啟用)。</li>
+                                        <li>參數 <code>MOT_POLE_COUNT</code> = 14 (依 2216 馬達設定)。</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-amber-400 mb-4">Actuators 設定與防護</h3>
+                            <div class="bg-slate-950 p-4 rounded border border-slate-700 text-sm text-slate-300 space-y-4">
+                                <div>
+                                    <strong class="text-white block mb-1">QGC 設定:</strong>
+                                    需在 Actuators 頁面將馬達映射至正確的 FMU 通道。建議 Minimum PWM 設為 <code class="text-sky-400">1100us</code> 確保同步啟動。
+                                </div>
+                                <div class="border-l-4 border-rose-500 pl-3 bg-rose-900/10 py-2">
+                                    <strong class="text-rose-400 text-xs block uppercase">開發建議與安全:</strong>
+                                    韌體初始化時，PWM 必須強制輸出 1000µs (或 0)，防止上電即飛人的意外。監測波形建議使用邏輯分析儀。
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== 12. PID 控制理論 ==================== -->
+        <section id="section-pid" class="mb-16 hidden animate-section relative">
+            <i class="fa-regular fa-bookmark bookmark-badge" data-bookmark="section-pid"></i>
+            <header class="mb-8 border-b border-slate-800 pb-4">
+                <h2 class="text-3xl font-bold text-slate-100 mb-2">PID 控制理論與實作 (Control Theory)</h2>
+                <div class="flex items-center gap-2 text-slate-400 text-sm">
+                    <span class="source-badge badge-software">Control Loop</span>
+                    <span>Inner & Outer Loop Tuning</span>
+                </div>
+            </header>
+
+            <div class="grid lg:grid-cols-2 gap-8">
+                <!-- Theory -->
+                <div class="space-y-6">
+                    <div class="bg-slate-900 p-6 rounded-xl border border-slate-800 shadow-lg">
+                        <h3 class="text-lg font-bold text-emerald-400 mb-4">標準 PID 公式 + 前饋 (Feed Forward)</h3>
+                        <div class="bg-slate-950 p-4 rounded text-center border border-slate-700 mb-4">
+                            <p class="text-slate-200 text-sm mono-font">$$ u(t) = K_p e(t) + K_i \int_0^t e(\tau)d\tau + K_d \frac{de(t)}{dt} + FF $$</p>
+                        </div>
+                        <ul class="text-sm text-slate-300 space-y-3">
+                            <li><strong class="text-emerald-400">P (比例):</strong> 對抗當前誤差。過高會導致高頻震盪 (Oscillation)。</li>
+                            <li><strong class="text-sky-400">I (積分):</strong> 消除穩態誤差 (如重心偏移)。過高會導致低頻畫圈。</li>
+                            <li><strong class="text-rose-400">D (微分):</strong> 預測趨勢，提供阻尼 (Damping)。對雜訊極敏感。</li>
+                            <li><strong class="text-amber-400">FF (前饋):</strong> 直接將目標指令轉換為輸出，大幅降低響應延遲。</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="bg-slate-900 p-6 rounded-xl border border-slate-800 shadow-lg">
+                        <h3 class="text-lg font-bold text-violet-400 mb-4">串級 PID 架構 (Cascaded PID)</h3>
+                        <div class="bg-slate-950 p-4 rounded border border-slate-700 text-xs font-mono text-slate-400 whitespace-pre overflow-x-auto">
+[搖桿指令 Target Angle] 
+  ↓ (外環 P: 姿態環 50-100Hz)
+[目標角速度 Target Rate]
+  ↓ (內環 PID: 角速度環 400-800Hz)
+[馬達輸出 Motor Output]</div>
+                    </div>
+                </div>
+
+                <!-- Simulation -->
+                <div class="bg-slate-900 p-6 rounded-xl border border-slate-800 shadow-lg flex flex-col">
+                    <h3 class="text-lg font-bold text-sky-400 mb-4">閉迴路響應模擬 (Step Response)</h3>
+                    <div class="chart-container flex-1 min-h-[250px] bg-slate-950 rounded border border-slate-700 p-2 mb-4">
+                        <canvas id="pidChart"></canvas>
+                    </div>
+                    <div class="flex flex-wrap justify-center gap-3">
+                        <button onclick="updatePidChart('balanced')" class="px-3 py-1.5 bg-emerald-900/30 text-emerald-400 border border-emerald-800 rounded hover:bg-emerald-900/50 transition font-bold text-sm">完美調校</button>
+                        <button onclick="updatePidChart('highP')" class="px-3 py-1.5 bg-rose-900/30 text-rose-400 border border-rose-800 rounded hover:bg-rose-900/50 transition font-bold text-sm">P值過高</button>
+                        <button onclick="updatePidChart('lowD')" class="px-3 py-1.5 bg-amber-900/30 text-amber-400 border border-amber-800 rounded hover:bg-amber-900/50 transition font-bold text-sm">D值過低</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== 13. 軟體棧 ==================== -->
+        <section id="section-software" class="mb-16 hidden animate-section relative">
+            <i class="fa-regular fa-bookmark bookmark-badge" data-bookmark="section-software"></i>
+            <header class="mb-8 border-b border-slate-800 pb-4">
+                <h2 class="text-3xl font-bold text-slate-100 mb-2">飛控軟體框架 (Software Stack)</h2>
+            </header>
+            <div class="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden mb-8">
                 <div class="flex border-b border-slate-800 bg-slate-950">
-                    <button id="tab-px4" onclick="switchStack('px4')" class="flex-1 py-4 font-bold text-sky-400 bg-slate-900 border-r border-slate-800 transition">PX4 Autopilot (BVLOS 推薦)</button>
-                    <button id="tab-ardupilot" onclick="switchStack('ardupilot')" class="flex-1 py-4 font-bold text-slate-500 bg-slate-950 transition">ArduPilot (DIY/教育 推薦)</button>
+                    <button id="tab-soft-px4" onclick="switchSoftTab('px4')" class="flex-1 py-4 font-bold text-sky-400 bg-slate-900 border-r border-slate-800 transition">PX4 Autopilot (BVLOS 推薦)</button>
+                    <button id="tab-soft-ardupilot" onclick="switchSoftTab('ardupilot')" class="flex-1 py-4 font-bold text-slate-500 bg-slate-950 transition">ArduPilot (DIY/教育 推薦)</button>
                 </div>
                 
-                <!-- PX4 Content -->
-                <div id="content-px4" class="p-8">
+                <div id="content-soft-px4" class="p-8 animate-fade-in">
                     <div class="grid md:grid-cols-2 gap-8">
                         <div>
                             <ul class="space-y-3 text-sm text-slate-300">
-                                <li><strong>核心版本:</strong> v1.16.1 (穩定)</li>
+                                <li><strong>核心版本:</strong> v1.14.x / v1.16.1 (穩定)</li>
                                 <li><strong>RTOS:</strong> NuttX 11.4 (POSIX 相容)</li>
                                 <li><strong>架構優勢:</strong> 
                                     <ul class="list-disc list-inside ml-4 mt-1 text-slate-400">
@@ -670,7 +1135,7 @@
                                 </li>
                             </ul>
                         </div>
-                        <div class="bg-slate-900 p-4 rounded border border-slate-700">
+                        <div class="bg-slate-950 p-4 rounded border border-slate-700">
                             <strong class="text-sky-400 text-xs block mb-2">安裝與編譯 (Ubuntu 22.04+):</strong>
                             <code class="text-xs text-slate-400 block whitespace-pre">git clone https://github.com/PX4/PX4-Autopilot.git
 bash Tools/setup/ubuntu.sh
@@ -679,8 +1144,7 @@ make px4_fmu-v6c_default</code>
                     </div>
                 </div>
 
-                <!-- ArduPilot Content -->
-                <div id="content-ardupilot" class="p-8 hidden">
+                <div id="content-soft-ardupilot" class="p-8 hidden animate-fade-in">
                     <div class="grid md:grid-cols-2 gap-8">
                         <div>
                             <ul class="space-y-3 text-sm text-slate-300">
@@ -695,7 +1159,7 @@ make px4_fmu-v6c_default</code>
                                 </li>
                             </ul>
                         </div>
-                        <div class="bg-slate-900 p-4 rounded border border-slate-700">
+                        <div class="bg-slate-950 p-4 rounded border border-slate-700">
                             <strong class="text-rose-400 text-xs block mb-2">安裝與編譯 (Ubuntu 22.04+):</strong>
                             <code class="text-xs text-slate-400 block whitespace-pre">git clone https://github.com/ArduPilot/ardupilot.git
 Tools/environment_install/install-prereqs-ubuntu.sh -y
@@ -707,16 +1171,68 @@ Tools/environment_install/install-prereqs-ubuntu.sh -y
             </div>
         </section>
 
-        <!-- 14. AIoT & ROS 2 -->
+        <!-- ==================== 14. 開發環境 ==================== -->
+        <section id="section-devenv" class="mb-16 hidden animate-section relative">
+            <i class="fa-regular fa-bookmark bookmark-badge" data-bookmark="section-devenv"></i>
+            <header class="mb-8 border-b border-slate-800 pb-4">
+                <h2 class="text-3xl font-bold text-slate-100 mb-2">開發環境建置 (Development Setup)</h2>
+            </header>
+            <div class="bg-slate-900 p-6 rounded-xl border border-slate-800 mb-8">
+                <h3 class="text-xl font-bold text-indigo-400 mb-4 flex items-center"><i class="fa-solid fa-layer-group mr-2"></i>基礎 MCU 開發工具</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm text-slate-400">
+                        <thead class="text-xs text-slate-500 uppercase bg-slate-950">
+                            <tr><th class="px-4 py-2">工具</th><th class="px-4 py-2">用途</th><th class="px-4 py-2">優先度</th></tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-800">
+                            <tr>
+                                <td class="px-4 py-3 font-bold text-white">STM32CubeIDE 1.16.1+</td>
+                                <td>ST 官方調試、雙核 H7 支援</td>
+                                <td class="text-emerald-400">⭐⭐⭐⭐⭐</td>
+                            </tr>
+                            <tr>
+                                <td class="px-4 py-3 font-bold text-white">STM32CubeMX 6.11.1</td>
+                                <td>圖形化 Pinout 配置、FreeRTOS 生成</td>
+                                <td class="text-emerald-400">⭐⭐⭐⭐⭐</td>
+                            </tr>
+                            <tr>
+                                <td class="px-4 py-3 font-bold text-white">PlatformIO (VSCode)</td>
+                                <td>輕量級開發、跨平台專案管理</td>
+                                <td class="text-sky-400">⭐⭐⭐⭐</td>
+                            </tr>
+                            <tr>
+                                <td class="px-4 py-3 font-bold text-white">arm-none-eabi-gcc 12.2+</td>
+                                <td>ARM 交叉編譯器 (基礎 Toolchain)</td>
+                                <td class="text-emerald-400">⭐⭐⭐⭐⭐</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="bg-slate-900 p-6 rounded-xl border border-slate-800 mb-8">
+                <h3 class="text-xl font-bold text-amber-400 mb-4 flex items-center"><i class="fa-solid fa-vr-cardboard mr-2"></i>仿真驗證環境 (SITL)</h3>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="bg-slate-950 p-4 rounded border border-slate-700">
+                        <strong class="text-white block mb-2">Gazebo Ignition (推薦)</strong>
+                        <p class="text-xs text-slate-400 mb-2">高保真物理引擎，支援 ROS 2 整合。</p>
+                        <code class="block bg-slate-900 p-2 rounded text-emerald-400 text-xs">make px4_sitl_default gazebo</code>
+                    </div>
+                    <div class="bg-slate-950 p-4 rounded border border-slate-700">
+                        <strong class="text-white block mb-2">jMAVSim</strong>
+                        <p class="text-xs text-slate-400 mb-2">輕量級，適合快速測試演算法。</p>
+                        <code class="block bg-slate-900 p-2 rounded text-sky-400 text-xs">make px4_sitl_default jmavsim</code>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== 15. AIoT & ROS 2 ==================== -->
         <section id="section-aiot" class="mb-16 hidden animate-section relative">
             <i class="fa-regular fa-bookmark bookmark-badge" data-bookmark="section-aiot"></i>
             <header class="mb-8 border-b border-slate-800 pb-4">
                 <h2 class="text-3xl font-bold text-slate-100 mb-2">AIoT 與邊緣運算層 (ROS 2 + ESP32)</h2>
-                <div class="flex items-center gap-2 text-slate-400 text-sm"><span class="source-badge badge-aiot">micro-ROS</span><span>Ubuntu 22.04 + Humble</span></div>
             </header>
-
             <div class="grid lg:grid-cols-2 gap-8 mb-8">
-                <!-- Architecture -->
                 <div class="bg-slate-900 p-6 rounded-xl border border-slate-800">
                     <h3 class="text-xl font-bold text-violet-400 mb-4"><i class="fa-solid fa-sitemap mr-2"></i>系統架構</h3>
                     <div class="bg-slate-950 p-4 rounded border border-slate-700 font-mono text-xs text-slate-300 whitespace-pre leading-relaxed">
@@ -730,10 +1246,7 @@ ESP32 (邊緣節點)
     ├─ Arduino Framework
     └─ micro-ROS Client (WiFi)
                     </div>
-                    <p class="text-sm text-slate-400 mt-4">應用：無線影像串流、自適應控制、TinyML 推論。</p>
                 </div>
-
-                <!-- ESP32 Code -->
                 <div class="bg-slate-900 p-6 rounded-xl border border-slate-800">
                     <h3 class="text-xl font-bold text-emerald-400 mb-4"><i class="fa-solid fa-code mr-2"></i>ESP32 Client 範例</h3>
                     <pre class="bg-slate-950 p-3 rounded border border-slate-700 text-xs font-mono text-slate-400 overflow-x-auto"><code>// Arduino + micro-ROS
@@ -743,17 +1256,10 @@ ESP32 (邊緣節點)
 
 void setup() {
   set_microros_wifi_transports("SSID", "PASS", IP, 8888);
-  
   rclc_node_init_default(&node, "esp32_node", "", &support);
-  rclc_publisher_init_default(
-    &pub, &node,
-    ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, Float32),
-    "sensor_data");
 }</code></pre>
                 </div>
             </div>
-
-            <!-- ROS 2 Integration -->
             <div class="bg-slate-900 p-6 rounded-xl border border-slate-800">
                 <h3 class="text-xl font-bold text-sky-400 mb-4"><i class="fa-brands fa-linux mr-2"></i>ROS 2 Humble + PX4 深度整合</h3>
                 <div class="grid md:grid-cols-2 gap-4">
@@ -761,39 +1267,36 @@ void setup() {
                         <strong class="text-white text-sm block mb-2">安裝步驟 (Ubuntu 22.04):</strong>
                         <ol class="list-decimal list-inside text-xs text-slate-400 space-y-1">
                             <li>安裝 ROS 2 Humble Desktop</li>
-                            <li>建立工作空間 <code>~/ros2_px4_ws</code></li>
-                            <li>克隆 <code>px4_ros_com</code> 與 <code>px4_msgs</code></li>
-                            <li>使用 <code>colcon build</code> 編譯</li>
-                            <li>啟動 <code>micro_xrce_dds_agent</code></li>
+                            <li>建立 <code>~/ros2_px4_ws</code>，克隆 <code>px4_ros_com</code></li>
+                            <li><code>colcon build</code> 編譯</li>
                         </ol>
                     </div>
                     <div class="bg-slate-950 p-3 rounded border border-slate-700">
-                        <strong class="text-white text-xs block mb-1">啟動命令:</strong>
+                        <strong class="text-white text-xs block mb-1">啟動 Agent:</strong>
                         <code class="text-xs text-sky-400 block">MicroXRCEAgent udp4 -p 8888</code>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- 15. Troubleshooting -->
+        <!-- ==================== 16. 故障診斷 ==================== -->
         <section id="section-maint" class="mb-16 hidden animate-section relative">
-            <i class="fa-regular fa-bookmark bookmark-badge" data-bookmark="section-maint"></i>
             <header class="mb-8 border-b border-slate-800 pb-4">
-                <h2 class="text-3xl font-bold text-slate-100 mb-2">故障診斷與維護 (Troubleshooting)</h2>
-                <div class="flex items-center gap-2 text-slate-400 text-sm"><span class="source-badge badge-standard">實戰經驗</span></div>
+                <h2 class="text-3xl font-bold text-slate-100 mb-2">故障診斷 (Troubleshooting)</h2>
             </header>
-
-            <div class="bg-slate-900 p-6 rounded-xl border border-slate-800 mb-6">
+            <div class="bg-slate-900 p-6 rounded-xl border border-slate-800">
                 <select id="diagnostic-select" onchange="showDiagnosis()" class="w-full p-3 bg-slate-800 border border-slate-700 rounded text-slate-200 mb-4">
                     <option value="">選擇症狀...</option>
-                    <option value="accel_nose_down">加速度計校正異常 (Nose Down Timeout)</option>
-                    <option value="motor_no_spin">馬達無反應 (Actuators Slider)</option>
-                    <option value="battery_volt">電池電壓異常 / 壓降過大</option>
+                    <option value="accel_nose_down">加速度計校正異常 (Nose Down)</option>
+                    <option value="motor_no_spin">馬達無反應 / 接線錯誤</option>
+                    <option value="kill_switch">緊急斷電 vs 安全鎖 (Kill Switch)</option>
+                    <option value="compass_inc">羅盤不一致 (Compass Inconsistent)</option>
+                    <option value="no_local_pos">位置預估失敗 (No Valid Local Position)</option>
+                    <option value="battery_volt">電池壓降過大</option>
                     <option value="ubuntu_dep">Ubuntu 24.04 安裝 CubeIDE 失敗</option>
                     <option value="sitl_udp">PX4 SITL 連接 Gazebo 逾時</option>
                     <option value="ros2_topic">ROS 2 找不到 /fmu 主題</option>
                     <option value="desync">馬達失步 (Desync)</option>
-                    <option value="mag">羅盤干擾 (Compass Error)</option>
                 </select>
                 <div id="diagnostic-result" class="hidden mt-4 p-4 bg-slate-950 border-l-4 border-emerald-500">
                     <h4 id="diag-title" class="font-bold text-emerald-400 mb-2"></h4>
@@ -802,32 +1305,75 @@ void setup() {
             </div>
         </section>
 
-        <!-- 16. Resources -->
+        <!-- ==================== 17. 資源與術語 (經典還原) ==================== -->
         <section id="section-resources" class="mb-16 hidden animate-section relative">
             <i class="fa-regular fa-bookmark bookmark-badge" data-bookmark="section-resources"></i>
             <header class="mb-8 border-b border-slate-800 pb-4">
                 <h2 class="text-3xl font-bold text-slate-100 mb-2">資源與術語 (Resources & Glossary)</h2>
             </header>
             
-            <!-- Battery Spec -->
-            <div class="bg-slate-900 p-6 rounded-xl border border-slate-800 mb-8">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-lg font-bold text-rose-400"><i class="fa-solid fa-car-battery mr-2"></i>4S LiPo 電池技術規範</h3>
-                    <span class="text-xs text-slate-500">CNHL 3300mAh</span>
+            <div class="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden mb-8">
+                <div class="flex border-b border-slate-800 bg-slate-950 overflow-x-auto">
+                    <button onclick="switchResTab('bom')" id="tab-res-bom" class="px-6 py-4 text-sm font-bold text-teal-400 bg-slate-900 border-r border-slate-800 transition whitespace-nowrap">BOM & Datasheets</button>
+                    <button onclick="switchResTab('battery')" id="tab-res-battery" class="px-6 py-4 text-sm font-bold text-slate-500 bg-slate-950 transition whitespace-nowrap">4S 電池規範</button>
+                    <button onclick="switchResTab('glossary')" id="tab-res-glossary" class="px-6 py-4 text-sm font-bold text-slate-500 bg-slate-950 transition whitespace-nowrap">工程術語表</button>
                 </div>
-                <div class="grid md:grid-cols-2 gap-6">
-                    <div class="bg-slate-950 p-4 rounded border border-slate-700">
-                        <strong class="text-white block mb-3 border-b border-slate-800 pb-2">基本參數 (Specs)</strong>
-                        <div class="grid grid-cols-2 gap-2 text-sm text-slate-300">
-                            <div>標稱電壓: <span class="text-sky-400">14.8V</span></div>
-                            <div>滿充總壓: <span class="text-emerald-400">16.8V</span></div>
-                            <div>單節滿充: <span class="text-emerald-400">4.2V</span></div>
-                            <div>放電倍率: <span class="text-rose-400">40C</span></div>
-                        </div>
+                
+                <!-- Tab: BOM -->
+                <div id="content-res-bom" class="p-6 md:p-8 animate-fade-in">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-left text-slate-400">
+                            <thead class="bg-slate-950 text-xs uppercase text-slate-500">
+                                <tr><th class="p-3">類別</th><th class="p-3">元件 (MPN)</th><th class="p-3">關鍵規格</th><th class="p-3">封裝</th><th class="p-3 text-right">Datasheet</th></tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-800">
+                                <tr>
+                                    <td class="p-3 text-purple-400">MCU (Main)</td>
+                                    <td class="p-3 font-bold text-white">STM32H743ZIT6</td>
+                                    <td>Cortex-M7, 480MHz, 2MB Flash</td>
+                                    <td>LQFP-144</td>
+                                    <td class="p-3 text-right"><a href="#" class="text-sky-400 hover:underline">PDF</a></td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 text-purple-400">MCU (IO)</td>
+                                    <td class="p-3 font-bold text-white">STM32F103C8T6</td>
+                                    <td>Cortex-M3, 72MHz (Failsafe)</td>
+                                    <td>LQFP-48</td>
+                                    <td class="p-3 text-right"><a href="#" class="text-sky-400 hover:underline">PDF</a></td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 text-emerald-400">IMU 1</td>
+                                    <td class="p-3 font-bold text-white">ICM-42688-P</td>
+                                    <td>High frequency vibration tolerance</td>
+                                    <td>LGA-14</td>
+                                    <td class="p-3 text-right"><a href="#" class="text-sky-400 hover:underline">PDF</a></td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 text-emerald-400">IMU 2</td>
+                                    <td class="p-3 font-bold text-white">BMI088</td>
+                                    <td>High stability, low drift</td>
+                                    <td>LGA-16</td>
+                                    <td class="p-3 text-right"><a href="#" class="text-sky-400 hover:underline">PDF</a></td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
-                    <div class="bg-slate-950 p-4 rounded border border-slate-700">
-                        <strong class="text-white block mb-3 border-b border-slate-800 pb-2">充電建議 (Charging)</strong>
-                        <div class="overflow-x-auto">
+                </div>
+
+                <!-- Tab: Battery -->
+                <div id="content-res-battery" class="hidden p-6 md:p-8 animate-fade-in">
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="bg-slate-950 p-4 rounded border border-slate-700">
+                            <strong class="text-white block mb-3 border-b border-slate-800 pb-2">基本參數 (CNHL 3300mAh)</strong>
+                            <div class="grid grid-cols-2 gap-2 text-sm text-slate-300">
+                                <div>標稱電壓: <span class="text-sky-400">14.8V</span></div>
+                                <div>滿充總壓: <span class="text-emerald-400">16.8V</span></div>
+                                <div>單節滿充: <span class="text-emerald-400">4.2V</span></div>
+                                <div>放電倍率: <span class="text-rose-400">40C</span></div>
+                            </div>
+                        </div>
+                        <div class="bg-slate-950 p-4 rounded border border-slate-700">
+                            <strong class="text-white block mb-3 border-b border-slate-800 pb-2">充電建議 (HOTA D6)</strong>
                             <table class="w-full text-xs text-left text-slate-400">
                                 <thead><tr><th class="pb-1">模式</th><th class="pb-1">電流</th><th class="pb-1">倍率</th></tr></thead>
                                 <tbody>
@@ -838,85 +1384,43 @@ void setup() {
                             </table>
                         </div>
                     </div>
-                </div>
-                <div class="mt-4 grid md:grid-cols-2 gap-4 text-xs">
-                    <div class="bg-slate-800 p-3 rounded text-slate-300 border-l-4 border-amber-500">
-                        <strong>安全規範:</strong> 必須連接平衡頭。超過 24hr 不使用請放電至 Storage 電壓 (3.85V/cell)。
-                    </div>
-                    <div class="bg-slate-800 p-3 rounded text-slate-300 border-l-4 border-rose-500">
-                        <strong>BMS 邏輯:</strong> 警報 (Alarm) 設為 3.5V/cell，強制切斷 (Cut-off) 設為 3.2V/cell。
-                    </div>
-                </div>
-            </div>
-
-            <!-- Engineering Glossary (NEW) -->
-            <div class="bg-slate-900 p-6 rounded-xl border border-slate-800 mb-8">
-                <h3 class="text-lg font-bold text-violet-400 mb-4"><i class="fa-solid fa-book-atlas mr-2"></i>工程術語手冊 (Engineering Glossary)</h3>
-                
-                <div class="space-y-6">
-                    <!-- Controls -->
-                    <div>
-                        <h4 class="text-sm font-bold text-slate-300 border-l-4 border-sky-500 pl-2 mb-2">1. 飛行控制 (Controls)</h4>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-xs text-left text-slate-400">
-                                <thead class="bg-slate-950 uppercase"><tr><th class="p-2">術語 (代號)</th><th class="p-2">定義</th><th class="p-2">功能</th></tr></thead>
-                                <tbody class="divide-y divide-slate-800">
-                                    <tr><td class="p-2 font-bold text-white">Throttle (THR)</td><td>油門</td><td>控制高度 (Multicopter) 或速度 (Fixed-wing)。</td></tr>
-                                    <tr><td class="p-2 font-bold text-white">Yaw (RUD)</td><td>偏航</td><td>機頭左右轉向 (自轉)。</td></tr>
-                                    <tr><td class="p-2 font-bold text-white">Pitch (ELE)</td><td>俯仰</td><td>機頭上下傾斜 (前進/後退)。</td></tr>
-                                    <tr><td class="p-2 font-bold text-white">Roll (AIL)</td><td>橫滾</td><td>機身左右傾斜 (平移)。</td></tr>
-                                </tbody>
-                            </table>
+                    <div class="mt-4 grid md:grid-cols-2 gap-4 text-xs">
+                        <div class="bg-slate-800 p-3 rounded text-slate-300 border-l-4 border-amber-500">
+                            <strong>安全規範:</strong> 必須連接平衡頭。超過 24hr 不使用請放電至 Storage 電壓 (3.85V/cell)。
+                        </div>
+                        <div class="bg-slate-800 p-3 rounded text-slate-300 border-l-4 border-rose-500">
+                            <strong>BMS 邏輯:</strong> 警報 (Alarm) 設為 3.5V/cell，強制切斷 (Cut-off) 設為 3.2V/cell。
                         </div>
                     </div>
+                </div>
 
-                    <!-- QGC Config -->
-                    <div>
-                        <h4 class="text-sm font-bold text-slate-300 border-l-4 border-emerald-500 pl-2 mb-2">2. QGC 設定 (Configuration)</h4>
-                        <div class="grid grid-cols-2 gap-4 text-xs text-slate-400">
-                            <div class="bg-slate-950 p-2 rounded"><strong>Airframe:</strong> 機架選擇 (Quadrotor X, Hexacopter)。</div>
-                            <div class="bg-slate-950 p-2 rounded"><strong>Sensors:</strong> 感測器校正 (Accel, Gyro, Mag, Level)。</div>
-                            <div class="bg-slate-950 p-2 rounded"><strong>Radio:</strong> 遙控器通道映射與校正。</div>
-                            <div class="bg-slate-950 p-2 rounded"><strong>Actuators:</strong> 馬達輸出與轉向設定 (PX4 v1.14+)。</div>
+                <!-- Tab: Glossary -->
+                <div id="content-res-glossary" class="hidden p-6 md:p-8 animate-fade-in">
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <h4 class="text-sm font-bold text-slate-300 border-l-4 border-sky-500 pl-2 mb-2">1. 飛行控制 (Controls)</h4>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-xs text-left text-slate-400">
+                                    <thead class="bg-slate-950 uppercase"><tr><th class="p-2">術語 (代號)</th><th class="p-2">定義</th><th class="p-2">功能</th></tr></thead>
+                                    <tbody class="divide-y divide-slate-800">
+                                        <tr><td class="p-2 font-bold text-white">Throttle (THR)</td><td>油門</td><td>控制高度 (Multicopter) 或速度 (Fixed-wing)。</td></tr>
+                                        <tr><td class="p-2 font-bold text-white">Yaw (RUD)</td><td>偏航</td><td>機頭左右轉向 (自轉)。</td></tr>
+                                        <tr><td class="p-2 font-bold text-white">Pitch (ELE)</td><td>俯仰</td><td>機頭上下傾斜 (前進/後退)。</td></tr>
+                                        <tr><td class="p-2 font-bold text-white">Roll (AIL)</td><td>橫滾</td><td>機身左右傾斜 (平移)。</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="text-sm font-bold text-slate-300 border-l-4 border-emerald-500 pl-2 mb-2">2. QGC 設定 (Configuration)</h4>
+                            <div class="grid grid-cols-2 gap-4 text-xs text-slate-400">
+                                <div class="bg-slate-950 p-2 rounded"><strong>Airframe:</strong> 機架選擇 (Quadrotor X, Hexacopter)。</div>
+                                <div class="bg-slate-950 p-2 rounded"><strong>Sensors:</strong> 感測器校正 (Accel, Gyro, Mag, Level)。</div>
+                                <div class="bg-slate-950 p-2 rounded"><strong>Radio:</strong> 遙控器通道映射與校正。</div>
+                                <div class="bg-slate-950 p-2 rounded"><strong>Actuators:</strong> 馬達輸出與轉向設定 (PX4 v1.14+)。</div>
+                            </div>
                         </div>
                     </div>
-
-                    <!-- Flight Modes -->
-                    <div>
-                        <h4 class="text-sm font-bold text-slate-300 border-l-4 border-amber-500 pl-2 mb-2">3. 飛行模式 (Flight Modes)</h4>
-                        <ul class="text-xs text-slate-400 space-y-1">
-                            <li><span class="text-white font-bold w-20 inline-block">Stabilized:</span> 自穩模式。純手動，無 GPS，僅維持水平。</li>
-                            <li><span class="text-white font-bold w-20 inline-block">Position:</span> 定點模式。GPS 輔助懸停 (Loiter)。</li>
-                            <li><span class="text-white font-bold w-20 inline-block">RTL:</span> 返航模式 (Return To Launch)。</li>
-                            <li><span class="text-white font-bold w-20 inline-block">Offboard:</span> 外部控制。由 Companion Computer (ROS 2) 控制。</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
-            <div class="grid lg:grid-cols-2 gap-8">
-                <div class="bg-slate-900 p-6 rounded-xl border border-slate-800">
-                    <h3 class="text-lg font-bold text-teal-400 mb-4">硬體成本估算 (2026 Q1 參考)</h3>
-                    <table class="w-full text-sm text-slate-400">
-                        <thead class="text-xs text-slate-500 bg-slate-950"><tr><th class="p-2 text-left">組件</th><th class="p-2 text-right">預估 (NTD)</th></tr></thead>
-                        <tbody class="divide-y divide-slate-800">
-                            <tr><td class="p-2">Pixhawk 6C 飛控</td><td class="p-2 text-right">3,500</td></tr>
-                            <tr><td class="p-2">STM32H743 核心板</td><td class="p-2 text-right">1,200</td></tr>
-                            <tr><td class="p-2">ESP32-S3 DevKit</td><td class="p-2 text-right">500</td></tr>
-                            <tr><td class="p-2">Jetson Orin Nano (伴飛)</td><td class="p-2 text-right">12,000</td></tr>
-                            <tr><td class="p-2">ST-Link V3 / J-Link</td><td class="p-2 text-right">600</td></tr>
-                            <tr class="font-bold text-white bg-slate-800"><td class="p-2">總計 (不含機架動力)</td><td class="p-2 text-right">~17,800</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="bg-slate-900 p-6 rounded-xl border border-slate-800">
-                    <h3 class="text-lg font-bold text-sky-400 mb-4">社群與文檔資源</h3>
-                    <ul class="space-y-3 text-sm text-slate-300">
-                        <li><a href="https://docs.px4.io/main/zh/" target="_blank" class="hover:text-sky-400 transition"><i class="fa-solid fa-book mr-2"></i>PX4 官方文檔 (中文)</a></li>
-                        <li><a href="https://ardupilot.org/copter/" target="_blank" class="hover:text-rose-400 transition"><i class="fa-solid fa-book mr-2"></i>ArduPilot Wiki</a></li>
-                        <li><a href="https://docs.ros.org/en/humble/" target="_blank" class="hover:text-violet-400 transition"><i class="fa-brands fa-linux mr-2"></i>ROS 2 Humble 文檔</a></li>
-                        <li><a href="https://micro.ros.org/" target="_blank" class="hover:text-emerald-400 transition"><i class="fa-solid fa-microchip mr-2"></i>micro-ROS 官網</a></li>
-                    </ul>
                 </div>
             </div>
         </section>
@@ -924,24 +1428,25 @@ void setup() {
     </main>
 
     <script>
-        // ==================== 全域變數 ====================
+        // ==================== 1. 全域變數 ====================
         let currentSection = 'section-roadmap';
         let vehicleChartInstance = null;
         let pidChartInstance = null;
         let bookmarks = JSON.parse(localStorage.getItem('uas-bookmarks') || '[]');
         let tourStep = 0;
 
-        // ==================== 搜尋資料 (更新) ====================
+        // ==================== 2. 搜尋資料 (完整版) ====================
         const searchData = [
             { title: '技術路線圖', section: 'section-roadmap', keywords: ['roadmap', 'imx', 'rt1176', 'pab', 'rtk'] },
             { title: 'X500 硬體拆解', section: 'section-teardown', keywords: ['x500', 'teardown', 'pixhawk', '6c'] },
+            { title: 'X500 AIoT 建置', section: 'section-build-aiot', keywords: ['build', 'aiot', 'pi5', 'yolo', 'ubec'] },
             { title: '專案實作日誌', section: 'section-logs', keywords: ['log', 'build', 'config', 'qgc', 'calibration', 'sop'] },
             { title: 'MCU 架構詳解', section: 'section-mcu', keywords: ['mcu', 'stm32', 'h7', 'f103', 'io'] },
-            { title: '自製硬體指南', section: 'section-design', keywords: ['design', 'diy', 'pinout'] },
+            { title: '硬體解剖', section: 'section-hardware', keywords: ['hardware', 'anatomy'] },
             { title: 'Pixhawk 6X/6C', section: 'section-pixhawk', keywords: ['pixhawk', '6x', '6c'] },
+            { title: '自製硬體指南', section: 'section-design', keywords: ['design', 'diy', 'pinout'] },
             { title: 'BLDC 馬達實驗室', section: 'section-bldc', keywords: ['bldc', 'motor', 'esc', 'foc'] },
             { title: '系統概觀', section: 'section-intro', keywords: ['intro', 'overview', '飛行原理'] },
-            { title: '硬體解剖', section: 'section-hardware', keywords: ['hardware', 'anatomy'] },
             { title: 'DShot 通訊時序', section: 'section-protocols', keywords: ['dshot', 'protocol'] },
             { title: 'PID 控制理論', section: 'section-pid', keywords: ['pid', 'control', 'tuning'] },
             { title: '開發環境', section: 'section-devenv', keywords: ['dev', 'environment', 'ide', 'cubeide', 'platformio', 'checklist'] },
@@ -951,11 +1456,12 @@ void setup() {
             { title: '資源與術語', section: 'section-resources', keywords: ['cost', 'bom', 'price', 'community', 'battery', 'lipo', 'glossary', 'throttle', 'yaw', 'pitch', 'roll'] }
         ];
 
-        // ==================== 初始化 ====================
+        // ==================== 3. 頁面加載初始化 ====================
         document.addEventListener('DOMContentLoaded', function() {
             initNavigation();
             initCharts();
             initPortDetails();
+            initAnatomy();
             initMobileMenu();
             initScrollProgress();
             initBackToTop();
@@ -965,7 +1471,7 @@ void setup() {
             updateBookmarkUI();
         });
 
-        // ==================== 導航功能 ====================
+        // ==================== 4. 側邊欄導航功能 ====================
         function initNavigation() {
             const navItems = document.querySelectorAll('.nav-item');
             navItems.forEach(item => {
@@ -973,15 +1479,22 @@ void setup() {
                     e.preventDefault();
                     const targetSection = this.getAttribute('data-section');
                     showSection(targetSection);
+                    
                     navItems.forEach(nav => nav.classList.remove('active'));
                     this.classList.add('active');
-                    if (window.innerWidth < 768) document.getElementById('sidebar').classList.add('hidden');
+                    
+                    if (window.innerWidth < 768) {
+                        document.getElementById('sidebar').classList.add('hidden');
+                    }
                 });
             });
         }
 
         function showSection(sectionId) {
-            document.querySelectorAll('section').forEach(section => section.classList.add('hidden'));
+            document.querySelectorAll('section').forEach(section => {
+                section.classList.add('hidden');
+            });
+            
             const targetSection = document.getElementById(sectionId);
             if (targetSection) {
                 targetSection.classList.remove('hidden');
@@ -991,32 +1504,204 @@ void setup() {
             }
         }
 
-        // ==================== Pixhawk 推薦 ====================
-        function recommendBoard(useCase) {
-            const rec = useCase === 'industrial' ? { board: 'Pixhawk 6X', color: 'emerald', reasons: ['三路冗餘', '硬體加密', 'Ethernet'] } : { board: 'Pixhawk 6C', color: 'sky', reasons: ['成本效益', '整合式設計', '雙路冗餘'] };
-            const div = document.getElementById('recommendation-result');
-            div.innerHTML = `<div class="flex items-start"><i class="fa-solid fa-lightbulb text-${rec.color}-400 text-2xl mr-3 mt-1"></i><div><strong class="text-${rec.color}-400 text-lg block mb-2">推薦: ${rec.board}</strong><ul class="space-y-2 text-sm text-slate-300">${rec.reasons.map(r => `<li>✓ ${r}</li>`).join('')}</ul></div></div>`;
-            div.classList.remove('hidden', 'border-slate-600');
-            div.classList.add('border-' + rec.color + '-500');
+        // ==================== 5. 圖表初始化 (Chart.js) ====================
+        function initCharts() {
+            const vehicleCtx = document.getElementById('vehicleChart');
+            if (vehicleCtx) {
+                vehicleChartInstance = new Chart(vehicleCtx, {
+                    type: 'radar',
+                    data: {
+                        labels: ['速度', '續航', '載重', '穩定性', '成本'],
+                        datasets: [{
+                            label: '多旋翼',
+                            data: [8, 6, 7, 9, 7],
+                            borderColor: 'rgb(56, 189, 248)',
+                            backgroundColor: 'rgba(56, 189, 248, 0.2)'
+                        }, {
+                            label: '固定翼',
+                            data: [9, 9, 6, 7, 6],
+                            borderColor: 'rgb(16, 185, 129)',
+                            backgroundColor: 'rgba(16, 185, 129, 0.2)'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            r: {
+                                beginAtZero: true, max: 10,
+                                ticks: { color: '#64748b', display: false },
+                                grid: { color: '#334155' },
+                                pointLabels: { color: '#cbd5e1' }
+                            }
+                        },
+                        plugins: { legend: { labels: { color: '#cbd5e1' } } }
+                    }
+                });
+            }
+
+            const pidCtx = document.getElementById('pidChart');
+            if (pidCtx) {
+                const timeData = Array.from({length: 50}, (_, i) => i * 0.1);
+                pidChartInstance = new Chart(pidCtx, {
+                    type: 'line',
+                    data: {
+                        labels: timeData,
+                        datasets: [{
+                            label: 'P Only',
+                            data: timeData.map(t => 1 - Math.exp(-t) + 0.2 * Math.sin(3*t)),
+                            borderColor: 'rgb(16, 185, 129)', backgroundColor: 'rgba(16, 185, 129, 0.1)', tension: 0.4
+                        }, {
+                            label: 'PD',
+                            data: timeData.map(t => 1 - Math.exp(-1.5*t) + 0.05 * Math.sin(4*t)),
+                            borderColor: 'rgb(56, 189, 248)', backgroundColor: 'rgba(56, 189, 248, 0.1)', tension: 0.4
+                        }, {
+                            label: 'PID',
+                            data: timeData.map(t => 1 - Math.exp(-2*t)),
+                            borderColor: 'rgb(251, 191, 36)', backgroundColor: 'rgba(251, 191, 36, 0.1)', tension: 0.4
+                        }, {
+                            label: 'Setpoint',
+                            data: timeData.map(() => 1),
+                            borderColor: 'rgb(148, 163, 184)', borderDash: [5, 5], pointRadius: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: { display: false },
+                            y: { ticks: { color: '#64748b' }, grid: { color: '#334155' } }
+                        },
+                        plugins: { legend: { labels: { color: '#cbd5e1' } } }
+                    }
+                });
+            }
         }
 
-        // ==================== 軟體棧切換 ====================
-        function switchStack(id) {
-            document.getElementById('content-px4').classList.add('hidden');
-            document.getElementById('content-ardupilot').classList.add('hidden');
-            document.getElementById(`content-${id}`).classList.remove('hidden');
-            document.getElementById('tab-px4').className = id === 'px4' ? 'flex-1 py-4 font-bold text-sky-400 bg-slate-900 border-r border-slate-800 transition' : 'flex-1 py-4 font-bold text-slate-500 bg-slate-950 transition';
-            document.getElementById('tab-ardupilot').className = id === 'ardupilot' ? 'flex-1 py-4 font-bold text-rose-400 bg-slate-900 transition' : 'flex-1 py-4 font-bold text-slate-500 bg-slate-950 transition';
+        // ==================== 6. Port 詳細資訊互動 ====================
+        const portData = {
+            power: {
+                icon: '<i class="fa-solid fa-battery-full text-rose-500"></i>',
+                title: 'POWER 1 & 2',
+                content: `
+                    <div class="space-y-3">
+                        <div class="overflow-x-auto">
+                            <table class="pin-table w-full text-left">
+                                <thead><tr><th>Pin</th><th>Function</th><th>Voltage</th></tr></thead>
+                                <tbody>
+                                    <tr><td>1,2</td><td>VCC</td><td><span class="voltage-tag v-5">5V</span> (Max 3A)</td></tr>
+                                    <tr><td>3</td><td>I_SENS</td><td><span class="voltage-tag v-33">3.3V</span> (Analog)</td></tr>
+                                    <tr><td>4</td><td>V_SENS</td><td><span class="voltage-tag v-33">3.3V</span> (Analog)</td></tr>
+                                    <tr><td>5,6</td><td>GND</td><td>GND</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>`
+            },
+            gps: {
+                icon: '<i class="fa-solid fa-satellite text-emerald-500"></i>',
+                title: 'GPS 1 & 2',
+                content: `
+                    <div class="space-y-3">
+                        <div class="overflow-x-auto">
+                            <table class="pin-table w-full text-left">
+                                <thead><tr><th>Pin</th><th>Function</th><th>Protocol</th></tr></thead>
+                                <tbody>
+                                    <tr><td>1</td><td>VCC</td><td><span class="voltage-tag v-5">5V</span></td></tr>
+                                    <tr><td>2,3</td><td>TX/RX</td><td>UART</td></tr>
+                                    <tr><td>4,5</td><td>SCL/SDA</td><td>I2C</td></tr>
+                                    <tr><td>6,7</td><td>SAFETY</td><td>GPIO</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>`
+            },
+            telem: {
+                icon: '<i class="fa-solid fa-wifi text-sky-500"></i>',
+                title: 'TELEM 1-3',
+                content: `
+                    <div class="space-y-3">
+                        <div class="overflow-x-auto">
+                            <table class="pin-table w-full text-left">
+                                <thead><tr><th>Pin</th><th>Function</th><th>Note</th></tr></thead>
+                                <tbody>
+                                    <tr><td>1</td><td>VCC</td><td><span class="voltage-tag v-5">5V</span> (TELEM1 限流 1.5A)</td></tr>
+                                    <tr><td>2,3</td><td>TX/RX</td><td>UART</td></tr>
+                                    <tr><td>4,5</td><td>CTS/RTS</td><td>Flow Control</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>`
+            },
+            fmu_pwm: {
+                icon: '<i class="fa-solid fa-fan text-amber-500"></i>',
+                title: 'FMU PWM OUT',
+                content: `
+                    <div class="space-y-3">
+                        <p class="text-sm">由主處理器 (FMU H7) 直接輸出的 PWM/DShot 訊號。</p>
+                        <div class="bg-amber-900/20 border border-amber-800 p-2 rounded mt-3">
+                            <strong class="text-amber-400 text-xs">注意:</strong>
+                            <p class="text-xs text-slate-400 mt-1">FMU PWM 無硬體 Failsafe，建議用於 DShot 電變或雲台控制。</p>
+                        </div>
+                    </div>`
+            },
+            io_pwm: {
+                icon: '<i class="fa-solid fa-gears text-slate-400"></i>',
+                title: 'IO PWM OUT (Main)',
+                content: `
+                    <div class="space-y-3">
+                        <p class="text-sm">由 IO 協處理器 (STM32F103) 輸出, 具備硬體 Failsafe。</p>
+                        <div class="bg-emerald-900/20 border border-emerald-800 p-2 rounded mt-3">
+                            <strong class="text-emerald-400 text-xs">優勢:</strong>
+                            <p class="text-xs text-slate-400 mt-1">當主板當機時，IO 仍可自動接管或切換 RC 直通模式。</p>
+                        </div>
+                    </div>`
+            },
+            can: {
+                icon: '<i class="fa-solid fa-network-wired text-indigo-500"></i>',
+                title: 'CAN 1 & 2',
+                content: `
+                    <div class="space-y-3">
+                        <div class="overflow-x-auto">
+                            <table class="pin-table w-full text-left">
+                                <thead><tr><th>Pin</th><th>Function</th></tr></thead>
+                                <tbody>
+                                    <tr><td>1</td><td>VCC</td></tr>
+                                    <tr><td>2,3</td><td>CAN_H / CAN_L</td></tr>
+                                    <tr><td>4</td><td>GND</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>`
+            }
+        };
+
+        function initPortDetails() {
+            const portConnectors = document.querySelectorAll('.port-connector');
+            portConnectors.forEach(c => {
+                c.addEventListener('click', function() {
+                    const d = portData[this.getAttribute('data-port')];
+                    if (d) {
+                        document.getElementById('port-icon').innerHTML = d.icon;
+                        document.getElementById('port-title').textContent = d.title;
+                        document.getElementById('port-content').innerHTML = d.content;
+                        
+                        portConnectors.forEach(el => el.classList.remove('ring-2', 'ring-sky-500'));
+                        this.classList.add('ring-2', 'ring-sky-500');
+                    }
+                });
+            });
         }
 
-        // ==================== 設計指南與日誌切換 (更新) ====================
-        function showDesignTab(tabId) {
-            document.getElementById('content-modules').classList.add('hidden');
-            document.getElementById('content-pinout').classList.add('hidden');
-            document.getElementById(`content-${tabId}`).classList.remove('hidden');
-            document.getElementById('tab-modules').className = tabId === 'modules' ? "px-6 py-4 text-sm font-bold text-pink-400 bg-slate-900 border-r border-slate-800 transition whitespace-nowrap" : "px-6 py-4 text-sm font-bold text-slate-500 bg-slate-950 transition whitespace-nowrap";
-            document.getElementById('tab-pinout').className = tabId === 'pinout' ? "px-6 py-4 text-sm font-bold text-pink-400 bg-slate-900 border-l border-slate-800 transition whitespace-nowrap" : "px-6 py-4 text-sm font-bold text-slate-500 bg-slate-950 transition whitespace-nowrap";
+        // ==================== 7. 各種頁籤切換 ====================
+        function switchDesignTab(tabId) {
+            document.getElementById('content-design-modules').classList.add('hidden');
+            document.getElementById('content-design-pinout').classList.add('hidden');
+            document.getElementById(`content-design-${tabId}`).classList.remove('hidden');
+            document.getElementById('tab-design-modules').className = tabId === 'modules' ? "px-6 py-4 text-sm font-bold text-pink-400 bg-slate-900 border-r border-slate-800 transition whitespace-nowrap" : "px-6 py-4 text-sm font-bold text-slate-500 bg-slate-950 transition whitespace-nowrap";
+            document.getElementById('tab-design-pinout').className = tabId === 'pinout' ? "px-6 py-4 text-sm font-bold text-pink-400 bg-slate-900 border-l border-slate-800 transition whitespace-nowrap" : "px-6 py-4 text-sm font-bold text-slate-500 bg-slate-950 transition whitespace-nowrap";
         }
+        function showDesignTab(id) { switchDesignTab(id); } // Alias
 
         function switchLogsTab(tabId) {
             document.getElementById('content-logs-status').classList.add('hidden');
@@ -1026,12 +1711,189 @@ void setup() {
             document.getElementById('tab-log-sop').className = tabId === 'sop' ? "px-6 py-4 text-sm font-bold text-amber-400 bg-slate-900 border-l border-slate-800 transition whitespace-nowrap" : "px-6 py-4 text-sm font-bold text-slate-500 bg-slate-950 transition whitespace-nowrap";
         }
 
-        // ==================== 故障診斷 (更新) ====================
+        function switchSoftTab(id) {
+            document.getElementById('content-soft-px4').classList.add('hidden');
+            document.getElementById('content-soft-ardupilot').classList.add('hidden');
+            document.getElementById(`content-soft-${id}`).classList.remove('hidden');
+            document.getElementById('tab-soft-px4').className = id === 'px4' ? 'flex-1 py-4 font-bold text-sky-400 bg-slate-900 border-r border-slate-800 transition' : 'flex-1 py-4 font-bold text-slate-500 bg-slate-950 transition';
+            document.getElementById('tab-soft-ardupilot').className = id === 'ardupilot' ? 'flex-1 py-4 font-bold text-rose-400 bg-slate-900 transition' : 'flex-1 py-4 font-bold text-slate-500 bg-slate-950 transition';
+        }
+
+        function switchProtoTab(id) {
+            document.getElementById('content-proto-pwm').classList.add('hidden');
+            document.getElementById('content-proto-dshot').classList.add('hidden');
+            document.getElementById(`content-proto-${id}`).classList.remove('hidden');
+            document.getElementById('tab-proto-pwm').className = id === 'pwm' ? 'px-6 py-4 text-sm font-bold text-blue-400 bg-slate-900 border-r border-slate-800 transition whitespace-nowrap' : 'px-6 py-4 text-sm font-bold text-slate-500 bg-slate-950 transition whitespace-nowrap';
+            document.getElementById('tab-proto-dshot').className = id === 'dshot' ? 'px-6 py-4 text-sm font-bold text-sky-400 bg-slate-900 border-l border-slate-800 transition whitespace-nowrap' : 'px-6 py-4 text-sm font-bold text-slate-500 bg-slate-950 transition whitespace-nowrap';
+        }
+
+        function switchResTab(tabId) {
+            document.getElementById('content-res-bom').classList.add('hidden');
+            document.getElementById('content-res-battery').classList.add('hidden');
+            document.getElementById('content-res-glossary').classList.add('hidden');
+            document.getElementById(`content-res-${tabId}`).classList.remove('hidden');
+            
+            ['bom', 'battery', 'glossary'].forEach(id => {
+                document.getElementById(`tab-res-${id}`).className = "px-6 py-4 text-sm font-bold text-slate-500 bg-slate-950 transition whitespace-nowrap";
+            });
+            document.getElementById(`tab-res-${tabId}`).className = "px-6 py-4 text-sm font-bold text-teal-400 bg-slate-900 border-x border-slate-800 transition whitespace-nowrap";
+        }
+
+        // ==================== 8. 硬體解剖學資料 ====================
+        const anatomyDataArray = [
+            { id: 'brain', icon: '🧠', title: 'FC (FMU H7)', desc: '系統大腦，執行 EKF3 與控制迴路。', specs: ['<span class="text-white">IMU Bus:</span> SPI1 (10MHz)', '<span class="text-white">SD Card:</span> SDMMC1 (4-bit)', '<span class="text-white">RAM:</span> 1MB SRAM + 2MB Flash'] },
+            { id: 'senses', icon: '👁️', title: 'Sensors (IMU)', desc: 'ICM-42688-P (High Rate) + BMI088 (Stable)。', specs: ['<span class="text-white">ICM-42688:</span> Low noise, 4kHz loop', '<span class="text-white">BMI088:</span> Vibration robust', '<span class="text-white">Mag:</span> External I2C (BMM150)'] },
+            { id: 'heart', icon: '🔋', title: 'Power (PMIC)', desc: 'LTC4417 三路電源切換 (PowerPath)。', specs: ['<span class="text-white">Input:</span> 3x Sources (Batt1/2, USB)', '<span class="text-white">Limit:</span> 5.7V Max Input', '<span class="text-white">Monitor:</span> Analog V/I Sense'] },
+            { id: 'muscle', icon: '💪', title: 'IO (Failsafe)', desc: 'F103 協處理器，負責 PWM 與 RC。', specs: ['<span class="text-white">Proto:</span> SBUS/PPM/DSM', '<span class="text-white">PWM:</span> 8x Main Outputs', '<span class="text-white">Link:</span> UART @ 1.5Mbps'] }
+        ];
+
+        function initAnatomy() {
+            const ag = document.getElementById('anatomy-grid');
+            if(ag) {
+                anatomyDataArray.forEach(d => {
+                    const div = document.createElement('div');
+                    div.className = 'interactive-card bg-slate-900 p-4 rounded-xl border border-slate-800 shadow-lg text-center group';
+                    div.onclick = () => {
+                        document.getElementById('detail-title').innerText = d.title;
+                        document.getElementById('detail-desc').innerText = d.desc;
+                        document.getElementById('detail-specs').innerHTML = d.specs.map(s => `<li>> ${s}</li>`).join('');
+                        document.getElementById('anatomy-detail').classList.remove('hidden');
+                    };
+                    div.innerHTML = `<div class="text-3xl mb-2 grayscale group-hover:grayscale-0 transition">${d.icon}</div><h3 class="font-bold text-slate-200 text-sm">${d.title}</h3>`;
+                    ag.appendChild(div);
+                });
+            }
+        }
+
+        // ==================== 9. 輔助/次要互動 ====================
+        function initMobileMenu() {
+            const menuBtn = document.getElementById('mobile-menu-btn');
+            const sidebar = document.getElementById('sidebar');
+            if (menuBtn && sidebar) {
+                menuBtn.addEventListener('click', function() { sidebar.classList.toggle('hidden'); });
+            }
+        }
+
+        function initScrollProgress() {
+            const progressBar = document.getElementById('reading-progress');
+            window.addEventListener('scroll', function() {
+                const windowHeight = window.innerHeight;
+                const documentHeight = document.documentElement.scrollHeight - windowHeight;
+                const scrolled = window.scrollY;
+                progressBar.style.width = (scrolled / documentHeight) * 100 + '%';
+            });
+        }
+
+        function initBackToTop() {
+            const btn = document.getElementById('back-to-top');
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 300) btn.classList.add('visible'); 
+                else btn.classList.remove('visible');
+            });
+            btn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+        }
+
+        function initSearch() {
+            const input = document.getElementById('search-input');
+            const results = document.getElementById('search-results');
+            
+            input.addEventListener('input', function(e) {
+                const query = e.target.value.toLowerCase().trim();
+                if (query.length < 2) { results.classList.add('hidden'); return; }
+                
+                const res = searchData.filter(item => item.title.toLowerCase().includes(query) || item.keywords.some(k => k.includes(query)));
+                
+                if (res.length > 0) {
+                    results.innerHTML = res.map(result => `
+                        <div class="search-result-item" onclick="navigateToSection('${result.section}')">
+                            <div class="font-bold text-slate-200 text-sm">${result.title}</div>
+                        </div>
+                    `).join('');
+                    results.classList.remove('hidden');
+                } else {
+                    results.innerHTML = '<div class="search-result-item text-slate-500 text-sm">無搜尋結果</div>';
+                    results.classList.remove('hidden');
+                }
+            });
+            
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.search-container')) { results.classList.add('hidden'); }
+            });
+        }
+
+        function navigateToSection(sectionId) {
+            showSection(sectionId);
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('data-section') === sectionId) item.classList.add('active');
+            });
+            document.getElementById('search-results').classList.add('hidden');
+            document.getElementById('search-input').value = '';
+            if (window.innerWidth < 768) document.getElementById('sidebar').classList.add('hidden');
+        }
+
+        function initBookmarks() {
+            document.querySelectorAll('.bookmark-badge').forEach(b => {
+                const sid = b.getAttribute('data-bookmark');
+                if(bookmarks.includes(sid)) {
+                    b.classList.add('bookmarked'); b.classList.remove('fa-regular'); b.classList.add('fa-solid');
+                }
+                
+                b.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const index = bookmarks.indexOf(sid);
+                    if (index > -1) {
+                        bookmarks.splice(index, 1);
+                        this.classList.remove('bookmarked', 'fa-solid'); this.classList.add('fa-regular');
+                    } else {
+                        bookmarks.push(sid);
+                        this.classList.add('bookmarked', 'fa-solid'); this.classList.remove('fa-regular');
+                    }
+                    localStorage.setItem('uas-bookmarks', JSON.stringify(bookmarks));
+                    updateBookmarkUI();
+                });
+            });
+        }
+
+        function updateBookmarkUI() {
+            const list = document.getElementById('bookmark-list');
+            document.getElementById('bookmark-count').innerText = bookmarks.length;
+            
+            if (bookmarks.length === 0) {
+                list.innerHTML = '<div class="text-slate-600 italic">尚無書籤</div>'; return;
+            }
+            list.innerHTML = bookmarks.map(bid => {
+                const d = searchData.find(s => s.section === bid);
+                return `
+                    <div class="flex items-center justify-between p-2 bg-slate-800 rounded hover:bg-slate-700 cursor-pointer transition" onclick="navigateToSection('${bid}')">
+                        <span class="text-slate-300">${d ? d.title : bid}</span>
+                        <i class="fa-solid fa-chevron-right text-slate-600"></i>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function initThemeToggle() {
+            const t = document.getElementById('theme-toggle');
+            const html = document.documentElement;
+            
+            if(localStorage.getItem('uas-theme') === 'light') { 
+                html.classList.remove('dark'); t.classList.remove('active'); 
+            }
+            
+            t.addEventListener('click', function() {
+                html.classList.toggle('dark');
+                this.classList.toggle('active');
+                localStorage.setItem('uas-theme', html.classList.contains('dark') ? 'dark' : 'light');
+            });
+        }
+
         function showDiagnosis() {
             const v = document.getElementById('diagnostic-select').value;
             const r = document.getElementById('diagnostic-result');
             const t = document.getElementById('diag-title');
             const d = document.getElementById('diag-desc');
+            
             if(!v) { r.classList.add('hidden'); return; }
             
             const db = {
@@ -1042,183 +1904,100 @@ void setup() {
                 sitl_udp: { t:'SITL 連接 Gazebo 逾時', d:'解法：1. 檢查防火牆 (ufw allow 14550/udp)。\n2. 設定 export PX4_SIM_HOST_ADDR=127.0.0.1。\n3. 使用 make px4_sitl_default gazebo __verbose:=1 查看詳細錯誤。' },
                 ros2_topic: { t:'ROS 2 找不到 /fmu 主題', d:'解法：1. 確認 micro_xrce_dds_agent 已啟動 (udp4 -p 8888)。\n2. 確認 PX4 SITL 運行中。\n3. 重新 source /opt/ros/humble/setup.bash。' },
                 desync: { t:'馬達失步 (Desync)', d:'建議操作：1. 在 BLHeli 中增加 Rampup Power。 2. 檢查馬達接線是否鬆脫。' },
-                mag: { t:'羅盤干擾 (TBE)', d:'建議操作：1. 重新校準磁羅盤。 2. 將 GPS 支架移離 PDB 或電源線。' }
+                mag: { t:'羅盤干擾 (TBE)', d:'建議操作：1. 重新校準磁羅盤。 2. 將 GPS 支架移離 PDB 或電源線。' },
+                kill_switch: { t:'緊急斷電 (Kill Switch) 邏輯', d:'說明：按下 Kill Switch 馬達會瞬間停轉，但系統【仍維持 Armed 狀態】。\n注意：若在空中撥回開關，馬達會立即恢復全速旋轉！' },
+                compass_inc: { t:'羅盤不一致 (Compass Inconsistent)', d:'根因：環境磁場干擾，導致羅盤誤差超過 60 度。\n解法：系統會顯示紅色 Not Ready。請遠離金屬/螢幕，並在 Sensors 頁面重新六面校正。' },
+                no_local_pos: { t:'位置預估失敗 (No Valid Local Position)', d:'根因：室內無 GPS 訊號，Position 模式鎖死。\n解法：透過遙控器切換至 Stabilized (自穩) 模式，系統燈號轉為藍色呼吸燈後即可解鎖 (Arm)。' }
             };
             
             const data = db[v];
-            if(data) { t.innerText = data.t; d.innerText = data.d; r.classList.remove('hidden'); }
-        }
-
-        // ==================== 其他初始化 ====================
-        function initCharts() {
-            const pidCtx = document.getElementById('pidChart');
-            if (pidCtx) {
-                const timeData = Array.from({length: 50}, (_, i) => i * 0.1);
-                pidChartInstance = new Chart(pidCtx, {
-                    type: 'line',
-                    data: {
-                        labels: timeData,
-                        datasets: [
-                            { label: 'P Only', data: timeData.map(t => 1 - Math.exp(-t) + 0.2 * Math.sin(3*t)), borderColor: 'rgb(16, 185, 129)', backgroundColor: 'rgba(16, 185, 129, 0.1)', tension: 0.4 },
-                            { label: 'PD', data: timeData.map(t => 1 - Math.exp(-1.5*t) + 0.05 * Math.sin(4*t)), borderColor: 'rgb(56, 189, 248)', backgroundColor: 'rgba(56, 189, 248, 0.1)', tension: 0.4 },
-                            { label: 'PID', data: timeData.map(t => 1 - Math.exp(-2*t)), borderColor: 'rgb(251, 191, 36)', backgroundColor: 'rgba(251, 191, 36, 0.1)', tension: 0.4 },
-                            { label: 'Target', data: timeData.map(() => 1), borderColor: 'rgb(148, 163, 184)', borderDash: [5, 5], pointRadius: 0 }
-                        ]
-                    },
-                    options: { responsive: true, maintainAspectRatio: false, scales: { x: { display: false }, y: { ticks: { color: '#64748b' }, grid: { color: '#334155' } } }, plugins: { legend: { labels: { color: '#cbd5e1' } } } }
-                });
-            }
-            const vehicleCtx = document.getElementById('vehicleChart');
-            if (vehicleCtx) {
-                vehicleChartInstance = new Chart(vehicleCtx, {
-                    type: 'radar',
-                    data: {
-                        labels: ['速度', '續航', '載重', '穩定性', '成本'],
-                        datasets: [
-                            { label: '多旋翼', data: [8, 6, 7, 9, 7], borderColor: 'rgb(56, 189, 248)', backgroundColor: 'rgba(56, 189, 248, 0.2)' },
-                            { label: '固定翼', data: [9, 9, 6, 7, 6], borderColor: 'rgb(16, 185, 129)', backgroundColor: 'rgba(16, 185, 129, 0.2)' }
-                        ]
-                    },
-                    options: { responsive: true, maintainAspectRatio: false, scales: { r: { ticks: { display: false }, grid: { color: '#334155' }, pointLabels: { color: '#cbd5e1' } } }, plugins: { legend: { labels: { color: '#cbd5e1' } } } }
-                });
+            if(data) { 
+                t.innerText = data.t; d.innerText = data.d; r.classList.remove('hidden'); 
             }
         }
 
-        function initPortDetails() {
-            const portConnectors = document.querySelectorAll('.port-connector');
-            const portData = {
-                power: { icon: '<i class="fa-solid fa-battery-full text-rose-500"></i>', title: 'POWER 1 & 2', content: '<table class="w-full pin-table"><tr><th>Pin</th><th>Function</th><th>Voltage</th></tr><tr><td>1,2</td><td>VCC</td><td class="v-5">5V</td></tr><tr><td>3</td><td>I_SENS</td><td class="v-33">3.3V</td></tr><tr><td>4</td><td>V_SENS</td><td class="v-33">3.3V</td></tr><tr><td>5,6</td><td>GND</td><td class="v-gnd">GND</td></tr></table>' },
-                gps: { icon: '<i class="fa-solid fa-satellite text-emerald-500"></i>', title: 'GPS 1', content: '<table class="w-full pin-table"><tr><th>Pin</th><th>Function</th></tr><tr><td>1</td><td>VCC</td></tr><tr><td>2,3</td><td>TX/RX</td></tr><tr><td>4,5</td><td>I2C</td></tr><tr><td>6</td><td>Safety</td></tr></table>' },
-                telem: { icon: '<i class="fa-solid fa-wifi text-sky-500"></i>', title: 'TELEM 1', content: '<table class="w-full pin-table"><tr><th>Pin</th><th>Function</th></tr><tr><td>1</td><td>VCC</td></tr><tr><td>2,3</td><td>TX/RX</td></tr><tr><td>4,5</td><td>CTS/RTS</td></tr></table>' },
-                fmu_pwm: { icon: '<i class="fa-solid fa-fan text-amber-500"></i>', title: 'FMU PWM', content: '由主處理器 (FMU) 直接輸出。支援 DShot/OneShot。' },
-                io_pwm: { icon: '<i class="fa-solid fa-gears text-slate-400"></i>', title: 'IO PWM', content: '由 F103 協處理器輸出，具備 Failsafe 保護。' },
-                can: { icon: '<i class="fa-solid fa-network-wired text-indigo-500"></i>', title: 'CAN 1/2', content: '<table class="w-full pin-table"><tr><th>Pin</th><th>Function</th></tr><tr><td>1</td><td>VCC</td></tr><tr><td>2</td><td>CAN_H</td></tr><tr><td>3</td><td>CAN_L</td></tr><tr><td>4</td><td>GND</td></tr></table>' }
-            };
-            portConnectors.forEach(c => {
-                c.addEventListener('click', function() {
-                    const d = portData[this.getAttribute('data-port')];
-                    if(d) {
-                        document.getElementById('port-icon').innerHTML = d.icon;
-                        document.getElementById('port-title').textContent = d.title;
-                        document.getElementById('port-content').innerHTML = d.content;
-                        portConnectors.forEach(el => el.classList.remove('ring-2', 'ring-sky-500'));
-                        this.classList.add('ring-2', 'ring-sky-500');
-                    }
-                });
-            });
-        }
-
-        function showBldcDetail(k) {
-            const data = {
-                mcu: { t:'STM32 G4', d:'CORDIC/FMAC 數學加速器，專為 FOC 設計。', s:['170MHz Cortex-M4', '3x ADC (同步採樣)', 'Advanced Timer'] },
-                driver: { t:'Gate Driver', d:'驅動 MOSFET 閘極，控制死區時間 (Deadtime)。', s:['Bootstrap 電路', '保護機制 (OCP, OTP)', '驅動電流 > 1A'] },
-                mosfet: { t:'MOSFETs', d:'三相逆變橋，低導通電阻。', s:['Vds > 電池電壓 x 1.5', 'Rds(on) < 3mΩ', 'DFN 5x6 封裝'] }
-            };
-            const d = data[k];
-            document.getElementById('bldc-title').innerText = d.t;
-            document.getElementById('bldc-desc').innerText = d.d;
-            document.getElementById('bldc-specs').innerHTML = d.s.map(i => `<li>> ${i}</li>`).join('');
-            document.getElementById('bldc-detail-box').classList.remove('hidden');
-        }
-
-        function initMobileMenu() {
-            document.getElementById('mobile-menu-btn').addEventListener('click', () => {
-                document.getElementById('sidebar').classList.toggle('hidden');
-            });
-        }
-        function initScrollProgress() {
-            window.addEventListener('scroll', () => {
-                const scrolled = window.scrollY;
-                const max = document.documentElement.scrollHeight - window.innerHeight;
-                document.getElementById('reading-progress').style.width = (scrolled / max) * 100 + '%';
-            });
-        }
-        function initBackToTop() {
-            const btn = document.getElementById('back-to-top');
-            window.addEventListener('scroll', () => {
-                if(window.scrollY > 300) btn.classList.add('visible'); else btn.classList.remove('visible');
-            });
-            btn.addEventListener('click', () => window.scrollTo({top: 0, behavior: 'smooth'}));
-        }
-        function initSearch() {
-            const input = document.getElementById('search-input');
-            const results = document.getElementById('search-results');
-            input.addEventListener('input', (e) => {
-                const q = e.target.value.toLowerCase();
-                if(q.length < 2) { results.classList.add('hidden'); return; }
-                const res = searchData.filter(d => d.title.toLowerCase().includes(q) || d.keywords.some(k => k.includes(q)));
-                results.innerHTML = res.length ? res.map(r => `<div class="search-result-item" onclick="showSection('${r.section}')"><div class="font-bold text-slate-200 text-sm">${r.title}</div></div>`).join('') : '<div class="p-2 text-slate-500 text-sm">無結果</div>';
-                results.classList.remove('hidden');
-            });
-        }
-        function initBookmarks() {
-            document.querySelectorAll('.bookmark-badge').forEach(b => {
-                const sid = b.getAttribute('data-bookmark');
-                if(bookmarks.includes(sid)) b.classList.add('bookmarked', 'fa-solid');
-                b.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    if(bookmarks.includes(sid)) { bookmarks = bookmarks.filter(i => i !== sid); b.classList.remove('bookmarked', 'fa-solid'); b.classList.add('fa-regular'); }
-                    else { bookmarks.push(sid); b.classList.add('bookmarked', 'fa-solid'); b.classList.remove('fa-regular'); }
-                    localStorage.setItem('uas-bookmarks', JSON.stringify(bookmarks));
-                    updateBookmarkUI();
-                });
-            });
-        }
-        function updateBookmarkUI() {
-            const list = document.getElementById('bookmark-list');
-            document.getElementById('bookmark-count').innerText = bookmarks.length;
-            if(!bookmarks.length) { list.innerHTML = '<div class="text-slate-600 italic">無書籤</div>'; return; }
-            list.innerHTML = bookmarks.map(bid => {
-                const d = searchData.find(s => s.section === bid);
-                return `<div class="flex justify-between p-2 bg-slate-800 rounded cursor-pointer hover:bg-slate-700" onclick="showSection('${bid}')"><span class="text-slate-300">${d ? d.title : bid}</span></div>`;
-            }).join('');
-        }
-        function initThemeToggle() {
-            const t = document.getElementById('theme-toggle');
-            if(localStorage.getItem('uas-theme') === 'light') { document.documentElement.classList.remove('dark'); t.classList.remove('active'); }
-            t.addEventListener('click', () => {
-                document.documentElement.classList.toggle('dark');
-                t.classList.toggle('active');
-                localStorage.setItem('uas-theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
-            });
-        }
-        function startTour() {
-            const overlay = document.getElementById('tour-overlay');
-            overlay.innerHTML = `<div class="tour-tooltip" style="top:50%;left:50%;transform:translate(-50%,-50%)"><h3 class="font-bold text-white mb-2">歡迎使用 UAS R&D Hub</h3><p class="text-slate-300 text-sm mb-4">左側選單包含所有技術章節。請依序瀏覽。</p><button class="tour-btn tour-btn-primary" onclick="document.getElementById('tour-overlay').classList.remove('active')">開始探索</button></div>`;
-            overlay.classList.add('active');
-        }
-        
-        // MathJax
-        window.MathJax = { tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] } };
-        
-        // Initial anatomy grid
-        const anatomyData = [
-            { id: 'brain', icon: '🧠', title: 'FC (大腦)', desc: 'H753', specs: ['三路 IMU'] },
-            { id: 'muscle', icon: '💪', title: 'ESC (肌肉)', desc: 'FOC', specs: ['DShot600'] },
-            { id: 'senses', icon: '👁️', title: 'Sensor (感官)', desc: '陣列', specs: ['ICM/BMI'] },
-            { id: 'heart', icon: '🔋', title: 'Power (心臟)', desc: 'PM02D', specs: ['I2C 數位'] }
+        // ==================== 10. 互動式導覽系統 ====================
+        const steps = [
+            { target: '[data-tour="sidebar"]', title: '目錄導航', text: '這裡包含所有工程文件模組。' },
+            { target: '[data-tour="search"]', title: '全局搜尋', text: '支援快捷鍵，可快速查找術語與設定檔。' },
+            { target: '[data-tour="bookmarks"]', title: '書籤管理', text: '儲存常用文件，關閉網頁也不會遺失。' },
+            { target: '#section-roadmap', title: '閱讀文件', text: '點擊右上方星號即可加入書籤。' }
         ];
-        const ag = document.getElementById('anatomy-grid');
-        if(ag) anatomyData.forEach(d => {
-            const div = document.createElement('div');
-            div.className = 'interactive-card bg-slate-900 p-4 rounded-xl border border-slate-800 shadow-lg text-center group';
-            div.onclick = () => {
-                document.getElementById('detail-title').innerText = d.title;
-                document.getElementById('detail-desc').innerText = d.desc;
-                document.getElementById('detail-specs').innerHTML = d.specs.map(s => `<li>> ${s}</li>`).join('');
-                document.getElementById('anatomy-detail').classList.remove('hidden');
-            };
-            div.innerHTML = `<div class="text-3xl mb-2 grayscale group-hover:grayscale-0 transition">${d.icon}</div><h3 class="font-bold text-slate-200 text-sm">${d.title}</h3>`;
-            ag.appendChild(div);
-        });
 
-        // Initial DShot bits
-        const db = document.getElementById('dshot-bits');
-        if(db) for(let i=0; i<16; i++) {
-            const b = document.createElement('div');
-            let color = i < 11 ? 'bg-emerald-500' : (i < 12 ? 'bg-amber-500' : 'bg-rose-500');
-            b.className = `bit-box w-5 h-8 md:w-6 md:h-10 ${color} rounded opacity-60 hover:opacity-100 border border-white/10 m-0.5 cursor-help`;
-            db.appendChild(b);
+        function startTour() {
+            tourStep = 0;
+            document.getElementById('tour-overlay').classList.add('active');
+            showTourStep();
+        }
+
+        function showTourStep() {
+            const step = steps[tourStep];
+            const target = document.querySelector(step.target);
+            
+            document.querySelectorAll('.tour-highlight').forEach(el => {
+                el.classList.remove('tour-highlight');
+                el.style.zIndex = '';
+            });
+
+            if (target) {
+                target.classList.add('tour-highlight');
+                target.style.zIndex = '10001';
+                target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+
+            const tooltip = document.createElement('div');
+            tooltip.className = 'tour-tooltip animate-fade-in';
+            
+            if (target) {
+                const rect = target.getBoundingClientRect();
+                if (window.innerWidth - rect.right > 380) {
+                    tooltip.style.left = `${rect.right + 20}px`;
+                    tooltip.style.top = `${rect.top}px`;
+                } else {
+                    tooltip.style.left = `50%`;
+                    tooltip.style.top = `50%`;
+                    tooltip.style.transform = `translate(-50%, -50%)`;
+                }
+            } else {
+                tooltip.style.left = `50%`;
+                tooltip.style.top = `50%`;
+                tooltip.style.transform = `translate(-50%, -50%)`;
+            }
+
+            tooltip.innerHTML = `
+                <h3 class="font-bold text-white mb-2 text-lg">${step.title}</h3>
+                <p class="text-slate-300 text-sm mb-6">${step.text}</p>
+                <div class="flex justify-between items-center mt-4">
+                    <span class="text-xs text-slate-500">${tourStep + 1} / ${steps.length}</span>
+                    <div class="space-x-2">
+                        ${tourStep > 0 ? `<button class="tour-btn tour-btn-secondary" onclick="prevTourStep()">上一步</button>` : ''}
+                        <button class="tour-btn tour-btn-primary" onclick="nextTourStep()">${tourStep === steps.length - 1 ? '完成' : '下一步'}</button>
+                        <button class="tour-btn tour-btn-secondary" onclick="closeTour()">跳過</button>
+                    </div>
+                </div>
+            `;
+
+            const oldTooltip = document.querySelector('.tour-tooltip');
+            if (oldTooltip) oldTooltip.remove();
+            document.body.appendChild(tooltip);
+        }
+
+        function nextTourStep() {
+            if (tourStep < steps.length - 1) { tourStep++; showTourStep(); } 
+            else { closeTour(); }
+        }
+
+        function prevTourStep() {
+            if (tourStep > 0) { tourStep--; showTourStep(); }
+        }
+
+        function closeTour() {
+            document.getElementById('tour-overlay').classList.remove('active');
+            const tooltip = document.querySelector('.tour-tooltip');
+            if (tooltip) tooltip.remove();
+            document.querySelectorAll('.tour-highlight').forEach(el => {
+                el.classList.remove('tour-highlight'); el.style.zIndex = '';
+            });
         }
     </script>
 </body>

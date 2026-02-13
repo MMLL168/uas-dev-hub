@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UAS R&D Hub (繁體中文工程版 V2.7)</title>
+    <title>UAS R&D Hub (繁體中文工程版 V2.9)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
@@ -75,6 +75,8 @@
         .badge-datasheet { background-color: rgba(168, 85, 247, 0.1); border: 1px solid rgba(168, 85, 247, 0.3); color: #c084fc; }
         .badge-procurement { background-color: rgba(236, 72, 153, 0.1); border: 1px solid rgba(236, 72, 153, 0.3); color: #f472b6; }
         .badge-protocol { background-color: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); color: #60a5fa; }
+        .badge-aiot { background-color: rgba(139, 92, 246, 0.1); border: 1px solid rgba(139, 92, 246, 0.3); color: #a78bfa; }
+        .badge-log { background-color: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); color: #fbbf24; }
         
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         .animate-fade-in { animation: fadeIn 0.3s ease; }
@@ -107,6 +109,11 @@
         .tour-btn-primary { background: #0ea5e9; color: white; }
         .tour-btn-secondary { background: #334155; color: #cbd5e1; }
         .tour-highlight { position: relative; z-index: 9999 !important; box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.5); background-color: #1e293b; border-radius: 0.5rem; }
+        
+        /* IO Logic Flow */
+        .io-flow-container { position: relative; display: flex; align-items: center; justify-content: space-between; font-size: 0.75rem; }
+        .io-box { padding: 0.5rem; border-radius: 4px; border: 1px solid #475569; background: #1e293b; text-align: center; font-weight: bold; width: 22%; }
+        .io-arrow { color: #64748b; font-size: 1rem; }
     </style>
 </head>
 <body class="flex flex-col md:flex-row min-h-screen">
@@ -127,7 +134,7 @@
     <nav id="sidebar" class="hidden md:flex flex-col w-64 bg-slate-900 border-r border-slate-800 h-screen sticky top-0 z-40 overflow-y-auto" data-tour="sidebar">
         <div class="p-6 border-b border-slate-800">
             <h1 class="text-xl font-bold text-slate-100 tracking-tight mono-font">UAS<span class="text-sky-500">_Dev</span></h1>
-            <p class="text-xs text-slate-500 mt-1">繁體中文工程版 V2.7</p>
+            <p class="text-xs text-slate-500 mt-1">繁體中文工程版 V2.9</p>
         </div>
 
         <div class="p-4 border-b border-slate-800 search-container" data-tour="search">
@@ -169,7 +176,7 @@
             <a href="#" data-section="section-pid" class="nav-item block px-6 py-3 text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-slate-200 border-l-4 border-transparent transition-colors"><i class="fa-solid fa-arrow-trend-up mr-2 w-4"></i>PID 控制理論</a>
             <a href="#" data-section="section-software" class="nav-item block px-6 py-3 text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-slate-200 border-l-4 border-transparent transition-colors"><i class="fa-brands fa-git-alt mr-2 w-4"></i>軟體棧 (PX4/Ardu)</a>
             <a href="#" data-section="section-devenv" class="nav-item block px-6 py-3 text-sm font-medium text-indigo-400 hover:bg-slate-800 hover:text-indigo-200 border-l-4 border-transparent transition-colors"><i class="fa-solid fa-laptop-code mr-2 w-4"></i>開發環境 (Toolchain)</a>
-            <a href="#" data-section="section-aiot" class="nav-item block px-6 py-3 text-sm font-medium text-violet-400 hover:bg-slate-800 hover:text-violet-200 border-l-4 border-transparent transition-colors"><i class="fa-solid fa-network-wired mr-2 w-4"></i>AIoT 與 ROS 2</a>
+            <a href="#" data-section="section-aiot" class="nav-item block px-6 py-3 text-sm font-medium text-violet-400 hover:bg-slate-800 hover:text-violet-200 border-l-4 border-transparent transition-colors"><i class="fa-solid fa-network-wired mr-2 w-4"></i>AIoT 與 Trainer Port</a>
             <a href="#" data-section="section-maint" class="nav-item block px-6 py-3 text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-slate-200 border-l-4 border-transparent transition-colors"><i class="fa-solid fa-wrench mr-2 w-4"></i>故障診斷 (Debug)</a>
         </div>
         <div class="p-4 border-t border-slate-800">
@@ -177,7 +184,7 @@
                 <i class="fa-solid fa-route mr-2"></i>開始導覽
             </button>
         </div>
-        <div class="p-4 bg-slate-950 border-t border-slate-800 text-xs text-slate-500">Engineer: Marlon | V2.7 Fix</div>
+        <div class="p-4 bg-slate-950 border-t border-slate-800 text-xs text-slate-500">Engineer: Marlon | V2.9 Final</div>
     </nav>
 
     <!-- Main Content -->
@@ -456,7 +463,7 @@
                             <p class="text-sm text-slate-400 mt-1">Pixhawk 6C / PX4 v1.14.x / Operator: Marlon</p>
                         </div>
                         <div class="text-right">
-                            <span class="bg-emerald-900/30 text-emerald-400 px-3 py-1 rounded text-sm font-bold border border-emerald-800">Pre-Flight Ready</span>
+                            <span class="bg-emerald-900/30 text-emerald-400 px-3 py-1 rounded text-sm font-bold border border-emerald-800">Flight Ready</span>
                         </div>
                     </div>
                     <div class="grid md:grid-cols-2 gap-6">
@@ -466,7 +473,7 @@
                                 <li><i class="fa-solid fa-check text-emerald-500 mr-2"></i><strong>機架:</strong> Holybro X500 V2 (Quad X)</li>
                                 <li><i class="fa-solid fa-check text-emerald-500 mr-2"></i><strong>感測器:</strong> Accel, Gyro, Mag, Level 校正完成</li>
                                 <li><i class="fa-solid fa-check text-emerald-500 mr-2"></i><strong>動力:</strong> 馬達轉向驗證通過 (1000-2000us PWM)</li>
-                                <li><i class="fa-regular fa-square text-slate-500 mr-2"></i><strong>遙控:</strong> 待 R81 接收機安裝校正</li>
+                                <li><i class="fa-solid fa-check text-emerald-500 mr-2"></i><strong>遙控:</strong> R81 接收機安裝校正完成</li>
                             </ul>
                         </div>
                         <div class="bg-slate-950 p-4 rounded border border-slate-700">
@@ -490,8 +497,9 @@
                     <div class="space-y-6">
                         <div class="bg-slate-950 p-4 rounded border border-slate-800">
                             <h4 class="text-lg font-bold text-emerald-400 mb-3 border-l-4 border-emerald-500 pl-3">1. 感測器校正 (Calibration)</h4>
-                            <p class="text-sm text-slate-300 mb-2"><strong>加速度計:</strong> 依序放置 6 個面向，靜止直到黃條跑完。驗證 Z 軸 ≈ 9.8 m/s²。<br><strong>羅盤:</strong> 旋轉機身 6 面。若報錯 "Inconsistent"，需重啟或遠離磁干擾。</p>
-                            <p class="text-xs text-slate-500 italic">*校正後務必斷電重啟以更新 EKF。</p>
+                            <p class="text-sm text-slate-300 mb-2"><strong>加速度計 (Wall-Assist):</strong> 針對 Nose Down 超時問題，採用「靠牆法」物理固定機身，消除手持微震動。驗證 Z 軸 ≈ 9.8 m/s²。</p>
+                            <p class="text-sm text-slate-300 mb-2"><strong>羅盤:</strong> 旋轉機身 6 面。若報錯 "Inconsistent"，需重啟或遠離磁干擾。</p>
+                            <p class="text-xs text-slate-500 italic mt-2">*校正後務必斷電重啟以更新 EKF。</p>
                         </div>
                         
                         <div class="grid md:grid-cols-2 gap-6">
@@ -525,6 +533,9 @@
                                     M1(右上)/M2(左下): CCW (銀帽)<br>
                                     M3(左上)/M4(右下): CW (黑帽)
                                 </div>
+                            </div>
+                            <div class="mt-3 p-2 bg-amber-900/20 border border-amber-800 rounded text-xs text-amber-400">
+                                <strong>關鍵修正:</strong> 曾遇馬達無反應，經查為接線錯誤。ESC 訊號線必須接在 <strong>IO PWM OUT (Main)</strong>，並確認 <code>CBRK_IO_SAFETY</code> 參數設定正確。
                             </div>
                         </div>
                     </div>
@@ -1145,7 +1156,7 @@ Motor 4 (FR):  -Roll, -Pitch, +Yaw
                 </div>
             </div>
         </section>
-
+        
         <!-- ==================== 13. 軟體棧 ==================== -->
         <section id="section-software" class="mb-16 hidden animate-section relative">
             <i class="fa-regular fa-bookmark bookmark-badge" data-bookmark="section-software"></i>
@@ -1250,12 +1261,12 @@ Tools/environment_install/install-prereqs-ubuntu.sh -y
             <div class="bg-slate-900 p-6 rounded-xl border border-slate-800 mb-8">
                 <h3 class="text-xl font-bold text-amber-400 mb-4 flex items-center"><i class="fa-solid fa-vr-cardboard mr-2"></i>仿真驗證環境 (SITL)</h3>
                 <div class="grid md:grid-cols-2 gap-6">
-                    <div class="bg-slate-950 p-4 rounded border border-slate-700">
+                    <div class="bg-slate-900 p-4 rounded border border-slate-700">
                         <strong class="text-white block mb-2">Gazebo Ignition (推薦)</strong>
                         <p class="text-xs text-slate-400 mb-2">高保真物理引擎，支援 ROS 2 整合。</p>
                         <code class="block bg-slate-900 p-2 rounded text-emerald-400 text-xs">make px4_sitl_default gazebo</code>
                     </div>
-                    <div class="bg-slate-950 p-4 rounded border border-slate-700">
+                    <div class="bg-slate-900 p-4 rounded border border-slate-700">
                         <strong class="text-white block mb-2">jMAVSim</strong>
                         <p class="text-xs text-slate-400 mb-2">輕量級，適合快速測試演算法。</p>
                         <code class="block bg-slate-900 p-2 rounded text-sky-400 text-xs">make px4_sitl_default jmavsim</code>
@@ -1264,54 +1275,124 @@ Tools/environment_install/install-prereqs-ubuntu.sh -y
             </div>
         </section>
 
-        <!-- ==================== 15. AIoT & ROS 2 ==================== -->
+        <!-- ==================== 15. AIoT & ROS 2 (Upgraded) ==================== -->
         <section id="section-aiot" class="mb-16 hidden animate-section relative">
             <i class="fa-regular fa-bookmark bookmark-badge" data-bookmark="section-aiot"></i>
             <header class="mb-8 border-b border-slate-800 pb-4">
                 <h2 class="text-3xl font-bold text-slate-100 mb-2">AIoT 與邊緣運算層 (ROS 2 + ESP32)</h2>
+                <div class="flex items-center gap-2 text-slate-400 text-sm">
+                    <span class="source-badge badge-aiot">Hybrid Control</span>
+                    <span>Human-In-The-Loop Safety</span>
+                </div>
             </header>
-            <div class="grid lg:grid-cols-2 gap-8 mb-8">
-                <div class="bg-slate-900 p-6 rounded-xl border border-slate-800">
-                    <h3 class="text-xl font-bold text-violet-400 mb-4"><i class="fa-solid fa-sitemap mr-2"></i>系統架構</h3>
-                    <div class="bg-slate-950 p-4 rounded border border-slate-700 font-mono text-xs text-slate-300 whitespace-pre leading-relaxed">
-Pixhawk 6C (PX4)
-    ↓ (MAVLink + UART)
-伴飛電腦 (Jetson/Pi 5)
-    ├─ ROS 2 Humble
-    ├─ micro-ROS Agent
-    │
-ESP32 (邊緣節點)
-    ├─ Arduino Framework
-    └─ micro-ROS Client (WiFi)
-                    </div>
+            
+            <div class="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden mb-8">
+                <div class="flex border-b border-slate-800 bg-slate-950 overflow-x-auto">
+                    <button onclick="switchAiotTab('ros')" id="tab-aiot-ros" class="px-6 py-4 text-sm font-bold text-violet-400 bg-slate-900 border-r border-slate-800 transition whitespace-nowrap">ROS 2 標準架構</button>
+                    <button onclick="switchAiotTab('trainer')" id="tab-aiot-trainer" class="px-6 py-4 text-sm font-bold text-slate-500 bg-slate-950 transition whitespace-nowrap">教練口注入 (Trainer Port Injection)</button>
                 </div>
-                <div class="bg-slate-900 p-6 rounded-xl border border-slate-800">
-                    <h3 class="text-xl font-bold text-emerald-400 mb-4"><i class="fa-solid fa-code mr-2"></i>ESP32 Client 範例</h3>
-                    <pre class="bg-slate-950 p-3 rounded border border-slate-700 text-xs font-mono text-slate-400 overflow-x-auto"><code>// Arduino + micro-ROS
-#include &lt;micro_ros_platformio.h&gt;
-#include &lt;rcl/rcl.h&gt;
-#include &lt;std_msgs/msg/float32.h&gt;
 
-void setup() {
-  set_microros_wifi_transports("SSID", "PASS", IP, 8888);
-  rclc_node_init_default(&node, "esp32_node", "", &support);
-}</code></pre>
-                </div>
-            </div>
-            <div class="bg-slate-900 p-6 rounded-xl border border-slate-800">
-                <h3 class="text-xl font-bold text-sky-400 mb-4"><i class="fa-brands fa-linux mr-2"></i>ROS 2 Humble + PX4 深度整合</h3>
-                <div class="grid md:grid-cols-2 gap-4">
-                    <div>
-                        <strong class="text-white text-sm block mb-2">安裝步驟 (Ubuntu 22.04):</strong>
-                        <ol class="list-decimal list-inside text-xs text-slate-400 space-y-1">
-                            <li>安裝 ROS 2 Humble Desktop</li>
-                            <li>建立 <code>~/ros2_px4_ws</code>，克隆 <code>px4_ros_com</code></li>
-                            <li><code>colcon build</code> 編譯</li>
-                        </ol>
+                <!-- Tab 1: ROS 2 (Original) -->
+                <div id="content-aiot-ros" class="p-6 md:p-8 animate-fade-in">
+                    <div class="grid lg:grid-cols-2 gap-8 mb-8">
+                        <div class="bg-slate-950 p-4 rounded border border-slate-700">
+                            <h3 class="text-lg font-bold text-violet-400 mb-2"><i class="fa-solid fa-sitemap mr-2"></i>micro-ROS 系統架構</h3>
+                            <div class="font-mono text-xs text-slate-300 whitespace-pre leading-relaxed">Pixhawk 6C (PX4)
+  ↓ (MAVLink + UART)
+伴飛電腦 (Jetson/Pi 5)
+  ├─ ROS 2 Humble
+  ├─ micro-ROS Agent
+  │
+ESP32 (邊緣節點)
+  ├─ Arduino Framework
+  └─ micro-ROS Client (WiFi)</div>
+                        </div>
+                        <div class="bg-slate-900 p-4 rounded border border-slate-700">
+                            <h3 class="text-lg font-bold text-sky-400 mb-2"><i class="fa-brands fa-linux mr-2"></i>PX4 深度整合</h3>
+                            <ul class="list-decimal list-inside text-xs text-slate-400 space-y-1">
+                                <li>安裝 ROS 2 Humble Desktop</li>
+                                <li>建立 <code>~/ros2_px4_ws</code>，克隆 <code>px4_ros_com</code></li>
+                                <li>執行 Agent: <code class="text-sky-300">MicroXRCEAgent udp4 -p 8888</code></li>
+                            </ul>
+                        </div>
                     </div>
-                    <div class="bg-slate-950 p-3 rounded border border-slate-700">
-                        <strong class="text-white text-xs block mb-1">啟動 Agent:</strong>
-                        <code class="text-xs text-sky-400 block">MicroXRCEAgent udp4 -p 8888</code>
+                </div>
+
+                <!-- Tab 2: Trainer Port Injection (NEW) -->
+                <div id="content-aiot-trainer" class="hidden p-6 md:p-8 animate-fade-in">
+                    <div class="grid lg:grid-cols-2 gap-8 mb-8">
+                        <!-- Architecture -->
+                        <div class="space-y-6">
+                            <div class="bg-slate-900 p-4 rounded border border-slate-700">
+                                <h3 class="text-lg font-bold text-rose-400 mb-3"><i class="fa-solid fa-shield-cat mr-2"></i>四層安全架構</h3>
+                                <div class="io-flow-container mb-4">
+                                    <div class="io-box border-violet-500 text-violet-400">感知<br><span class="text-[10px] text-slate-500">Pi 5 (YOLO)</span></div>
+                                    <i class="fa-solid fa-arrow-right io-arrow"></i>
+                                    <div class="io-box border-sky-500 text-sky-400">翻譯<br><span class="text-[10px] text-slate-500">ESP32 (PPM)</span></div>
+                                    <i class="fa-solid fa-arrow-right io-arrow"></i>
+                                    <div class="io-box border-amber-500 text-amber-400">控制<br><span class="text-[10px] text-slate-500">EdgeTX</span></div>
+                                    <i class="fa-solid fa-arrow-right io-arrow"></i>
+                                    <div class="io-box border-emerald-500 text-emerald-400">執行<br><span class="text-[10px] text-slate-500">Drone</span></div>
+                                </div>
+                                <p class="text-xs text-slate-400"><strong>核心邏輯：</strong> 遙控器擁有最高優先權 (Master Override)。若 AI 失控，只需撥動開關 (如 Switch SF) 即可瞬間切回手動控制。</p>
+                            </div>
+                            
+                            <div class="bg-slate-900 p-4 rounded border border-slate-700">
+                                <h3 class="text-lg font-bold text-amber-400 mb-3"><i class="fa-solid fa-plug mr-2"></i>硬體接線 (Wiring)</h3>
+                                <ul class="text-sm text-slate-300 space-y-2">
+                                    <li><strong>Pi 5 -> ESP32:</strong> USB Serial (推薦) 或 UART (GPIO 14/15)。</li>
+                                    <li><strong>ESP32 -> EdgeTX:</strong> GPIO 25 -> 1kΩ 電阻 -> 3.5mm Jack (Tip)。共地 (GND -> Sleeve)。</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Code & Protocol -->
+                        <div class="space-y-6">
+                            <div class="bg-slate-900 p-4 rounded border border-slate-700">
+                                <h3 class="text-lg font-bold text-sky-400 mb-3">通訊協議 (Serial Protocol)</h3>
+                                <table class="w-full text-xs text-left text-slate-400">
+                                    <thead class="bg-slate-900"><tr><th class="p-2">指令</th><th class="p-2">動作</th><th class="p-2">PPM 輸出</th></tr></thead>
+                                    <tbody class="divide-y divide-slate-800">
+                                        <tr><td class="p-2 text-white font-mono">'A'</td><td>ARM</td><td>CH5 = 2000us (解鎖)</td></tr>
+                                        <tr><td class="p-2 text-white font-mono">'D'</td><td>DISARM</td><td>CH5 = 1000us (上鎖)</td></tr>
+                                        <tr><td class="p-2 text-white font-mono">'T'</td><td>TAKEOFF</td><td>Throttle = 1600us</td></tr>
+                                        <tr><td class="p-2 text-white font-mono">'L'</td><td>LAND</td><td>Throttle = 1300us</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <div class="bg-slate-900 p-4 rounded border border-slate-700">
+                                <h3 class="text-lg font-bold text-emerald-400 mb-3">實作代碼片段</h3>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <strong class="text-xs text-violet-400 block mb-1">Pi 5 (Python)</strong>
+                                        <pre class="text-[10px] text-slate-400 overflow-x-auto bg-slate-900 p-2 rounded"><code>import serial
+ser = serial.Serial('/dev/ttyUSB0', 115200)
+if action == "Raise Hand":
+    ser.write(b'A') # Arm
+elif action == "Waving":
+    ser.write(b'L') # Land</code></pre>
+                                    </div>
+                                    <div>
+                                        <strong class="text-xs text-sky-400 block mb-1">ESP32 (Arduino)</strong>
+                                        <pre class="text-[10px] text-slate-400 overflow-x-auto bg-slate-900 p-2 rounded"><code>if (Serial.available()) {
+  char cmd = Serial.read();
+  if (cmd == 'A') ppm[4] = 2000;
+  if (cmd == 'L') ppm[2] = 1200;
+}</code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-slate-900 p-4 rounded border-l-4 border-amber-500">
+                        <strong class="text-amber-400 text-sm">EdgeTX 設定指南:</strong>
+                        <ol class="list-decimal list-inside text-xs text-slate-300 mt-1">
+                            <li>插入 3.5mm 線，確認遙控器顯示 "TR" 圖示。</li>
+                            <li>Model Setup -> Trainer Mode -> Master/Jack。</li>
+                            <li>Special Functions -> SF↓ -> Trainer -> Chans: Sticks (接管搖桿)。</li>
+                        </ol>
                     </div>
                 </div>
             </div>
@@ -1489,7 +1570,7 @@ void setup() {
             { title: 'PID 控制理論', section: 'section-pid', keywords: ['pid', 'control', 'tuning'] },
             { title: '開發環境', section: 'section-devenv', keywords: ['dev', 'environment', 'ide', 'cubeide', 'platformio', 'checklist'] },
             { title: '軟體棧 (PX4/ArduPilot)', section: 'section-software', keywords: ['software', 'stack', 'px4', 'ardupilot', 'uorb'] },
-            { title: 'AIoT 與 ROS 2', section: 'section-aiot', keywords: ['aiot', 'ros2', 'esp32', 'micro-ros', 'humble'] },
+            { title: 'AIoT 與 ROS 2', section: 'section-aiot', keywords: ['aiot', 'ros2', 'esp32', 'micro-ros', 'humble', 'trainer', 'ppm'] },
             { title: '故障診斷', section: 'section-maint', keywords: ['debug', 'troubleshooting', 'ubuntu', 'sitl', 'accel', 'motor'] },
             { title: '資源與術語', section: 'section-resources', keywords: ['cost', 'bom', 'price', 'community', 'battery', 'lipo', 'glossary', 'throttle', 'yaw', 'pitch', 'roll'] }
         ];
@@ -1704,6 +1785,21 @@ void setup() {
             document.getElementById(`content-soft-${id}`).classList.remove('hidden');
             document.getElementById('tab-soft-px4').className = id === 'px4' ? 'flex-1 py-4 font-bold text-sky-400 bg-slate-900 border-r border-slate-800 transition' : 'flex-1 py-4 font-bold text-slate-500 bg-slate-950 transition';
             document.getElementById('tab-soft-ardupilot').className = id === 'ardupilot' ? 'flex-1 py-4 font-bold text-rose-400 bg-slate-900 transition' : 'flex-1 py-4 font-bold text-slate-500 bg-slate-950 transition';
+        }
+
+        // Updated for AIoT Tabs
+        function switchAiotTab(id) {
+            document.getElementById('content-aiot-ros').classList.add('hidden');
+            document.getElementById('content-aiot-trainer').classList.add('hidden');
+            document.getElementById(`content-aiot-${id}`).classList.remove('hidden');
+            
+            document.getElementById('tab-aiot-ros').className = id === 'ros' 
+                ? 'px-6 py-4 text-sm font-bold text-violet-400 bg-slate-900 border-r border-slate-800 transition whitespace-nowrap'
+                : 'px-6 py-4 text-sm font-bold text-slate-500 bg-slate-950 transition whitespace-nowrap';
+            
+            document.getElementById('tab-aiot-trainer').className = id === 'trainer'
+                ? 'px-6 py-4 text-sm font-bold text-pink-400 bg-slate-900 border-l border-slate-800 transition whitespace-nowrap'
+                : 'px-6 py-4 text-sm font-bold text-slate-500 bg-slate-950 transition whitespace-nowrap';
         }
 
         function switchProtoTab(id) {

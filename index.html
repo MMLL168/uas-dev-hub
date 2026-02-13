@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UAS R&D Hub (繁體中文工程版 V2.9)</title>
+    <title>UAS R&D Hub (繁體中文工程版 V3.0)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
@@ -134,7 +134,7 @@
     <nav id="sidebar" class="hidden md:flex flex-col w-64 bg-slate-900 border-r border-slate-800 h-screen sticky top-0 z-40 overflow-y-auto" data-tour="sidebar">
         <div class="p-6 border-b border-slate-800">
             <h1 class="text-xl font-bold text-slate-100 tracking-tight mono-font">UAS<span class="text-sky-500">_Dev</span></h1>
-            <p class="text-xs text-slate-500 mt-1">繁體中文工程版 V2.9</p>
+            <p class="text-xs text-slate-500 mt-1">繁體中文工程版 V3.0</p>
         </div>
 
         <div class="p-4 border-b border-slate-800 search-container" data-tour="search">
@@ -184,7 +184,7 @@
                 <i class="fa-solid fa-route mr-2"></i>開始導覽
             </button>
         </div>
-        <div class="p-4 bg-slate-950 border-t border-slate-800 text-xs text-slate-500">Engineer: Marlon | V2.9 Final</div>
+        <div class="p-4 bg-slate-950 border-t border-slate-800 text-xs text-slate-500">Engineer: Marlon | V3.0 Final</div>
     </nav>
 
     <!-- Main Content -->
@@ -467,16 +467,16 @@
                         </div>
                     </div>
                     <div class="grid md:grid-cols-2 gap-6">
-                        <div class="bg-slate-950 p-4 rounded border border-slate-700">
+                        <div class="bg-slate-900 p-4 rounded border border-slate-700">
                             <strong class="text-sky-400 block mb-2">系統驗收狀態</strong>
                             <ul class="text-sm text-slate-300 space-y-2">
                                 <li><i class="fa-solid fa-check text-emerald-500 mr-2"></i><strong>機架:</strong> Holybro X500 V2 (Quad X)</li>
                                 <li><i class="fa-solid fa-check text-emerald-500 mr-2"></i><strong>感測器:</strong> Accel, Gyro, Mag, Level 校正完成</li>
                                 <li><i class="fa-solid fa-check text-emerald-500 mr-2"></i><strong>動力:</strong> 馬達轉向驗證通過 (1000-2000us PWM)</li>
-                                <li><i class="fa-solid fa-check text-emerald-500 mr-2"></i><strong>遙控:</strong> R81 接收機安裝校正完成</li>
+                                <li><i class="fa-regular fa-square text-slate-500 mr-2"></i><strong>遙控:</strong> R81 接收機安裝校正完成</li>
                             </ul>
                         </div>
-                        <div class="bg-slate-950 p-4 rounded border border-slate-700">
+                        <div class="bg-slate-900 p-4 rounded border border-slate-700">
                             <strong class="text-amber-400 block mb-2">架構操作定義</strong>
                             <table class="w-full text-xs text-left text-slate-400">
                                 <thead>
@@ -495,7 +495,7 @@
                 <!-- Tab 2: SOP -->
                 <div id="content-logs-sop" class="hidden p-6 md:p-8 animate-fade-in">
                     <div class="space-y-6">
-                        <div class="bg-slate-950 p-4 rounded border border-slate-800">
+                        <div class="bg-slate-900 p-4 rounded border border-slate-800">
                             <h4 class="text-lg font-bold text-emerald-400 mb-3 border-l-4 border-emerald-500 pl-3">1. 感測器校正 (Calibration)</h4>
                             <p class="text-sm text-slate-300 mb-2"><strong>加速度計 (Wall-Assist):</strong> 針對 Nose Down 超時問題，採用「靠牆法」物理固定機身，消除手持微震動。驗證 Z 軸 ≈ 9.8 m/s²。</p>
                             <p class="text-sm text-slate-300 mb-2"><strong>羅盤:</strong> 旋轉機身 6 面。若報錯 "Inconsistent"，需重啟或遠離磁干擾。</p>
@@ -503,7 +503,7 @@
                         </div>
                         
                         <div class="grid md:grid-cols-2 gap-6">
-                            <div class="bg-slate-950 p-4 rounded border border-slate-800">
+                            <div class="bg-slate-900 p-4 rounded border border-slate-800">
                                 <h4 class="text-lg font-bold text-sky-400 mb-3 border-l-4 border-sky-500 pl-3">2. 遙控器對頻與配置</h4>
                                 <ul class="text-sm text-slate-300 space-y-1">
                                     <li><strong>TX16S:</strong> Mode 2 (左手油門)</li>
@@ -511,7 +511,7 @@
                                     <li><strong>通道驗證:</strong> 右手搖桿向右 &rarr; QGC Roll 數值增加。</li>
                                 </ul>
                             </div>
-                            <div class="bg-slate-950 p-4 rounded border border-slate-800">
+                            <div class="bg-slate-900 p-4 rounded border border-slate-800">
                                 <h4 class="text-lg font-bold text-rose-400 mb-3 border-l-4 border-rose-500 pl-3">3. 飛行模式 (Flight Modes)</h4>
                                 <ul class="text-sm text-slate-300 space-y-1">
                                     <li><strong>High (上):</strong> Stabilized (自穩，室內無 GPS 必用)</li>
@@ -521,7 +521,7 @@
                             </div>
                         </div>
 
-                        <div class="bg-slate-950 p-4 rounded border border-slate-800">
+                        <div class="bg-slate-900 p-4 rounded border border-slate-800">
                             <h4 class="text-lg font-bold text-amber-400 mb-3 border-l-4 border-amber-500 pl-3">4. 動力與解鎖驗證 (Props OFF)</h4>
                             <div class="grid grid-cols-2 gap-4 text-sm text-slate-300">
                                 <div>
@@ -561,7 +561,7 @@
                         主飛控核心 (FMU): H7 系列
                     </h3>
                     <div class="space-y-6">
-                        <div class="bg-slate-950 p-4 rounded-lg border border-slate-700">
+                        <div class="bg-slate-900 p-4 rounded-lg border border-slate-700">
                             <div class="grid grid-cols-2 gap-4 border-b border-slate-800 pb-2 mb-2">
                                 <div>
                                     <h4 class="text-emerald-400 font-bold">STM32H753</h4>
@@ -591,7 +591,7 @@
                         <i class="fa-solid fa-shield-halved mr-2 text-rose-500"></i>
                         IO 協處理器 (STM32F103)
                     </h3>
-                    <div class="bg-slate-950 p-4 rounded-lg border border-slate-700 h-full">
+                    <div class="bg-slate-900 p-4 rounded-lg border border-slate-700 h-full">
                         <div class="mb-4 pb-2 border-b border-slate-800">
                             <h4 class="text-rose-400 font-bold">PX4IO 架構 (Safety Island)</h4>
                             <span class="text-xs text-slate-500">目的:當主核 (H7) 當機時,確保飛機仍受控制。</span>
@@ -820,7 +820,7 @@
                 <h2 class="text-3xl font-bold text-slate-100 mb-2">FOC 馬達控制 (BLDC Lab)</h2>
             </header>
             
-            <div class="bg-slate-900 p-6 rounded-xl border border-slate-800 shadow-inner mb-8 overflow-x-auto">
+            <div class="bg-slate-950 p-6 rounded-xl border border-slate-800 shadow-inner mb-8 overflow-x-auto">
                 <h3 class="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4">逆變器拓撲 (Inverter Topology)</h3>
                 <div class="flex flex-col md:flex-row gap-4 items-stretch min-w-[700px]">
                     <div class="topo-box flex-1 bg-slate-900 rounded-lg p-4 cursor-pointer hover:border-sky-500 transition" onclick="showBldcDetail('mcu')">
@@ -1513,31 +1513,110 @@ elif action == "Waving":
                     </div>
                 </div>
 
-                <!-- Tab: Glossary -->
+                <!-- Tab: Glossary (Mode 2 Upgrade) -->
                 <div id="content-res-glossary" class="hidden p-6 md:p-8 animate-fade-in">
-                    <div class="grid md:grid-cols-2 gap-6">
-                        <div>
-                            <h4 class="text-sm font-bold text-slate-300 border-l-4 border-sky-500 pl-2 mb-2">1. 飛行控制 (Controls)</h4>
-                            <div class="overflow-x-auto">
-                                <table class="w-full text-xs text-left text-slate-400">
-                                    <thead class="bg-slate-950 uppercase"><tr><th class="p-2">術語 (代號)</th><th class="p-2">定義</th><th class="p-2">功能</th></tr></thead>
-                                    <tbody class="divide-y divide-slate-800">
-                                        <tr><td class="p-2 font-bold text-white">Throttle (THR)</td><td>油門</td><td>控制高度 (Multicopter) 或速度 (Fixed-wing)。</td></tr>
-                                        <tr><td class="p-2 font-bold text-white">Yaw (RUD)</td><td>偏航</td><td>機頭左右轉向 (自轉)。</td></tr>
-                                        <tr><td class="p-2 font-bold text-white">Pitch (ELE)</td><td>俯仰</td><td>機頭上下傾斜 (前進/後退)。</td></tr>
-                                        <tr><td class="p-2 font-bold text-white">Roll (AIL)</td><td>橫滾</td><td>機身左右傾斜 (平移)。</td></tr>
-                                    </tbody>
-                                </table>
+                    
+                    <!-- Mode 2 Detailed Guide (New) -->
+                    <div class="mb-8">
+                        <h3 class="text-lg font-bold text-white mb-4 flex items-center">
+                            <i class="fa-solid fa-gamepad mr-2 text-indigo-400"></i>
+                            美國手 (Mode 2) 操控詳解
+                        </h3>
+                        <p class="text-sm text-slate-400 mb-4 bg-slate-900/50 p-3 rounded border border-slate-700">
+                            <strong class="text-white">定義：</strong>左手搖桿負責<span class="text-sky-400">動力與旋轉</span>，右手搖桿負責<span class="text-emerald-400">方向與水平移動</span>。此為全球 90% 主流設定 (含 DJI)。
+                        </p>
+
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <!-- Left Stick -->
+                            <div class="bg-slate-900 p-5 rounded-xl border border-slate-700 relative overflow-hidden group hover:border-sky-500 transition">
+                                <div class="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition">
+                                    <i class="fa-solid fa-arrow-up-down text-6xl text-sky-500"></i>
+                                </div>
+                                <h4 class="font-bold text-sky-400 mb-3 border-b border-slate-800 pb-2">1. 左手搖桿 (Left Stick)</h4>
+                                <div class="text-xs text-slate-500 mb-3">控制能量與機頭朝向 (不回中)</div>
+                                
+                                <div class="space-y-3 text-sm">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-slate-300"><i class="fa-solid fa-arrow-up mr-2 text-sky-500"></i>上推 (Up)</span>
+                                        <span class="font-mono text-sky-300">Throttle Up</span>
+                                        <span class="text-slate-400 text-xs">上升 (Ascend)</span>
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-slate-300"><i class="fa-solid fa-arrow-down mr-2 text-sky-500"></i>下拉 (Down)</span>
+                                        <span class="font-mono text-sky-300">Throttle Down</span>
+                                        <span class="text-slate-400 text-xs">下降 (Descend)</span>
+                                    </div>
+                                    <div class="flex items-center justify-between border-t border-slate-800 pt-2 mt-2">
+                                        <span class="text-slate-300"><i class="fa-solid fa-arrow-left mr-2 text-sky-500"></i>左撥 (Left)</span>
+                                        <span class="font-mono text-sky-300">Yaw Left</span>
+                                        <span class="text-slate-400 text-xs">左轉 (CCW)</span>
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-slate-300"><i class="fa-solid fa-arrow-right mr-2 text-sky-500"></i>右撥 (Right)</span>
+                                        <span class="font-mono text-sky-300">Yaw Right</span>
+                                        <span class="text-slate-400 text-xs">右轉 (CW)</span>
+                                    </div>
+                                </div>
+                                <div class="mt-4 p-2 bg-sky-900/20 border border-sky-800 rounded text-xs text-sky-200">
+                                    💡 <strong>心法：</strong>控制飛機「去哪裡的高度」以及「臉朝向哪裡」。
+                                </div>
+                            </div>
+
+                            <!-- Right Stick -->
+                            <div class="bg-slate-900 p-5 rounded-xl border border-slate-700 relative overflow-hidden group hover:border-emerald-500 transition">
+                                <div class="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition">
+                                    <i class="fa-solid fa-arrows-up-down-left-right text-6xl text-emerald-500"></i>
+                                </div>
+                                <h4 class="font-bold text-emerald-400 mb-3 border-b border-slate-800 pb-2">2. 右手搖桿 (Right Stick)</h4>
+                                <div class="text-xs text-slate-500 mb-3">控制水平位置 (自動回中)</div>
+                                
+                                <div class="space-y-3 text-sm">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-slate-300"><i class="fa-solid fa-arrow-up mr-2 text-emerald-500"></i>上推 (Up)</span>
+                                        <span class="font-mono text-emerald-300">Pitch Down</span>
+                                        <span class="text-slate-400 text-xs">前進 (Forward)</span>
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-slate-300"><i class="fa-solid fa-arrow-down mr-2 text-emerald-500"></i>下拉 (Down)</span>
+                                        <span class="font-mono text-emerald-300">Pitch Up</span>
+                                        <span class="text-slate-400 text-xs">後退 (Backward)</span>
+                                    </div>
+                                    <div class="flex items-center justify-between border-t border-slate-800 pt-2 mt-2">
+                                        <span class="text-slate-300"><i class="fa-solid fa-arrow-left mr-2 text-emerald-500"></i>左撥 (Left)</span>
+                                        <span class="font-mono text-emerald-300">Roll Left</span>
+                                        <span class="text-slate-400 text-xs">左橫移 (Left)</span>
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-slate-300"><i class="fa-solid fa-arrow-right mr-2 text-emerald-500"></i>右撥 (Right)</span>
+                                        <span class="font-mono text-emerald-300">Roll Right</span>
+                                        <span class="text-slate-400 text-xs">右橫移 (Right)</span>
+                                    </div>
+                                </div>
+                                <div class="mt-4 p-2 bg-emerald-900/20 border border-emerald-800 rounded text-xs text-emerald-200">
+                                    💡 <strong>心法：</strong>想像搖桿就是飛機本身，你推哪裡，它就往哪裡倒。
+                                </div>
                             </div>
                         </div>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-6">
                         <div>
                             <h4 class="text-sm font-bold text-slate-300 border-l-4 border-emerald-500 pl-2 mb-2">2. QGC 設定 (Configuration)</h4>
                             <div class="grid grid-cols-2 gap-4 text-xs text-slate-400">
-                                <div class="bg-slate-950 p-2 rounded"><strong>Airframe:</strong> 機架選擇 (Quadrotor X, Hexacopter)。</div>
-                                <div class="bg-slate-950 p-2 rounded"><strong>Sensors:</strong> 感測器校正 (Accel, Gyro, Mag, Level)。</div>
-                                <div class="bg-slate-950 p-2 rounded"><strong>Radio:</strong> 遙控器通道映射與校正。</div>
-                                <div class="bg-slate-950 p-2 rounded"><strong>Actuators:</strong> 馬達輸出與轉向設定 (PX4 v1.14+)。</div>
+                                <div class="bg-slate-900 p-2 rounded"><strong>Airframe:</strong> 機架選擇 (Quadrotor X, Hexacopter)。</div>
+                                <div class="bg-slate-900 p-2 rounded"><strong>Sensors:</strong> 感測器校正 (Accel, Gyro, Mag, Level)。</div>
+                                <div class="bg-slate-900 p-2 rounded"><strong>Radio:</strong> 遙控器通道映射與校正。</div>
+                                <div class="bg-slate-900 p-2 rounded"><strong>Actuators:</strong> 馬達輸出與轉向設定 (PX4 v1.14+)。</div>
                             </div>
+                        </div>
+                        <div>
+                            <h4 class="text-sm font-bold text-slate-300 border-l-4 border-amber-500 pl-2 mb-2">3. 飛行模式 (Flight Modes)</h4>
+                            <ul class="text-xs text-slate-400 space-y-1">
+                                <li><span class="text-white font-bold w-20 inline-block">Stabilized:</span> 自穩模式。純手動，無 GPS，僅維持水平。</li>
+                                <li><span class="text-white font-bold w-20 inline-block">Position:</span> 定點模式。GPS 輔助懸停 (Loiter)。</li>
+                                <li><span class="text-white font-bold w-20 inline-block">RTL:</span> 返航模式 (Return To Launch)。</li>
+                                <li><span class="text-white font-bold w-20 inline-block">Offboard:</span> 外部控制。由 Companion Computer (ROS 2) 控制。</li>
+                            </ul>
                         </div>
                     </div>
                 </div>
@@ -1572,7 +1651,7 @@ elif action == "Waving":
             { title: '軟體棧 (PX4/ArduPilot)', section: 'section-software', keywords: ['software', 'stack', 'px4', 'ardupilot', 'uorb'] },
             { title: 'AIoT 與 ROS 2', section: 'section-aiot', keywords: ['aiot', 'ros2', 'esp32', 'micro-ros', 'humble', 'trainer', 'ppm'] },
             { title: '故障診斷', section: 'section-maint', keywords: ['debug', 'troubleshooting', 'ubuntu', 'sitl', 'accel', 'motor'] },
-            { title: '資源與術語', section: 'section-resources', keywords: ['cost', 'bom', 'price', 'community', 'battery', 'lipo', 'glossary', 'throttle', 'yaw', 'pitch', 'roll'] }
+            { title: '資源與術語', section: 'section-resources', keywords: ['cost', 'bom', 'price', 'community', 'battery', 'lipo', 'glossary', 'throttle', 'yaw', 'pitch', 'roll', 'mode 2', 'stick', 'control'] }
         ];
 
         // ==================== 3. 頁面加載初始化 ====================

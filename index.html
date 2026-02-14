@@ -210,40 +210,84 @@
         <section id="section-roadmap" class="mb-16 animate-section relative">
             <i class="fa-regular fa-bookmark bookmark-badge" data-bookmark="section-roadmap"></i>
             <header class="mb-8 border-b border-slate-800 pb-4">
-                <h2 class="text-3xl font-bold text-slate-100 mb-2">技術前瞻 (Tech Roadmap)</h2>
+                <h2 class="text-3xl font-bold text-slate-100 mb-2">技術演進與定位 (Tech Roadmap & Evolution)</h2>
                 <div class="flex items-center gap-2 text-slate-400 text-sm">
                     <span class="source-badge badge-holybro">Official</span>
-                    <span>Holybro CTO @ PX4 Summit</span>
+                    <span>FMUv6 vs FMUv7 (RT)</span>
                 </div>
             </header>
-            <div class="grid lg:grid-cols-2 gap-8">
-                <div class="bg-slate-900 p-6 rounded-xl border border-slate-800">
-                    <h3 class="text-lg font-bold text-slate-200 mb-6 flex items-center">
-                        <i class="fa-solid fa-timeline mr-2 text-orange-500"></i>次世代架構
-                    </h3>
-                    <div class="pl-2 space-y-6 border-l-2 border-slate-800 ml-2">
-                        <div class="roadmap-item">
-                            <div class="roadmap-dot border-orange-500"></div>
-                            <h4 class="text-base font-bold text-orange-400">FMURT7 (i.MX RT1176)</h4>
-                            <p class="text-sm text-slate-400 mt-1">1GHz 雙核心 MCU (Cortex-M7/M4)。突破 STM32 頻寬瓶頸，原生支援 Gigabit Ethernet，適合邊緣 AI 計算。</p>
+            
+            <div class="grid lg:grid-cols-2 gap-8 mb-8">
+                <!-- Current Gen: Pixhawk 6C -->
+                <div class="bg-slate-900 p-6 rounded-xl border-l-4 border-emerald-500 shadow-lg relative overflow-hidden">
+                    <div class="absolute top-0 right-0 p-4 opacity-10"><i class="fa-solid fa-microchip text-9xl"></i></div>
+                    <span class="bg-emerald-900/50 text-emerald-400 px-2 py-1 rounded text-xs font-bold uppercase mb-2 inline-block">Current Standard (現在主流)</span>
+                    <h3 class="text-2xl font-bold text-white mb-2">Pixhawk 6C (FMUv6C)</h3>
+                    <p class="text-sm text-slate-400 mb-6">目前市場上相容性最高、最穩定的標準。專為中高階無人機設計，強調性價比與整合度。</p>
+                    
+                    <div class="space-y-4">
+                        <div class="flex items-start">
+                            <div class="w-8 mt-1 text-emerald-500"><i class="fa-solid fa-brain"></i></div>
+                            <div>
+                                <strong class="text-slate-200 block text-sm">STM32H743 (MCU)</strong>
+                                <span class="text-xs text-slate-500">480MHz, Cortex-M7。效能足以應付高頻率 EKF3 與振動濾波，是目前 PX4/ArduPilot 的甜蜜點。</span>
+                            </div>
                         </div>
-                        <div class="roadmap-item">
-                            <div class="roadmap-dot border-sky-500"></div>
-                            <h4 class="text-base font-bold text-sky-400">PAB 標準 (Pixhawk Autopilot Bus)</h4>
-                            <p class="text-sm text-slate-400 mt-1">模組化標準 (DS-010)。將「飛控核心」與「載板」分離，實現硬體熱插拔升級，降低載板設計門檻。</p>
+                        <div class="flex items-start">
+                            <div class="w-8 mt-1 text-emerald-500"><i class="fa-solid fa-cubes"></i></div>
+                            <div>
+                                <strong class="text-slate-200 block text-sm">All-in-One 設計</strong>
+                                <span class="text-xs text-slate-500">飛控核心與接口載板 (Baseboard) 整合在一起 (除 Mini 版外)，減少接觸不良風險，適合量產機。</span>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="bg-slate-900 p-6 rounded-xl border border-slate-800 shadow-lg">
-                    <h4 class="font-bold text-slate-200 mb-3 text-sm uppercase tracking-wider">關鍵周邊升級</h4>
-                    <div class="space-y-3">
-                        <div class="bg-slate-950 p-3 rounded border border-slate-700">
-                            <strong class="text-slate-300 text-sm block">Unicore UM982 (雙天線 RTK)</strong>
-                            <p class="text-xs text-slate-500 mt-1">支援 GPS Heading (雙天線定航向)。取代傳統磁羅盤，解決高壓電塔/橋樑下的磁干擾問題。</p>
+
+                <!-- Next Gen: FMURT7 -->
+                <div class="bg-slate-900 p-6 rounded-xl border-l-4 border-orange-500 shadow-lg relative overflow-hidden">
+                    <div class="absolute top-0 right-0 p-4 opacity-10"><i class="fa-solid fa-rocket text-9xl"></i></div>
+                    <span class="bg-orange-900/50 text-orange-400 px-2 py-1 rounded text-xs font-bold uppercase mb-2 inline-block">Next Gen (未來架構)</span>
+                    <h3 class="text-2xl font-bold text-white mb-2">Pixhawk RT (FMURT7)</h3>
+                    <p class="text-sm text-slate-400 mb-6">為了解決 H7 頻寬瓶頸而生的次世代架構。針對邊緣運算 (Edge AI) 與工業級模組化需求。</p>
+                    
+                    <div class="space-y-4">
+                        <div class="flex items-start">
+                            <div class="w-8 mt-1 text-orange-500"><i class="fa-solid fa-bolt"></i></div>
+                            <div>
+                                <strong class="text-slate-200 block text-sm">i.MX RT1176 (Crossover)</strong>
+                                <span class="text-xs text-slate-500">1GHz 雙核心 (M7+M4)。原生支援 Gigabit Ethernet，打破 STM32 的頻寬天花板。</span>
+                            </div>
                         </div>
-                        <div class="bg-slate-950 p-3 rounded border border-slate-700">
+                        <div class="flex items-start">
+                            <div class="w-8 mt-1 text-orange-500"><i class="fa-solid fa-puzzle-piece"></i></div>
+                            <div>
+                                <strong class="text-slate-200 block text-sm">PAB 標準 (模組化)</strong>
+                                <span class="text-xs text-slate-500">Pixhawk Autopilot Bus。將「運算核心」做成類似 SIM 卡的模組，可插拔升級，載板可通用。</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Key Peripherals -->
+            <div class="bg-slate-900 p-6 rounded-xl border border-slate-800">
+                <h4 class="font-bold text-slate-200 mb-4 text-sm uppercase tracking-wider flex items-center">
+                    <i class="fa-solid fa-plug mr-2 text-indigo-400"></i>
+                    6C 關鍵周邊支援 (Key Peripherals)
+                </h4>
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div class="bg-slate-950 p-3 rounded border border-slate-700 flex items-start">
+                        <i class="fa-solid fa-satellite-dish text-sky-500 mt-1 mr-3"></i>
+                        <div>
+                            <strong class="text-slate-300 text-sm block">Unicore UM982 (雙天線 RTK)</strong>
+                            <p class="text-xs text-slate-500 mt-1">6C 原生支援。透過雙天線直接計算航向 (Heading)，取代傳統磁羅盤，徹底解決高壓電塔/橋樑下的磁干擾問題。</p>
+                        </div>
+                    </div>
+                    <div class="bg-slate-950 p-3 rounded border border-slate-700 flex items-start">
+                        <i class="fa-solid fa-car-battery text-rose-500 mt-1 mr-3"></i>
+                        <div>
                             <strong class="text-slate-300 text-sm block">PM08D (數位電源模組)</strong>
-                            <p class="text-xs text-slate-500 mt-1">I2C 通訊 (INA226)。支援 14S 高壓 (60V) 與 200A 大電流，專為物流機設計。</p>
+                            <p class="text-xs text-slate-500 mt-1">6C 標配。透過 I2C (INA226) 通訊，比傳統類比 ADC 更精準。支援 14S 高壓 (60V) 與 200A 大電流。</p>
                         </div>
                     </div>
                 </div>

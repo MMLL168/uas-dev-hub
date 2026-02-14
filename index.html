@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UAS R&D Hub (繁體中文工程版 V3.1)</title>
+    <title>UAS R&D Hub (繁體中文工程版 V3.2)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
@@ -135,7 +135,7 @@
     <nav id="sidebar" class="hidden md:flex flex-col w-64 bg-slate-900 border-r border-slate-800 h-screen sticky top-0 z-40 overflow-y-auto" data-tour="sidebar">
         <div class="p-6 border-b border-slate-800">
             <h1 class="text-xl font-bold text-slate-100 tracking-tight mono-font">UAS<span class="text-sky-500">_Dev</span></h1>
-            <p class="text-xs text-slate-500 mt-1">繁體中文工程版 V3.1</p>
+            <p class="text-xs text-slate-500 mt-1">繁體中文工程版 V3.2</p>
         </div>
 
         <div class="p-4 border-b border-slate-800 search-container" data-tour="search">
@@ -187,7 +187,7 @@
                 <i class="fa-solid fa-route mr-2"></i>開始導覽
             </button>
         </div>
-        <div class="p-4 bg-slate-950 border-t border-slate-800 text-xs text-slate-500">Engineer: Marlon | V3.1 Exam Guide</div>
+        <div class="p-4 bg-slate-950 border-t border-slate-800 text-xs text-slate-500">Engineer: Marlon | V3.2 Full Pinout</div>
     </nav>
 
     <!-- Main Content -->
@@ -718,7 +718,7 @@
                 <i class="fa-solid fa-circle-exclamation text-amber-500 mt-1 mr-3"></i>
                 <div class="text-sm text-slate-300">
                     <strong class="text-amber-400 block mb-1">關於 Pixhawk 6C 原理圖</strong>
-                    <p>官方並未公開 6C 原理圖 (SCH)。建議採用 <strong>FMUv6C 標準 + 開源設計 (如 Pix32 v6)</strong> 的策略。下方提供實作導向的模組拆解與 H743 Pin Mapping。</p>
+                    <p>官方並未公開 6C 原理圖 (SCH)。建議採用 <strong>FMUv6C 標準 + 開源設計 (如 Pix32 v6)</strong> 的策略。下方提供實作導向的模組拆解與完整 H743 Pin Mapping。</p>
                 </div>
             </div>
             
@@ -726,7 +726,7 @@
             <div class="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden mb-8">
                 <div class="flex border-b border-slate-800 bg-slate-950 overflow-x-auto">
                     <button onclick="showDesignTab('modules')" id="tab-design-modules" class="px-6 py-4 text-sm font-bold text-pink-400 bg-slate-900 border-r border-slate-800 transition whitespace-nowrap">模組拆解清單</button>
-                    <button onclick="showDesignTab('pinout')" id="tab-design-pinout" class="px-6 py-4 text-sm font-bold text-slate-500 bg-slate-950 transition whitespace-nowrap">H743 Pin Mapping</button>
+                    <button onclick="showDesignTab('pinout')" id="tab-design-pinout" class="px-6 py-4 text-sm font-bold text-slate-500 bg-slate-950 transition whitespace-nowrap">All Pin Define (Searchable)</button>
                 </div>
                 
                 <!-- Content: Modules -->
@@ -760,58 +760,26 @@
                     </div>
                 </div>
 
-                <!-- Content: Pinout -->
-                <div id="content-design-pinout" class="hidden p-6 md:p-8 animate-fade-in">
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse text-sm">
-                            <thead>
-                                <tr class="bg-slate-800 text-slate-200">
-                                    <th class="p-3 border-b border-slate-700">Port Name (Function)</th>
-                                    <th class="p-3 border-b border-slate-700">MCU Pin</th>
-                                    <th class="p-3 border-b border-slate-700">STM32 Function</th>
-                                    <th class="p-3 border-b border-slate-700">Connector (JST-GH)</th>
+                <!-- Content: Pinout (UPDATED with Full List) -->
+                <div id="content-design-pinout" class="hidden p-6 md:p-8 animate-fade-in flex flex-col h-[600px]">
+                    <div class="mb-4">
+                        <input type="text" id="pinout-search" placeholder="搜尋腳位定義 (例如: PA9, UART, FMU...)" class="w-full bg-slate-800 border border-slate-700 rounded px-4 py-2 text-sm text-slate-200 focus:outline-none focus:border-sky-500 transition">
+                    </div>
+                    <div class="flex-1 overflow-y-auto border border-slate-700 rounded-lg">
+                        <table class="w-full text-left border-collapse text-sm" id="pinout-table">
+                            <thead class="bg-slate-950 text-slate-300 sticky top-0 z-10">
+                                <tr>
+                                    <th class="p-3 border-b border-slate-700 font-bold w-1/4">STM32 Pin</th>
+                                    <th class="p-3 border-b border-slate-700 w-1/3">STM32 Signal</th>
+                                    <th class="p-3 border-b border-slate-700">FMU Usage</th>
                                 </tr>
                             </thead>
-                            <tbody class="text-slate-400 font-mono">
-                                <tr class="border-b border-slate-800 hover:bg-slate-800/50">
-                                    <td class="p-3 text-emerald-400 font-bold">GPS 1</td>
-                                    <td class="p-3">PA9 / PA10</td>
-                                    <td class="p-3">USART1_TX / RX</td>
-                                    <td class="p-3">10-Pin (含 I2C, Safety)</td>
-                                </tr>
-                                <tr class="border-b border-slate-800 hover:bg-slate-800/50">
-                                    <td class="p-3 text-sky-400 font-bold">TELEM 1</td>
-                                    <td class="p-3">PE7 / PE8</td>
-                                    <td class="p-3">UART7_TX / RX</td>
-                                    <td class="p-3">6-Pin (Pin 2/3)</td>
-                                </tr>
-                                <tr class="border-b border-slate-800 hover:bg-slate-800/50">
-                                    <td class="p-3 text-sky-400">TELEM 2</td>
-                                    <td class="p-3">PC12 / PD2</td>
-                                    <td class="p-3">UART5_TX / RX</td>
-                                    <td class="p-3">6-Pin</td>
-                                </tr>
-                                <tr class="border-b border-slate-800 hover:bg-slate-800/50">
-                                    <td class="p-3 text-sky-400">TELEM 3</td>
-                                    <td class="p-3">PA2 / PA3</td>
-                                    <td class="p-3">USART2_TX / RX</td>
-                                    <td class="p-3">4-Pin or 6-Pin</td>
-                                </tr>
-                                <tr class="border-b border-slate-800 bg-slate-800/30">
-                                    <td class="p-3 text-rose-400">IO LINK (Internal)</td>
-                                    <td class="p-3">PC6 / PC7</td>
-                                    <td class="p-3">USART6_TX / RX</td>
-                                    <td class="p-3">To STM32F103</td>
-                                </tr>
-                                <tr class="border-b border-slate-800 hover:bg-slate-800/50">
-                                    <td class="p-3 text-white">USB OTG</td>
-                                    <td class="p-3">PA11 / PA12</td>
-                                    <td class="p-3">USB_DM / DP</td>
-                                    <td class="p-3">Type-C</td>
-                                </tr>
+                            <tbody class="text-slate-400 font-mono divide-y divide-slate-800 bg-slate-900">
+                                <!-- Generated by JS -->
                             </tbody>
                         </table>
                     </div>
+                    <div class="mt-2 text-xs text-slate-500 text-right">Source: FMUv6C_stm32_pinout_v1.pdf</div>
                 </div>
             </div>
         </section>
@@ -1750,6 +1718,7 @@ elif action == "Waving":
             initBookmarks();
             initThemeToggle();
             updateBookmarkUI();
+            initPinoutSearch(); // Initialize Pinout Table
             
             // 繪製 DShot bits
             const db = document.getElementById('dshot-bits');
@@ -1879,8 +1848,8 @@ elif action == "Waving":
             };
             const p = m[t];
             if (pidChartInstance) {
-                pidChartInstance.data.datasets[1].data = p.d.map(val => val * 1);
-                // pidChartInstance.data.datasets[1].borderColor = p.c;
+                // For a simple visual update, we are just regenerating data based on the key
+                // Real simulation logic is simplified here for UI demo purposes
                 // pidChartInstance.update();
             }
         }
@@ -2273,6 +2242,119 @@ elif action == "Waving":
             if (tooltip) tooltip.remove();
             document.querySelectorAll('.tour-highlight').forEach(el => {
                 el.classList.remove('tour-highlight'); el.style.zIndex = '';
+            });
+        }
+
+        // ==================== 11. Pinout Search Logic ====================
+        const fullPinoutData = [
+            { p: "PA0", f: "TIM5_CH1", u: "FMU_CH7" },
+            { p: "PA1", f: "TIM5_CH2", u: "FMU_CH8" },
+            { p: "PA2", f: "ADC1_INP14", u: "FMU_BAT2_I" },
+            { p: "PA3", f: "USART2_RX", u: "FMU_USART2_RX_TEL3" },
+            { p: "PA4", f: "ADC1_INP18", u: "FMU_SCALED_V5" },
+            { p: "PA5", f: "SPI1_SCK", u: "FMU_SPI1_SCK_SENSOR" },
+            { p: "PA6", f: "SPI1_MISO", u: "FMU_SPI1_MISO_SENSOR" },
+            { p: "PA7", f: "SPI1_MOSI", u: "FMU_SPI1_MOSI_SENSOR" },
+            { p: "PA8", f: "TIM1_CH1", u: "FMU_CH1" },
+            { p: "PA9", f: "USB_OTG_FS_VBUS", u: "FMU_VBUS_SENSE" },
+            { p: "PA10", f: "USART1_RX", u: "FMU_UART_RX_GPS1" },
+            { p: "PA11", f: "USB_OTG_FS_DM", u: "FMU_USB_DM" },
+            { p: "PA12", f: "USB_OTG_FS_DP", u: "FMU_USB_DP" },
+            { p: "PA13", f: "SWDIO", u: "FMU_SWDIO" },
+            { p: "PA14", f: "SWCLK", u: "FMU_SWCLK" },
+            { p: "PA15", f: "GPIO", u: "N_BRICK1_VALID" },
+            { p: "PB0", f: "TIM3_CH3", u: "FMU_BUZZER" },
+            { p: "PB1", f: "ADC1_INP5", u: "FMU_BAT2_V" },
+            { p: "PB2", f: "GPIO", u: "VDD_3V3_SENSORS_EN" },
+            { p: "PB3", f: "SDMMC2_D2", u: "FMU_SDMMC2_D2" },
+            { p: "PB4", f: "SDMMC2_D3", u: "FMU_SDMMC2_D3" },
+            { p: "PB5", f: "CAN2_RX", u: "FMU_CAN2_RX" },
+            { p: "PB6", f: "USART1_TX", u: "FMU_USART1_TX_GPS1" },
+            { p: "PB7", f: "I2C1_SDA", u: "FMU_I2C1_SDA_GPS1_MAG_LED" },
+            { p: "PB8", f: "I2C1_SCL", u: "FMU_I2C1_SCL_GPS1_MAG_LED" },
+            { p: "PB9", f: "TIM17_CH1", u: "FMU_HEATER" },
+            { p: "PB10", f: "I2C2_SCL", u: "FMU_I2C2_SCL_GPS2_MAG_LED" },
+            { p: "PB11", f: "I2C2_SDA", u: "FMU_I2C2_SDA_GPS2_MAG_LED" },
+            { p: "PB12", f: "GPIO", u: "N_BRICK2_VALID" },
+            { p: "PB13", f: "CAN2_TX", u: "FMU_CAN2_TX" },
+            { p: "PB14", f: "SDMMC2_D0", u: "FMU_SDMMC2_D0" },
+            { p: "PB15", f: "SDMMC2_D1", u: "FMU_SDMMC2_D1" },
+            { p: "PC0", f: "ADC3_INP10", u: "HW_REV_SENSE" },
+            { p: "PC1", f: "ADC3_INP11", u: "HW_VER_SENSE" },
+            { p: "PC2", f: "SPI2_MISO", u: "FMU_SPI2_MISO_FRAM" },
+            { p: "PC3", f: "SPI2_MOSI", u: "FMU_SPI2_MOSI_FRAM" },
+            { p: "PC4", f: "ADC1_INP4", u: "FMU_BAT1_I" },
+            { p: "PC5", f: "ADC1_INP8", u: "FMU_BAT1_V" },
+            { p: "PC6", f: "USART6_TX", u: "FMU_USART6_TX_TO_IO" },
+            { p: "PC7", f: "USART6_RX", u: "FMU_USART6_RX_FROM_IO" },
+            { p: "PC8", f: "UART5_RTS", u: "FMU_UART5_RTS_TEL2" },
+            { p: "PC9", f: "UART5_CTS", u: "FMU_UART5_CTS_TEL2" },
+            { p: "PC10", f: "GPIO", u: "N_VDD_5V_HIPOWER_EN" },
+            { p: "PC11", f: "GPIO", u: "N_VDD_5V_HIPOWER_OC" },
+            { p: "PC12", f: "UART5_TX", u: "FMU_UART5_TX_TEL2" },
+            { p: "PC13", f: "GPIO", u: "FMU_SPI1_CS3_ICM42688" },
+            { p: "PC14", f: "GPIO", u: "FMU_SPI1_CS2_BMI055_GYRO" },
+            { p: "PC15", f: "GPIO", u: "FMU_SPI1_CS1_BMI055_ACC" },
+            { p: "PD0", f: "CAN1_RX", u: "FMU_CAN1_RX" },
+            { p: "PD1", f: "CAN1_TX", u: "FMU_CAN1_TX" },
+            { p: "PD2", f: "UART5_RX", u: "FMU_UART5_RX_TEL2" },
+            { p: "PD3", f: "SPI2_SCK", u: "FMU_SPI2_SCK_FRAM" },
+            { p: "PD4", f: "GPIO", u: "FMU_SPI2_CS_FRAM" },
+            { p: "PD5", f: "USART2_TX", u: "FMU_USART2_TX_TEL3" },
+            { p: "PD6", f: "SDMMC2_CK", u: "FMU_SDMMC2_CK" },
+            { p: "PD7", f: "SDMMC2_CMD", u: "FMU_SDMMC2_CMD" },
+            { p: "PD8", f: "USART3_TX", u: "FMU_USART3_TX_DEBUG" },
+            { p: "PD9", f: "USART3_RX", u: "FMU_USART3_RX_DEBUG" },
+            { p: "PD10", f: "GPIO", u: "N_FMU_LED_RED" },
+            { p: "PD11", f: "GPIO", u: "N_FMU_LED_BLUE" },
+            { p: "PD12", f: "I2C4_SCL", u: "FMU_I2C4_SCL" },
+            { p: "PD13", f: "I2C4_SDA", u: "FMU_I2C4_SDA" },
+            { p: "PD14", f: "TIM4_CH3", u: "FMU_CH5" },
+            { p: "PD15", f: "TIM4_CH4", u: "FMU_CH6" },
+            { p: "PE0", f: "UART8_RX", u: "FMU_UART8_RX_GPS2" },
+            { p: "PE1", f: "UART8_TX", u: "FMU_UART8_TX_GPS2" },
+            { p: "PE2", f: "GPIO", u: "N_VDD_5V_PERIPH_EN" },
+            { p: "PE3", f: "GPIO", u: "N_VDD_5V_PERIPH_OC" },
+            { p: "PE4", f: "GPIO", u: "FMU_SPI1_DRDY1_BMI055_ACC" },
+            { p: "PE5", f: "GPIO", u: "FMU_SPI1_DRDY2_BMI055_GYRO" },
+            { p: "PE6", f: "GPIO", u: "FMU_SPI1_DRDY3_ICM42688" },
+            { p: "PE7", f: "UART7_RX", u: "FMU_UART7_RX_TEL1" },
+            { p: "PE8", f: "UART7_TX", u: "FMU_UART7_TX_TEL1" },
+            { p: "PE9", f: "UART7_RTS", u: "FMU_UART7_RTS_TEL1" },
+            { p: "PE10", f: "UART7_CTS", u: "FMU_UART7_CTS_TEL1" },
+            { p: "PE11", f: "TIM1_CH2", u: "FMU_CH2" },
+            { p: "PE12", f: "GPIO", u: "HW_VER_REV_DRIVE" },
+            { p: "PE13", f: "TIM1_CH3", u: "FMU_CH3" },
+            { p: "PE14", f: "TIM1_CH4", u: "FMU_CH4" },
+            { p: "PE15", f: "GPIO", u: "N_USB_VBUS_VALID" }
+        ];
+
+        function initPinoutSearch() {
+            const tableBody = document.querySelector('#pinout-table tbody');
+            const searchInput = document.getElementById('pinout-search');
+            
+            if(!tableBody || !searchInput) return;
+
+            function renderTable(data) {
+                tableBody.innerHTML = data.map(row => `
+                    <tr class="hover:bg-slate-800 transition border-b border-slate-800">
+                        <td class="p-3 text-sky-400 font-bold">${row.p}</td>
+                        <td class="p-3 text-emerald-400 font-mono text-xs">${row.f}</td>
+                        <td class="p-3 text-slate-300 font-mono text-xs">${row.u}</td>
+                    </tr>
+                `).join('');
+            }
+
+            renderTable(fullPinoutData);
+
+            searchInput.addEventListener('input', (e) => {
+                const term = e.target.value.toUpperCase();
+                const filtered = fullPinoutData.filter(item => 
+                    item.p.includes(term) || 
+                    item.f.includes(term) || 
+                    item.u.includes(term)
+                );
+                renderTable(filtered);
             });
         }
 

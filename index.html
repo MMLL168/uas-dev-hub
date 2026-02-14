@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UAS R&D Hub (繁體中文工程版 V3.0)</title>
+    <title>UAS R&D Hub (繁體中文工程版 V3.1)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
@@ -77,6 +77,7 @@
         .badge-protocol { background-color: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); color: #60a5fa; }
         .badge-aiot { background-color: rgba(139, 92, 246, 0.1); border: 1px solid rgba(139, 92, 246, 0.3); color: #a78bfa; }
         .badge-log { background-color: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); color: #fbbf24; }
+        .badge-exam { background-color: rgba(132, 204, 22, 0.1); border: 1px solid rgba(132, 204, 22, 0.3); color: #a3e635; }
         
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         .animate-fade-in { animation: fadeIn 0.3s ease; }
@@ -134,7 +135,7 @@
     <nav id="sidebar" class="hidden md:flex flex-col w-64 bg-slate-900 border-r border-slate-800 h-screen sticky top-0 z-40 overflow-y-auto" data-tour="sidebar">
         <div class="p-6 border-b border-slate-800">
             <h1 class="text-xl font-bold text-slate-100 tracking-tight mono-font">UAS<span class="text-sky-500">_Dev</span></h1>
-            <p class="text-xs text-slate-500 mt-1">繁體中文工程版 V3.0</p>
+            <p class="text-xs text-slate-500 mt-1">繁體中文工程版 V3.1</p>
         </div>
 
         <div class="p-4 border-b border-slate-800 search-container" data-tour="search">
@@ -178,13 +179,15 @@
             <a href="#" data-section="section-devenv" class="nav-item block px-6 py-3 text-sm font-medium text-indigo-400 hover:bg-slate-800 hover:text-indigo-200 border-l-4 border-transparent transition-colors"><i class="fa-solid fa-laptop-code mr-2 w-4"></i>開發環境 (Toolchain)</a>
             <a href="#" data-section="section-aiot" class="nav-item block px-6 py-3 text-sm font-medium text-violet-400 hover:bg-slate-800 hover:text-violet-200 border-l-4 border-transparent transition-colors"><i class="fa-solid fa-network-wired mr-2 w-4"></i>AIoT 與 Trainer Port</a>
             <a href="#" data-section="section-maint" class="nav-item block px-6 py-3 text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-slate-200 border-l-4 border-transparent transition-colors"><i class="fa-solid fa-wrench mr-2 w-4"></i>故障診斷 (Debug)</a>
+            <!-- 新增: 考試指南 -->
+            <a href="#" data-section="section-exam" class="nav-item block px-6 py-3 text-sm font-medium text-lime-400 hover:bg-slate-800 hover:text-lime-200 border-l-4 border-transparent transition-colors"><i class="fa-solid fa-graduation-cap mr-2 w-4"></i>CAA 術科測驗 (Exam)</a>
         </div>
         <div class="p-4 border-t border-slate-800">
             <button onclick="startTour()" class="w-full bg-sky-600 hover:bg-sky-500 text-white py-2 rounded text-sm font-bold transition">
                 <i class="fa-solid fa-route mr-2"></i>開始導覽
             </button>
         </div>
-        <div class="p-4 bg-slate-950 border-t border-slate-800 text-xs text-slate-500">Engineer: Marlon | V3.0 Final</div>
+        <div class="p-4 bg-slate-950 border-t border-slate-800 text-xs text-slate-500">Engineer: Marlon | V3.1 Exam Guide</div>
     </nav>
 
     <!-- Main Content -->
@@ -640,7 +643,7 @@
             <div id="anatomy-detail" class="mt-6 bg-slate-800/50 border border-slate-700 p-6 rounded-xl shadow-lg hidden">
                 <h3 id="detail-title" class="text-xl font-bold text-sky-400 mb-2"></h3>
                 <p id="detail-desc" class="text-slate-300 mb-4"></p>
-                <div class="bg-slate-950 p-4 rounded border border-slate-800">
+                <div class="bg-slate-900 p-4 rounded border border-slate-800">
                     <h4 class="text-xs text-slate-500 uppercase font-bold mb-2">技術規格 (Technical Specs)</h4>
                     <ul class="space-y-2 text-sm text-emerald-400 mono-font" id="detail-specs"></ul>
                 </div>
@@ -1295,7 +1298,7 @@ Tools/environment_install/install-prereqs-ubuntu.sh -y
                 <!-- Tab 1: ROS 2 (Original) -->
                 <div id="content-aiot-ros" class="p-6 md:p-8 animate-fade-in">
                     <div class="grid lg:grid-cols-2 gap-8 mb-8">
-                        <div class="bg-slate-950 p-4 rounded border border-slate-700">
+                        <div class="bg-slate-900 p-4 rounded border border-slate-700">
                             <h3 class="text-lg font-bold text-violet-400 mb-2"><i class="fa-solid fa-sitemap mr-2"></i>micro-ROS 系統架構</h3>
                             <div class="font-mono text-xs text-slate-300 whitespace-pre leading-relaxed">Pixhawk 6C (PX4)
   ↓ (MAVLink + UART)
@@ -1424,7 +1427,7 @@ elif action == "Waving":
             </div>
         </section>
 
-        <!-- ==================== 17. 資源與術語 (經典還原) ==================== -->
+        <!-- ==================== 17. 資源與術語 (經典還原 + Mode 2) ==================== -->
         <section id="section-resources" class="mb-16 hidden animate-section relative">
             <i class="fa-regular fa-bookmark bookmark-badge" data-bookmark="section-resources"></i>
             <header class="mb-8 border-b border-slate-800 pb-4">
@@ -1435,7 +1438,7 @@ elif action == "Waving":
                 <div class="flex border-b border-slate-800 bg-slate-950 overflow-x-auto">
                     <button onclick="switchResTab('bom')" id="tab-res-bom" class="px-6 py-4 text-sm font-bold text-teal-400 bg-slate-900 border-r border-slate-800 transition whitespace-nowrap">BOM & Datasheets</button>
                     <button onclick="switchResTab('battery')" id="tab-res-battery" class="px-6 py-4 text-sm font-bold text-slate-500 bg-slate-950 transition whitespace-nowrap">4S 電池規範</button>
-                    <button onclick="switchResTab('glossary')" id="tab-res-glossary" class="px-6 py-4 text-sm font-bold text-slate-500 bg-slate-950 transition whitespace-nowrap">工程術語表</button>
+                    <button onclick="switchResTab('glossary')" id="tab-res-glossary" class="px-6 py-4 text-sm font-bold text-slate-500 bg-slate-950 transition whitespace-nowrap">工程術語與操控</button>
                 </div>
                 
                 <!-- Tab: BOM -->
@@ -1482,7 +1485,7 @@ elif action == "Waving":
                 <!-- Tab: Battery -->
                 <div id="content-res-battery" class="hidden p-6 md:p-8 animate-fade-in">
                     <div class="grid md:grid-cols-2 gap-6">
-                        <div class="bg-slate-950 p-4 rounded border border-slate-700">
+                        <div class="bg-slate-900 p-4 rounded border border-slate-700">
                             <strong class="text-white block mb-3 border-b border-slate-800 pb-2">基本參數 (CNHL 3300mAh)</strong>
                             <div class="grid grid-cols-2 gap-2 text-sm text-slate-300">
                                 <div>標稱電壓: <span class="text-sky-400">14.8V</span></div>
@@ -1491,7 +1494,7 @@ elif action == "Waving":
                                 <div>放電倍率: <span class="text-rose-400">40C</span></div>
                             </div>
                         </div>
-                        <div class="bg-slate-950 p-4 rounded border border-slate-700">
+                        <div class="bg-slate-900 p-4 rounded border border-slate-700">
                             <strong class="text-white block mb-3 border-b border-slate-800 pb-2">充電建議 (HOTA D6)</strong>
                             <table class="w-full text-xs text-left text-slate-400">
                                 <thead><tr><th class="pb-1">模式</th><th class="pb-1">電流</th><th class="pb-1">倍率</th></tr></thead>
@@ -1513,10 +1516,10 @@ elif action == "Waving":
                     </div>
                 </div>
 
-                <!-- Tab: Glossary (Mode 2 Upgrade) -->
+                <!-- Tab: Glossary (Mode 2 Included) -->
                 <div id="content-res-glossary" class="hidden p-6 md:p-8 animate-fade-in">
                     
-                    <!-- Mode 2 Detailed Guide (New) -->
+                    <!-- Mode 2 Visual Guide (New) -->
                     <div class="mb-8">
                         <h3 class="text-lg font-bold text-white mb-4 flex items-center">
                             <i class="fa-solid fa-gamepad mr-2 text-indigo-400"></i>
@@ -1530,7 +1533,7 @@ elif action == "Waving":
                             <!-- Left Stick -->
                             <div class="bg-slate-900 p-5 rounded-xl border border-slate-700 relative overflow-hidden group hover:border-sky-500 transition">
                                 <div class="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition">
-                                    <i class="fa-solid fa-arrow-up-down text-6xl text-sky-500"></i>
+                                    <i class="fa-solid fa-arrows-up-down text-6xl text-sky-500"></i>
                                 </div>
                                 <h4 class="font-bold text-sky-400 mb-3 border-b border-slate-800 pb-2">1. 左手搖桿 (Left Stick)</h4>
                                 <div class="text-xs text-slate-500 mb-3">控制能量與機頭朝向 (不回中)</div>
@@ -1599,9 +1602,10 @@ elif action == "Waving":
                         </div>
                     </div>
 
+                    <!-- Glossary Tables -->
                     <div class="grid md:grid-cols-2 gap-6">
                         <div>
-                            <h4 class="text-sm font-bold text-slate-300 border-l-4 border-emerald-500 pl-2 mb-2">2. QGC 設定 (Configuration)</h4>
+                            <h4 class="text-sm font-bold text-slate-300 border-l-4 border-emerald-500 pl-2 mb-2">QGC 設定 (Configuration)</h4>
                             <div class="grid grid-cols-2 gap-4 text-xs text-slate-400">
                                 <div class="bg-slate-900 p-2 rounded"><strong>Airframe:</strong> 機架選擇 (Quadrotor X, Hexacopter)。</div>
                                 <div class="bg-slate-900 p-2 rounded"><strong>Sensors:</strong> 感測器校正 (Accel, Gyro, Mag, Level)。</div>
@@ -1610,13 +1614,91 @@ elif action == "Waving":
                             </div>
                         </div>
                         <div>
-                            <h4 class="text-sm font-bold text-slate-300 border-l-4 border-amber-500 pl-2 mb-2">3. 飛行模式 (Flight Modes)</h4>
+                            <h4 class="text-sm font-bold text-slate-300 border-l-4 border-amber-500 pl-2 mb-2">飛行模式 (Flight Modes)</h4>
                             <ul class="text-xs text-slate-400 space-y-1">
                                 <li><span class="text-white font-bold w-20 inline-block">Stabilized:</span> 自穩模式。純手動，無 GPS，僅維持水平。</li>
                                 <li><span class="text-white font-bold w-20 inline-block">Position:</span> 定點模式。GPS 輔助懸停 (Loiter)。</li>
                                 <li><span class="text-white font-bold w-20 inline-block">RTL:</span> 返航模式 (Return To Launch)。</li>
                                 <li><span class="text-white font-bold w-20 inline-block">Offboard:</span> 外部控制。由 Companion Computer (ROS 2) 控制。</li>
                             </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== 18. CAA 術科測驗指南 (NEW) ==================== -->
+        <section id="section-exam" class="mb-16 hidden animate-section relative">
+            <i class="fa-regular fa-bookmark bookmark-badge" data-bookmark="section-exam"></i>
+            <header class="mb-8 border-b border-slate-800 pb-4">
+                <h2 class="text-3xl font-bold text-slate-100 mb-2">CAA 無人機術科測驗指南 (Exam Guide)</h2>
+                <div class="flex items-center gap-2 text-slate-400 text-sm">
+                    <span class="source-badge badge-exam">G1/G2/G3</span>
+                    <span>專業級操作證攻略</span>
+                </div>
+            </header>
+
+            <div class="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden mb-8">
+                <div class="flex border-b border-slate-800 bg-slate-950 overflow-x-auto">
+                    <button onclick="switchExamTab('maneuvers')" id="tab-exam-maneuvers" class="px-6 py-4 text-sm font-bold text-lime-400 bg-slate-900 border-r border-slate-800 transition whitespace-nowrap">測驗項目 (Maneuvers)</button>
+                    <button onclick="switchExamTab('tips')" id="tab-exam-tips" class="px-6 py-4 text-sm font-bold text-slate-500 bg-slate-950 transition whitespace-nowrap">通關密技 (Pro Tips)</button>
+                    <button onclick="switchExamTab('mission')" id="tab-exam-mission" class="px-6 py-4 text-sm font-bold text-slate-500 bg-slate-950 transition whitespace-nowrap">任務規劃 (Mission)</button>
+                </div>
+
+                <!-- Tab 1: Maneuvers -->
+                <div id="content-exam-maneuvers" class="p-6 md:p-8 animate-fade-in">
+                    <div class="space-y-6">
+                        <div class="bg-slate-950 p-4 rounded border border-slate-700">
+                            <h4 class="text-lg font-bold text-lime-400 mb-2">1. 垂直起降與四面停懸</h4>
+                            <p class="text-sm text-slate-300">起飛至指定高度 (通常 2-3m)，依序執行 機頭朝前 -> 朝右 -> 朝後 -> 朝左 的 90 度轉向，每面需停懸 5 秒。</p>
+                        </div>
+                        <div class="bg-slate-950 p-4 rounded border border-slate-700">
+                            <h4 class="text-lg font-bold text-lime-400 mb-2">2. 八字水平圓 (Figure 8)</h4>
+                            <p class="text-sm text-slate-300">這是大魔王關卡。需保持機頭朝前，左右平移繞行兩個圓錐，形成 8 字軌跡。全程不可越界，高度需維持。</p>
+                        </div>
+                        <div class="bg-slate-950 p-4 rounded border border-slate-700">
+                            <h4 class="text-lg font-bold text-lime-400 mb-2">3. 矩形航線 (Rectangular Circuit)</h4>
+                            <p class="text-sm text-slate-300">G3 等級必考。需執行順時針與逆時針的矩形飛行，機頭需隨航線轉向 (Bank Turn)。</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab 2: Tips -->
+                <div id="content-exam-tips" class="hidden p-6 md:p-8 animate-fade-in">
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div class="bg-slate-900 p-5 rounded-xl border border-lime-800">
+                            <h4 class="text-lg font-bold text-lime-400 mb-3"><i class="fa-solid fa-wind mr-2"></i>抗風修正心法</h4>
+                            <ul class="text-sm text-slate-300 space-y-3">
+                                <li><strong>預先補償:</strong> 若風從左邊吹來，轉向 90 度前先稍微往左飛一點，轉的瞬間讓風把你「吹回」中心點。</li>
+                                <li><strong>慢速轉向:</strong> 不要轉太快！建議 0.5 秒轉 90 度，這樣才有時間邊轉邊修正位移。</li>
+                            </ul>
+                        </div>
+                        <div class="bg-slate-900 p-5 rounded-xl border border-lime-800">
+                            <h4 class="text-lg font-bold text-lime-400 mb-3"><i class="fa-solid fa-infinity mr-2"></i>八字水平圓攻略</h4>
+                            <ul class="text-sm text-slate-300 space-y-3">
+                                <li><strong>定舵打桿:</strong> 機頭保持朝前。左手搖桿 (Yaw) 固定微量不動，主要靠右手搖桿 (Roll/Pitch) 畫圓。</li>
+                                <li><strong>高度策略:</strong> 雖然規定 1-2m，建議飛低一點 (約 1m)，視覺誤差較小，比較容易對齊圓錐。</li>
+                                <li><strong>速度控制:</strong> 保持約 1m/s 的慢速，寧可慢也不要忽快忽慢。</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab 3: Mission -->
+                <div id="content-exam-mission" class="hidden p-6 md:p-8 animate-fade-in">
+                    <div class="space-y-6">
+                        <div class="bg-slate-950 p-4 rounded border border-slate-700">
+                            <h4 class="text-lg font-bold text-slate-200 mb-2">APP 選擇: Litchi (荔枝)</h4>
+                            <p class="text-sm text-slate-400 mb-3">考試推薦使用 Litchi 進行航點規劃，操作比 DJI Go 更直觀。</p>
+                            <ul class="list-disc list-inside text-xs text-slate-500 space-y-1">
+                                <li>在家先練習畫 G1/G2/G3 的圖形。</li>
+                                <li>考試時若平板髒污或觸控不良，請善用手指替代觸控筆。</li>
+                                <li>畫完後務必檢查每個航點的高度與速度設定。</li>
+                            </ul>
+                        </div>
+                        <div class="bg-slate-900 p-4 rounded border-l-4 border-rose-500">
+                            <strong class="text-rose-400 text-sm">緊急程序 (Emergency):</strong>
+                            <p class="text-xs text-slate-300 mt-1">G1/G2/G3 都會考。當考官喊「緊急迫降」或「返航」時，請保持冷靜，切換到姿態模式 (Attitude) 或直接執行 RTH，切勿猶豫。</p>
                         </div>
                     </div>
                 </div>
@@ -1651,7 +1733,8 @@ elif action == "Waving":
             { title: '軟體棧 (PX4/ArduPilot)', section: 'section-software', keywords: ['software', 'stack', 'px4', 'ardupilot', 'uorb'] },
             { title: 'AIoT 與 ROS 2', section: 'section-aiot', keywords: ['aiot', 'ros2', 'esp32', 'micro-ros', 'humble', 'trainer', 'ppm'] },
             { title: '故障診斷', section: 'section-maint', keywords: ['debug', 'troubleshooting', 'ubuntu', 'sitl', 'accel', 'motor'] },
-            { title: '資源與術語', section: 'section-resources', keywords: ['cost', 'bom', 'price', 'community', 'battery', 'lipo', 'glossary', 'throttle', 'yaw', 'pitch', 'roll', 'mode 2', 'stick', 'control'] }
+            { title: '資源與術語', section: 'section-resources', keywords: ['cost', 'bom', 'price', 'community', 'battery', 'lipo', 'glossary', 'throttle', 'yaw', 'pitch', 'roll', 'mode 2', 'stick', 'control'] },
+            { title: 'CAA 術科測驗', section: 'section-exam', keywords: ['exam', 'caa', 'g1', 'g2', 'g3', 'license', 'test', '八字'] }
         ];
 
         // ==================== 3. 頁面加載初始化 ====================
@@ -1879,6 +1962,22 @@ elif action == "Waving":
             document.getElementById('tab-aiot-trainer').className = id === 'trainer'
                 ? 'px-6 py-4 text-sm font-bold text-pink-400 bg-slate-900 border-l border-slate-800 transition whitespace-nowrap'
                 : 'px-6 py-4 text-sm font-bold text-slate-500 bg-slate-950 transition whitespace-nowrap';
+        }
+        
+        // NEW: Exam Tabs
+        function switchExamTab(id) {
+            document.getElementById('content-exam-maneuvers').classList.add('hidden');
+            document.getElementById('content-exam-tips').classList.add('hidden');
+            document.getElementById('content-exam-mission').classList.add('hidden');
+            
+            document.getElementById(`content-exam-${id}`).classList.remove('hidden');
+            
+            ['maneuvers', 'tips', 'mission'].forEach(tab => {
+                document.getElementById(`tab-exam-${tab}`).className = 'px-6 py-4 text-sm font-bold text-slate-500 bg-slate-950 transition whitespace-nowrap';
+            });
+            
+            const activeClass = 'px-6 py-4 text-sm font-bold text-lime-400 bg-slate-900 border-x border-slate-800 transition whitespace-nowrap';
+            document.getElementById(`tab-exam-${id}`).className = activeClass;
         }
 
         function switchProtoTab(id) {

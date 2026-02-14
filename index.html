@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UAS R&D Hub (繁體中文工程版 V3.2)</title>
+    <title>UAS R&D Hub (繁體中文工程版 V3.3)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
@@ -78,6 +78,7 @@
         .badge-aiot { background-color: rgba(139, 92, 246, 0.1); border: 1px solid rgba(139, 92, 246, 0.3); color: #a78bfa; }
         .badge-log { background-color: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); color: #fbbf24; }
         .badge-exam { background-color: rgba(132, 204, 22, 0.1); border: 1px solid rgba(132, 204, 22, 0.3); color: #a3e635; }
+        .badge-official { background-color: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.3); color: #818cf8; }
         
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         .animate-fade-in { animation: fadeIn 0.3s ease; }
@@ -115,6 +116,17 @@
         .io-flow-container { position: relative; display: flex; align-items: center; justify-content: space-between; font-size: 0.75rem; }
         .io-box { padding: 0.5rem; border-radius: 4px; border: 1px solid #475569; background: #1e293b; text-align: center; font-weight: bold; width: 22%; }
         .io-arrow { color: #64748b; font-size: 1rem; }
+        
+        /* Official Docs Table Styles */
+        .specs-table td { padding: 0.5rem; border-bottom: 1px solid #334155; vertical-align: top; }
+        .specs-table tr:last-child td { border-bottom: none; }
+        .specs-key { font-weight: bold; color: #94a3b8; width: 30%; }
+        .specs-val { color: #e2e8f0; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; }
+        .pinout-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; }
+        .connector-box { background: #1e293b; border: 1px solid #334155; border-radius: 0.5rem; padding: 1rem; }
+        .connector-title { font-weight: bold; color: #38bdf8; border-bottom: 1px solid #475569; padding-bottom: 0.5rem; margin-bottom: 0.5rem; display: flex; justify-content: space-between; }
+        .pin-row { display: flex; justify-content: space-between; font-size: 0.75rem; padding: 0.25rem 0; border-bottom: 1px dashed #334155; }
+        .pin-row:last-child { border-bottom: none; }
     </style>
 </head>
 <body class="flex flex-col md:flex-row min-h-screen">
@@ -135,7 +147,7 @@
     <nav id="sidebar" class="hidden md:flex flex-col w-64 bg-slate-900 border-r border-slate-800 h-screen sticky top-0 z-40 overflow-y-auto" data-tour="sidebar">
         <div class="p-6 border-b border-slate-800">
             <h1 class="text-xl font-bold text-slate-100 tracking-tight mono-font">UAS<span class="text-sky-500">_Dev</span></h1>
-            <p class="text-xs text-slate-500 mt-1">繁體中文工程版 V3.2</p>
+            <p class="text-xs text-slate-500 mt-1">繁體中文工程版 V3.3</p>
         </div>
 
         <div class="p-4 border-b border-slate-800 search-container" data-tour="search">
@@ -159,6 +171,7 @@
         <div class="flex-1 py-4 space-y-1">
             <div class="px-4 py-2 text-xs font-bold text-slate-600 uppercase">戰略與資源 (Strategic)</div>
             <a href="#" data-section="section-roadmap" class="nav-item block px-6 py-3 text-sm font-medium text-orange-400 hover:bg-slate-800 hover:text-orange-200 border-l-4 border-transparent transition-colors active bg-orange-900/10"><i class="fa-solid fa-chess-knight mr-2 w-4"></i>技術路線圖 (Roadmap)</a>
+            <a href="#" data-section="section-official-docs" class="nav-item block px-6 py-3 text-sm font-medium text-indigo-400 hover:bg-slate-800 hover:text-indigo-200 border-l-4 border-transparent transition-colors"><i class="fa-solid fa-book-atlas mr-2 w-4"></i>官方技術手冊 (Docs)</a>
             <a href="#" data-section="section-teardown" class="nav-item block px-6 py-3 text-sm font-medium text-emerald-400 hover:bg-slate-800 hover:text-emerald-200 border-l-4 border-transparent transition-colors"><i class="fa-solid fa-box-open mr-2 w-4"></i>X500 硬體拆解 (Ref)</a>
             <a href="#" data-section="section-build-aiot" class="nav-item block px-6 py-3 text-sm font-medium text-pink-400 hover:bg-slate-800 hover:text-pink-200 border-l-4 border-transparent transition-colors"><i class="fa-solid fa-cart-shopping mr-2 w-4"></i>X500 AIoT 建置 (Build)</a>
             <a href="#" data-section="section-logs" class="nav-item block px-6 py-3 text-sm font-medium text-amber-400 hover:bg-slate-800 hover:text-amber-200 border-l-4 border-transparent transition-colors"><i class="fa-solid fa-clipboard-list mr-2 w-4"></i>專案實作日誌 (SOP)</a>
@@ -187,7 +200,7 @@
                 <i class="fa-solid fa-route mr-2"></i>開始導覽
             </button>
         </div>
-        <div class="p-4 bg-slate-950 border-t border-slate-800 text-xs text-slate-500">Engineer: Marlon | V3.2 Full Pinout</div>
+        <div class="p-4 bg-slate-950 border-t border-slate-800 text-xs text-slate-500">Engineer: Marlon | V3.3 Official Specs</div>
     </nav>
 
     <!-- Main Content -->
@@ -237,7 +250,166 @@
             </div>
         </section>
 
-        <!-- ==================== 2. Teardown ==================== -->
+        <!-- ==================== NEW SECTION: Official Docs ==================== -->
+        <section id="section-official-docs" class="mb-16 hidden animate-section relative">
+            <i class="fa-regular fa-bookmark bookmark-badge" data-bookmark="section-official-docs"></i>
+            <header class="mb-8 border-b border-slate-800 pb-4">
+                <h2 class="text-3xl font-bold text-slate-100 mb-2">Pixhawk 6C 官方技術手冊 (Official Docs)</h2>
+                <div class="flex items-center gap-2 text-slate-400 text-sm">
+                    <span class="source-badge badge-official">Holybro Docs</span>
+                    <span>FMUv6C Open Standard</span>
+                </div>
+            </header>
+
+            <div class="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden mb-8">
+                <div class="flex border-b border-slate-800 bg-slate-950 overflow-x-auto">
+                    <button onclick="switchDocsTab('specs')" id="tab-docs-specs" class="px-6 py-4 text-sm font-bold text-indigo-400 bg-slate-900 border-r border-slate-800 transition whitespace-nowrap">規格總覽 (Specs)</button>
+                    <button onclick="switchDocsTab('ports')" id="tab-docs-ports" class="px-6 py-4 text-sm font-bold text-slate-500 bg-slate-950 transition whitespace-nowrap">接口定義大全 (Ports)</button>
+                </div>
+
+                <!-- Tab 1: Specs -->
+                <div id="content-docs-specs" class="p-6 md:p-8 animate-fade-in">
+                    <div class="grid lg:grid-cols-2 gap-8">
+                        <div>
+                            <h3 class="text-xl font-bold text-white mb-4">處理器與感測器 (Processors & Sensors)</h3>
+                            <table class="w-full text-sm specs-table">
+                                <tr><td class="specs-key">FMU Processor</td><td class="specs-val">STM32H743 (Cortex-M7, 480MHz, 2MB Flash, 1MB RAM)</td></tr>
+                                <tr><td class="specs-key">IO Processor</td><td class="specs-val">STM32F103 (Cortex-M3, 72MHz, 64KB SRAM)</td></tr>
+                                <tr><td class="specs-key">Accel/Gyro 1</td><td class="specs-val text-emerald-400">ICM-42688-P (High Performance)</td></tr>
+                                <tr><td class="specs-key">Accel/Gyro 2</td><td class="specs-val text-emerald-400">BMI088 (Replaces discontinued BMI055)</td></tr>
+                                <tr><td class="specs-key">Magnetometer</td><td class="specs-val">IST8310</td></tr>
+                                <tr><td class="specs-key">Barometer</td><td class="specs-val">MS5611</td></tr>
+                            </table>
+
+                            <h3 class="text-xl font-bold text-white mb-4 mt-8">電氣特性 (Electrical Data)</h3>
+                            <table class="w-full text-sm specs-table">
+                                <tr><td class="specs-key">Max Input</td><td class="specs-val text-rose-400">6V</td></tr>
+                                <tr><td class="specs-key">USB Power</td><td class="specs-val">4.75 ~ 5.25V</td></tr>
+                                <tr><td class="specs-key">Servo Rail</td><td class="specs-val">0 ~ 36V</td></tr>
+                                <tr><td class="specs-key">Telem1 Limit</td><td class="specs-val">1.5A (Independent)</td></tr>
+                                <tr><td class="specs-key">Other Ports</td><td class="specs-val">1.5A (Combined Limit)</td></tr>
+                            </table>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-white mb-4">機械數據 (Mechanical)</h3>
+                            <table class="w-full text-sm specs-table">
+                                <tr><td class="specs-key">Dimensions</td><td class="specs-val">84.8 x 44 x 12.4 mm</td></tr>
+                                <tr><td class="specs-key">Weight</td><td class="specs-val">59.3g (Aluminum) / 34.6g (Plastic)</td></tr>
+                                <tr><td class="specs-key">Operating Temp</td><td class="specs-val">-40 ~ 85°C</td></tr>
+                            </table>
+
+                            <h3 class="text-xl font-bold text-white mb-4 mt-8">主要接口 (Interfaces)</h3>
+                            <ul class="list-disc list-inside text-sm text-slate-400 space-y-2 mono-font">
+                                <li>16x PWM (8 IO, 8 FMU) w/ 3.3V/5V switch</li>
+                                <li>3x General Purpose Serial (Telem 1/2/3)</li>
+                                <li>2x GPS Ports (GPS1 Full, GPS2 Basic)</li>
+                                <li>2x CAN Buses (CAN FD)</li>
+                                <li>1x I2C Port</li>
+                                <li>1x Dedicated RC Input (Spektrum/SBUS/PPM)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab 2: Ports -->
+                <div id="content-docs-ports" class="hidden p-6 md:p-8 animate-fade-in">
+                    <div class="bg-amber-900/20 border border-amber-800 p-4 rounded mb-6">
+                        <strong class="text-amber-400 block mb-1"><i class="fa-solid fa-triangle-exclamation mr-2"></i>版本差異警告 (Critical Notes)</strong>
+                        <ul class="list-disc list-inside text-xs text-slate-300">
+                            <li><strong>Telem 3:</strong> 序號為 <code>XXXX 001 XXXXXX</code> 的版本，Pin 4/5 固定連接到 I2C4 (3.3V)。不可連接非 I2C 設備。</li>
+                            <li><strong>I2C Port:</strong> 序號 <code>XXXX XXX 20221100</code> 及以前的版本，連接的是 I2C4。</li>
+                        </ul>
+                    </div>
+
+                    <div class="pinout-grid">
+                        <!-- Power -->
+                        <div class="connector-box">
+                            <div class="connector-title"><span>POWER 1 & 2</span> <span class="text-xs text-slate-500">6-Pin</span></div>
+                            <div class="pin-row"><span class="text-rose-400">1</span> <span>VDD_5V (In)</span></div>
+                            <div class="pin-row"><span class="text-rose-400">2</span> <span>VDD_5V (In)</span></div>
+                            <div class="pin-row"><span class="text-slate-400">3</span> <span>CURRENT (3.3V)</span></div>
+                            <div class="pin-row"><span class="text-slate-400">4</span> <span>VOLTAGE (3.3V)</span></div>
+                            <div class="pin-row"><span class="text-slate-500">5</span> <span>GND</span></div>
+                            <div class="pin-row"><span class="text-slate-500">6</span> <span>GND</span></div>
+                        </div>
+
+                        <!-- Telem 1 -->
+                        <div class="connector-box">
+                            <div class="connector-title"><span>TELEM 1</span> <span class="text-xs text-slate-500">6-Pin</span></div>
+                            <div class="pin-row"><span class="text-rose-400">1</span> <span>VCC_5V</span></div>
+                            <div class="pin-row"><span class="text-slate-400">2</span> <span>UART7_TX</span></div>
+                            <div class="pin-row"><span class="text-slate-400">3</span> <span>UART7_RX</span></div>
+                            <div class="pin-row"><span class="text-slate-400">4</span> <span>UART7_CTS</span></div>
+                            <div class="pin-row"><span class="text-slate-400">5</span> <span>UART7_RTS</span></div>
+                            <div class="pin-row"><span class="text-slate-500">6</span> <span>GND</span></div>
+                        </div>
+
+                        <!-- GPS 1 -->
+                        <div class="connector-box">
+                            <div class="connector-title"><span>GPS 1</span> <span class="text-xs text-slate-500">10-Pin</span></div>
+                            <div class="pin-row"><span class="text-rose-400">1</span> <span>VCC_5V</span></div>
+                            <div class="pin-row"><span class="text-slate-400">2</span> <span>TX1</span></div>
+                            <div class="pin-row"><span class="text-slate-400">3</span> <span>RX1</span></div>
+                            <div class="pin-row"><span class="text-emerald-400">4</span> <span>SCL1</span></div>
+                            <div class="pin-row"><span class="text-emerald-400">5</span> <span>SDA1</span></div>
+                            <div class="pin-row"><span class="text-amber-400">6</span> <span>SAFETY_SW</span></div>
+                            <div class="pin-row"><span class="text-amber-400">7</span> <span>SAFETY_LED</span></div>
+                            <div class="pin-row"><span class="text-slate-400">9</span> <span>BUZZER</span></div>
+                            <div class="pin-row"><span class="text-slate-500">10</span> <span>GND</span></div>
+                        </div>
+
+                        <!-- USB -->
+                        <div class="connector-box">
+                            <div class="connector-title"><span>USB Port</span> <span class="text-xs text-slate-500">4-Pin</span></div>
+                            <div class="pin-row"><span class="text-rose-400">1</span> <span>VBUS (+5V)</span></div>
+                            <div class="pin-row"><span class="text-slate-400">2</span> <span>DM (D-)</span></div>
+                            <div class="pin-row"><span class="text-slate-400">3</span> <span>DP (D+)</span></div>
+                            <div class="pin-row"><span class="text-slate-500">4</span> <span>GND</span></div>
+                        </div>
+
+                        <!-- CAN -->
+                        <div class="connector-box">
+                            <div class="connector-title"><span>CAN 1 & 2</span> <span class="text-xs text-slate-500">4-Pin</span></div>
+                            <div class="pin-row"><span class="text-rose-400">1</span> <span>VCC_5V</span></div>
+                            <div class="pin-row"><span class="text-slate-400">2</span> <span>CAN_H</span></div>
+                            <div class="pin-row"><span class="text-slate-400">3</span> <span>CAN_L</span></div>
+                            <div class="pin-row"><span class="text-slate-500">4</span> <span>GND</span></div>
+                        </div>
+
+                        <!-- I2C -->
+                        <div class="connector-box">
+                            <div class="connector-title"><span>I2C Port</span> <span class="text-xs text-slate-500">4-Pin</span></div>
+                            <div class="pin-row"><span class="text-rose-400">1</span> <span>VCC_5V</span></div>
+                            <div class="pin-row"><span class="text-emerald-400">2</span> <span>SCL (I2C2/4*)</span></div>
+                            <div class="pin-row"><span class="text-emerald-400">3</span> <span>SDA (I2C2/4*)</span></div>
+                            <div class="pin-row"><span class="text-slate-500">4</span> <span>GND</span></div>
+                        </div>
+
+                        <!-- RC PPM/SBUS -->
+                        <div class="connector-box">
+                            <div class="connector-title"><span>RC Port</span> <span class="text-xs text-slate-500">PPM/SBUS</span></div>
+                            <div class="pin-row"><span class="text-rose-400">1</span> <span>VDD_5V</span></div>
+                            <div class="pin-row"><span class="text-sky-400">2</span> <span>PPM/SBUS_IN</span></div>
+                            <div class="pin-row"><span class="text-slate-400">3</span> <span>RSSI_IN</span></div>
+                            <div class="pin-row"><span class="text-slate-500">5</span> <span>GND</span></div>
+                        </div>
+
+                        <!-- Debug -->
+                        <div class="connector-box">
+                            <div class="connector-title"><span>FMU Debug</span> <span class="text-xs text-slate-500">JST-SH 10-Pin</span></div>
+                            <div class="pin-row"><span class="text-rose-400">1</span> <span>VDD_3V3</span></div>
+                            <div class="pin-row"><span class="text-slate-400">2</span> <span>UART3_TX</span></div>
+                            <div class="pin-row"><span class="text-slate-400">3</span> <span>UART3_RX</span></div>
+                            <div class="pin-row"><span class="text-slate-400">4</span> <span>SWD_IO</span></div>
+                            <div class="pin-row"><span class="text-slate-400">5</span> <span>SWD_CK</span></div>
+                            <div class="pin-row"><span class="text-slate-500">10</span> <span>GND</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== 2. Teardown (Updated) ==================== -->
         <section id="section-teardown" class="mb-16 hidden animate-section relative">
             <i class="fa-regular fa-bookmark bookmark-badge" data-bookmark="section-teardown"></i>
             <header class="mb-8 border-b border-slate-800 pb-4">
@@ -250,7 +422,7 @@
             <div class="grid md:grid-cols-2 gap-6 mb-8">
                 <div class="bg-slate-900 p-6 rounded-xl border border-slate-800">
                     <h3 class="text-xl font-bold text-emerald-400 mb-4 flex items-center">
-                        <i class="fa-solid fa-microchip mr-2"></i>飛控系統
+                        <i class="fa-solid fa-microchip mr-2"></i>飛控系統 (Updated)
                     </h3>
                     <div class="space-y-3 text-sm text-slate-300">
                         <div class="flex justify-between py-2 border-b border-slate-800">
@@ -265,9 +437,13 @@
                             <span class="text-slate-500">IMU:</span>
                             <span>ICM-42688-P + BMI088</span>
                         </div>
+                        <div class="flex justify-between py-2 border-b border-slate-800">
+                            <span class="text-slate-500">Mag:</span>
+                            <span>IST8310</span>
+                        </div>
                         <div class="flex justify-between py-2">
-                            <span class="text-slate-500">GPS:</span>
-                            <span>M9N (u-blox)</span>
+                            <span class="text-slate-500">Baro:</span>
+                            <span>MS5611</span>
                         </div>
                     </div>
                 </div>
@@ -740,9 +916,10 @@
                             </ul>
                             <h4 class="text-emerald-400 font-bold mb-3 mt-6 border-b border-emerald-900 pb-2">2. 感測器 (Sensors)</h4>
                             <ul class="space-y-3 text-sm text-slate-400">
-                                <li><strong class="text-white">IMU 1 (SPI):</strong> ICM-42688-P (高頻震動性能佳)。</li>
-                                <li><strong class="text-white">IMU 2 (SPI):</strong> BMI088 (工業級穩定性)。</li>
-                                <li><strong class="text-white">Mag (I2C):</strong> IST8310 (外部 I2C 磁羅盤)。</li>
+                                <li><strong class="text-white">IMU 1 (SPI):</strong> ICM-42688-P (High Performance).</li>
+                                <li><strong class="text-white">IMU 2 (SPI):</strong> BMI088 (Robustness).</li>
+                                <li><strong class="text-white">Mag (I2C):</strong> IST8310.</li>
+                                <li><strong class="text-white">Baro (I2C):</strong> MS5611.</li>
                             </ul>
                         </div>
                         <div>
@@ -760,7 +937,7 @@
                     </div>
                 </div>
 
-                <!-- Content: Pinout (UPDATED with Full List) -->
+                <!-- Content: Pinout (Full List) -->
                 <div id="content-design-pinout" class="hidden p-6 md:p-8 animate-fade-in flex flex-col h-[600px]">
                     <div class="mb-4">
                         <input type="text" id="pinout-search" placeholder="搜尋腳位定義 (例如: PA9, UART, FMU...)" class="w-full bg-slate-800 border border-slate-700 rounded px-4 py-2 text-sm text-slate-200 focus:outline-none focus:border-sky-500 transition">
@@ -1686,6 +1863,7 @@ elif action == "Waving":
         // ==================== 2. 搜尋資料 (完整版) ====================
         const searchData = [
             { title: '技術路線圖', section: 'section-roadmap', keywords: ['roadmap', 'imx', 'rt1176', 'pab', 'rtk'] },
+            { title: '官方技術手冊', section: 'section-official-docs', keywords: ['docs', 'spec', 'ports', 'jst', 'pinout', 'manual'] },
             { title: 'X500 硬體拆解', section: 'section-teardown', keywords: ['x500', 'teardown', 'pixhawk', '6c'] },
             { title: 'X500 AIoT 建置', section: 'section-build-aiot', keywords: ['build', 'aiot', 'pi5', 'yolo', 'ubec'] },
             { title: '專案實作日誌', section: 'section-logs', keywords: ['log', 'build', 'config', 'qgc', 'calibration', 'sop'] },
@@ -1982,6 +2160,21 @@ elif action == "Waving":
                 document.getElementById(`tab-res-${id}`).className = "px-6 py-4 text-sm font-bold text-slate-500 bg-slate-950 transition whitespace-nowrap";
             });
             document.getElementById(`tab-res-${tabId}`).className = "px-6 py-4 text-sm font-bold text-teal-400 bg-slate-900 border-x border-slate-800 transition whitespace-nowrap";
+        }
+
+        // NEW: Docs Tabs
+        function switchDocsTab(id) {
+            document.getElementById('content-docs-specs').classList.add('hidden');
+            document.getElementById('content-docs-ports').classList.add('hidden');
+            document.getElementById(`content-docs-${id}`).classList.remove('hidden');
+            
+            document.getElementById('tab-docs-specs').className = id === 'specs' 
+                ? 'px-6 py-4 text-sm font-bold text-indigo-400 bg-slate-900 border-r border-slate-800 transition whitespace-nowrap' 
+                : 'px-6 py-4 text-sm font-bold text-slate-500 bg-slate-950 transition whitespace-nowrap';
+            
+            document.getElementById('tab-docs-ports').className = id === 'ports' 
+                ? 'px-6 py-4 text-sm font-bold text-indigo-400 bg-slate-900 border-l border-slate-800 transition whitespace-nowrap' 
+                : 'px-6 py-4 text-sm font-bold text-slate-500 bg-slate-950 transition whitespace-nowrap';
         }
 
         // ==================== 8. 硬體解剖學資料 ====================

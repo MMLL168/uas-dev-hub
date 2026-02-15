@@ -1676,6 +1676,147 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- NEW: F103 Firmware & Bootloader Deep Dive -->
+                <div class="col-span-1 lg:col-span-2 bg-slate-900/50 p-6 rounded-xl border border-slate-700 mt-0">
+                    <h3 class="text-xl font-bold text-white mb-6 flex items-center border-b border-slate-700 pb-3">
+                        <i class="fa-solid fa-microchip mr-2 text-amber-500"></i>
+                        韌體更新與 Bootloader 架構 (Firmware & Bootloader)
+                    </h3>
+
+                    <div class="grid lg:grid-cols-2 gap-8">
+                        <!-- Left: How to Update -->
+                        <div>
+                            <h4 class="text-lg font-bold text-sky-400 mb-4">如何更新 F103 的韌體 (FW)？</h4>
+                            <div class="space-y-4">
+                                <div class="bg-slate-900 p-4 rounded border-l-4 border-emerald-500">
+                                    <strong class="text-emerald-400 block mb-1">情境 A：一般開發更新 (最常用)</strong>
+                                    <p class="text-sm text-slate-400">
+                                        在正常運作下，<span class="text-white">不需要手動更新</span>。
+                                        當更新 H743 主韌體 (<code>make px4_fmu-v6c_default upload</code>) 時，編譯系統會自動打包 IO 韌體
+                                        (<code>px4_io-v2_default.bin</code>)。
+                                        <br><br>
+                                        <i class="fa-solid fa-robot mr-1"></i> <strong>自動檢查機制：</strong> 開機時，H743 會檢查
+                                        F103 版本。若不一致，會自動透過內部匯流排「推」送新韌體給 F103。
+                                    </p>
+                                </div>
+
+                                <div class="bg-slate-900 p-4 rounded border-l-4 border-sky-500">
+                                    <strong class="text-sky-400 block mb-1">情境 B：終端機手動強制更新</strong>
+                                    <p class="text-sm text-slate-400 md:whitespace-nowrap">
+                                        若修改了 IO 程式碼想立刻測試，可在 NSH 終端機輸入：
+                                    </p>
+                                    <code
+                                        class="block bg-black px-2 py-1 mt-2 text-emerald-400 mono-font text-xs rounded">px4io update</code>
+                                    <p class="text-xs text-slate-500 mt-2">這會觸發主處理器讀取內建 .bin 並刷寫 IO。</p>
+                                </div>
+
+                                <div class="bg-slate-900 p-4 rounded border-l-4 border-rose-500">
+                                    <strong class="text-rose-400 block mb-1">情境 C：自製板子 (晶片完全空白)</strong>
+                                    <p class="text-sm text-slate-400">
+                                        若 F103 是空的，無法與 H743 溝通。必須走硬體流程：
+                                    </p>
+                                    <ul class="list-disc list-inside mt-2 text-xs text-slate-400 space-y-1">
+                                        <li><strong>1. 燒錄 Bootloader:</strong> 使用 ST-LINK (SWD) 將
+                                            <code>px4_io-v2_bootloader.bin</code> 燒入 <code
+                                                class="text-rose-300">0x08000000</code>。</li>
+                                        <li><strong>2. 後續更新:</strong> 之後即可依「情境 A」由 H743 自動代管。</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right: Bootloader Comparison -->
+                        <div>
+                            <h4 class="text-lg font-bold text-amber-400 mb-4">Bootloader 深度對比 (H743 vs F103)</h4>
+                            <p class="text-sm text-slate-400 mb-4">
+                                H743 (FMU) 與 F103 (IO) 雖都在板子上，但它們是<span class="text-white">完全獨立</span>的元件。
+                            </p>
+
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left border-collapse text-xs">
+                                    <thead class="bg-slate-950 text-slate-300">
+                                        <tr>
+                                            <th class="p-2 border-b border-slate-700">維度</th>
+                                            <th class="p-2 border-b border-slate-700 text-sky-400">FMU Bootloader (H743)
+                                            </th>
+                                            <th class="p-2 border-b border-slate-700 text-rose-400">IO Bootloader (F103)
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="text-slate-400 divide-y divide-slate-800 bg-slate-900">
+                                        <tr>
+                                            <td class="p-2 font-bold text-slate-300">1. 硬體架構</td>
+                                            <td class="p-2">Arm Cortex-M7<br><span
+                                                    class="text-[10px] text-slate-500">指令集不同，二進位不相容</span></td>
+                                            <td class="p-2">Arm Cortex-M3<br><span
+                                                    class="text-[10px] text-slate-500">需獨立編譯</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="p-2 font-bold text-slate-300">2. 功能職責</td>
+                                            <td class="p-2">
+                                                <ul class="list-disc list-inside space-y-1">
+                                                    <li><strong>面對 PC (USB):</strong> 讓 QGC 刷寫 PX4 App</li>
+                                                    <li><strong>位址:</strong> 0x08000000</li>
+                                                </ul>
+                                            </td>
+                                            <td class="p-2">
+                                                <ul class="list-disc list-inside space-y-1">
+                                                    <li><strong>面對 FMU (UART):</strong> 等待 H7 傳送韌體</li>
+                                                    <li><strong>故障保護:</strong> 負責 PWM Failsafe</li>
+                                                </ul>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="p-2 font-bold text-slate-300">3. 編譯來源</td>
+                                            <td class="p-2">
+                                                <code>make px4_fmu-v6c_bootloader</code>
+                                                <div class="text-[10px] text-slate-500 mt-1">PX4-Autopilot (in-tree)
+                                                </div>
+                                            </td>
+                                            <td class="p-2">
+                                                <code>make px4_io-v2_bootloader</code>
+                                                <div class="text-[10px] text-slate-500 mt-1">PX4-Bootloader (獨立 repo)
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="mt-4 bg-amber-900/10 border border-amber-800 p-3 rounded">
+                                <strong class="text-amber-400 text-xs block mb-1"><i
+                                        class="fa-solid fa-triangle-exclamation mr-1"></i> 自製板子設計警告</strong>
+                                <p class="text-xs text-slate-400">
+                                    務必確保 H743 與 F103 都有預留<strong>獨立的 SWD 測試點</strong> (DIO, CLK, GND, 3.3V)。若 Bootloader
+                                    損毀，SWD 是唯一的救磚管道。
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Integration Summary -->
+                    <div class="mt-6 pt-4 border-t border-slate-700">
+                        <h4 class="text-sm font-bold text-slate-300 mb-2">總結佈署架構 (The Full Chain)</h4>
+                        <div
+                            class="bg-black/30 p-3 rounded flex flex-col md:flex-row items-center justify-between text-xs text-center gap-2">
+                            <div class="flex-1">
+                                <div class="text-purple-400 font-bold mb-1">RSPI5 (大腦)</div>
+                                <div class="text-slate-500">Python/AI <br> (MAVLink over UART)</div>
+                            </div>
+                            <div class="text-slate-600"><i class="fa-solid fa-arrow-right"></i></div>
+                            <div class="flex-1">
+                                <div class="text-sky-400 font-bold mb-1">H743 (小腦/FMU)</div>
+                                <div class="text-slate-500">PX4 Core <br> (Internal Bus)</div>
+                            </div>
+                            <div class="text-slate-600"><i class="fa-solid fa-arrow-right"></i></div>
+                            <div class="flex-1">
+                                <div class="text-rose-400 font-bold mb-1">F103 (執行端/IO)</div>
+                                <div class="text-slate-500">PWM/DShot <br> (Motor Control)</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
         <section id="section-hardware" class="mb-16 hidden animate-section relative">

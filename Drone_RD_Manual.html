@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚁 X500 V2 手勢控制系統 - 研發技術手冊</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet"/>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-bash.min.js"></script>
+    <style>
+        :root {
+            --bg: #0d0d0d;
+            --bg2: #161b22;
+            --bg3: #1e2430;
+            --border: #30363d;
+            --accent: #00d4ff;
+            --accent2: #7c3aed;
+            --green: #3fb950;
+            --orange: #f78166;
+            --text: #c9d1d9;
+            --text2: #8b949e;
+            --card-shadow: 0 4px 24px rgba(0,212,255,0.08);
+        }
+        [data-theme="light"] {
+            --bg: #f0f4f8;
+            --bg2: #ffffff;
+            --bg3: #e8edf3;
+            --border: #d0d7de;
+            --accent: #0969da;
+            --accent2: #7c3aed;
+            --green: #1a7f37;
+            --orange: #cf222e;
+            --text: #1f2328;
+            --text2: #656d76;
+            --card-shadow: 0 4px 24px rgba(0,0,0,0.08);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        /* ===== TOP NAV ===== */
+        nav {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+            background: rgba(13,13,13,0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            display: flex; align-items: center;
+            padding: 0 2rem; height: 56px; gap: 1.5rem;
+            transition: background 0.3s;
+        }
+        [data-theme="light"] nav { background: rgba(240,244,248,0.85); }
+        .nav-logo { color: var(--accent); font-weight: 700; font-size: 1.1rem; text-decoration: none; }
+        .nav-links { display: flex; gap: 1rem; margin-left: auto; }
+        .nav-links a {
+            color: var(--text2); text-decoration: none; font-size: 0.9rem;
+            padding: 0.3rem 0.7rem; border-radius: 6px; transition: all 0.2s;
+        }
+        .nav-links a:hover { color: var(--accent); background: rgba(0,212,255,0.08); }
+        .theme-btn {
+            background: var(--bg3); border: 1px solid var(--border);
+            color: var(--text); padding: 0.3rem 0.8rem; border-radius: 20px;
+            cursor: pointer; font-size: 0.85rem; transition: all 0.2s;
+        }
+        .theme-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+        /* ===== HERO ===== */
+        .hero {
+            margin-top: 56px;
+            background: linear-gradient(135deg, #0d0d0d 0%, #0a1628 50%, #0d0d0d 100%);
+            padding: 4rem 2rem 3rem;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+            position: relative; overflow: hidden;
+        }
+        [data-theme="light"] .hero { background: linear-gradient(135deg, #f0f4f8 0%, #dbeafe 50%, #f0f4f8 100%); }
+        .hero::before {
+            content: "";
+            position: absolute; inset: 0;
+            background: radial-gradient(ellipse at 50% 0%, rgba(0,212,255,0.12) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .hero h1 { font-size: 2.8rem; color: var(--accent); margin-bottom: 0.5rem; position: relative; }
+        .hero p { color: var(--text2); font-size: 1.05rem; margin-bottom: 1.5rem; }
+        .badges { display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; }
+        .badge {
+            display: inline-flex; align-items: center; gap: 0.4rem;
+            padding: 0.35rem 1rem; border-radius: 20px; font-size: 0.85rem; font-weight: 600;
+        }
+        .badge-green { background: rgba(63,185,80,0.15); color: var(--green); border: 1px solid rgba(63,185,80,0.3); }
+        .badge-blue  { background: rgba(0,212,255,0.12); color: var(--accent); border: 1px solid rgba(0,212,255,0.3); }
+        .badge-purple{ background: rgba(124,58,237,0.15); color: #a78bfa; border: 1px solid rgba(124,58,237,0.3); }
+
+        /* ===== MAIN LAYOUT ===== */
+        .layout { display: flex; max-width: 1300px; margin: 2rem auto; padding: 0 2rem; gap: 2rem; }
+        .sidebar {
+            width: 220px; flex-shrink: 0;
+            position: sticky; top: 72px; align-self: flex-start;
+            background: var(--bg2); border: 1px solid var(--border);
+            border-radius: 12px; padding: 1.2rem; height: fit-content;
+        }
+        .sidebar h4 { color: var(--text2); font-size: 0.75rem; text-transform: uppercase;
+            letter-spacing: 0.08em; margin-bottom: 0.75rem; }
+        .sidebar a {
+            display: block; color: var(--text2); text-decoration: none;
+            font-size: 0.88rem; padding: 0.35rem 0.6rem; border-radius: 6px;
+            transition: all 0.2s; margin-bottom: 2px;
+        }
+        .sidebar a:hover { color: var(--accent); background: rgba(0,212,255,0.08); }
+        .sidebar a.active { color: var(--accent); background: rgba(0,212,255,0.12); }
+        .content { flex: 1; min-width: 0; }
+
+        /* ===== SECTION ===== */
+        .section {
+            background: var(--bg2); border: 1px solid var(--border);
+            border-radius: 12px; padding: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--card-shadow);
+        }
+        .section-header {
+            display: flex; align-items: center; gap: 0.75rem;
+            margin-bottom: 1.5rem; padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+        .section-icon {
+            width: 36px; height: 36px; border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.1rem; flex-shrink: 0;
+        }
+        .icon-blue   { background: rgba(0,212,255,0.12); }
+        .icon-green  { background: rgba(63,185,80,0.12); }
+        .icon-purple { background: rgba(124,58,237,0.12); }
+        .icon-orange { background: rgba(247,129,102,0.12); }
+        .section h2 { font-size: 1.3rem; color: var(--text); }
+        .section h3 { font-size: 1.05rem; color: var(--accent); margin: 1.5rem 0 0.75rem; }
+
+        /* ===== INFO CARDS ===== */
+        .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; }
+        .info-card {
+            background: var(--bg3); border: 1px solid var(--border);
+            border-radius: 8px; padding: 1rem 1.2rem;
+        }
+        .info-label { font-size: 0.75rem; color: var(--text2); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.3rem; }
+        .info-value { font-size: 1rem; color: var(--text); font-weight: 600; }
+
+        /* ===== MERMAID ===== */
+        .mermaid-wrap {
+            background: var(--bg3); border: 1px solid var(--border);
+            border-radius: 10px; padding: 1.5rem; margin: 1rem 0;
+            overflow-x: auto; text-align: center;
+        }
+        .pre.mermaid { background: transparent !important; }
+
+        /* ===== FLOW STEPS ===== */
+        .flow-steps { display: flex; flex-direction: column; gap: 0; margin: 1rem 0; }
+        .flow-step {
+            display: flex; align-items: flex-start; gap: 1rem;
+            padding: 0.9rem 1rem;
+            background: var(--bg3); border: 1px solid var(--border);
+            border-radius: 0; border-bottom: none;
+            transition: background 0.2s;
+        }
+        .flow-step:first-child { border-radius: 8px 8px 0 0; }
+        .flow-step:last-child  { border-radius: 0 0 8px 8px; border-bottom: 1px solid var(--border); }
+        .flow-step:hover { background: rgba(0,212,255,0.05); }
+        .step-num {
+            width: 28px; height: 28px; border-radius: 50%;
+            background: var(--accent); color: #000;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.8rem; font-weight: 700; flex-shrink: 0; margin-top: 1px;
+        }
+        .step-label { font-size: 0.85rem; color: var(--accent); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+        .step-desc   { color: var(--text); font-size: 0.95rem; margin-top: 0.2rem; }
+
+        /* ===== ENV TABS ===== */
+        .tab-bar { display: flex; gap: 0; margin-bottom: 0; }
+        .tab-btn {
+            padding: 0.6rem 1.3rem; border: 1px solid var(--border); background: var(--bg3);
+            color: var(--text2); cursor: pointer; font-size: 0.9rem; font-family: inherit;
+            transition: all 0.2s; border-bottom: none;
+        }
+        .tab-btn:first-child { border-radius: 8px 0 0 0; }
+        .tab-btn:last-child  { border-radius: 0 8px 0 0; }
+        .tab-btn.active { background: var(--bg2); color: var(--accent); border-color: var(--accent); border-bottom: 1px solid var(--bg2); z-index: 1; }
+        .tab-panel {
+            display: none; background: var(--bg2);
+            border: 1px solid var(--border); border-radius: 0 8px 8px 8px;
+            padding: 1.5rem;
+        }
+        .tab-panel.active { display: block; }
+        .env-list { list-style: none; padding: 0; }
+        .env-list li {
+            padding: 0.5rem 0; border-bottom: 1px solid var(--border);
+            display: flex; align-items: baseline; gap: 0.75rem; font-size: 0.95rem;
+        }
+        .env-list li:last-child { border-bottom: none; }
+        .env-key { color: var(--text2); min-width: 110px; font-size: 0.85rem; }
+        .env-val { color: var(--text); }
+
+        /* ===== CODE BLOCKS ===== */
+        .code-wrap {
+            background: var(--bg3) !important; border: 1px solid var(--border);
+            border-radius: 10px; overflow: hidden; margin: 1rem 0; width: 100%;
+        }
+        .code-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0.6rem 1rem; border-bottom: 1px solid var(--border);
+            background: rgba(0,0,0,0.2);
+        }
+        .code-lang { font-size: 0.8rem; color: var(--text2); font-family: monospace; }
+        .copy-btn {
+            background: transparent; border: 1px solid var(--border);
+            color: var(--text2); padding: 0.2rem 0.7rem; border-radius: 5px;
+            cursor: pointer; font-size: 0.78rem; transition: all 0.2s; font-family: inherit;
+        }
+        .copy-btn:hover { border-color: var(--accent); color: var(--accent); }
+        .code-wrap pre[class*="language-"] {
+            margin: 0 !important; border-radius: 0 !important;
+            background: transparent !important; padding: 1.2rem 1.4rem !important;
+        }
+        .fix-note {
+            background: rgba(63,185,80,0.08); border: 1px solid rgba(63,185,80,0.25);
+            border-radius: 8px; padding: 0.7rem 1rem; margin-bottom: 1rem;
+            font-size: 0.88rem; color: var(--green);
+            display: flex; align-items: center; gap: 0.5rem;
+        }
+
+        /* ===== GESTURE TABLE ===== */
+        .gesture-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin: 1rem 0; }
+        .gesture-card {
+            background: var(--bg3); border: 1px solid var(--border);
+            border-radius: 10px; padding: 1.2rem; text-align: center;
+            transition: all 0.25s; cursor: default;
+        }
+        .gesture-card:hover { border-color: var(--accent); transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,212,255,0.12); }
+        .gesture-emoji { font-size: 2.8rem; display: block; margin-bottom: 0.5rem; }
+        .gesture-name  { font-weight: 700; color: var(--text); margin-bottom: 0.25rem; }
+        .gesture-cmd   { font-size: 0.82rem; color: var(--accent); font-family: monospace; }
+        .gesture-state { font-size: 0.78rem; color: var(--text2); margin-top: 0.25rem; }
+
+        /* ===== NEXT STEPS ===== */
+        .next-steps { display: flex; flex-direction: column; gap: 0.75rem; margin-top: 1rem; }
+        .next-step {
+            display: flex; gap: 1rem; align-items: flex-start;
+            background: var(--bg3); border: 1px solid var(--border);
+            border-radius: 8px; padding: 1rem 1.2rem; transition: background 0.2s;
+        }
+        .next-step:hover { background: rgba(124,58,237,0.06); border-color: rgba(124,58,237,0.3); }
+        .next-num {
+            width: 28px; height: 28px; border-radius: 6px;
+            background: var(--accent2); color: white;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.8rem; font-weight: 700; flex-shrink: 0;
+        }
+        .next-title { font-weight: 600; color: var(--text); }
+        .next-desc  { font-size: 0.88rem; color: var(--text2); margin-top: 0.2rem; }
+        code.inline {
+            background: var(--bg3); border: 1px solid var(--border);
+            padding: 0.15rem 0.45rem; border-radius: 4px;
+            font-family: 'Consolas', monospace; font-size: 0.88em; color: var(--accent);
+        }
+        .warn { color: var(--orange); font-weight: 700; }
+
+        /* ===== FOOTER ===== */
+        footer {
+            text-align: center; padding: 2rem; margin-top: 1rem;
+            border-top: 1px solid var(--border); color: var(--text2); font-size: 0.85rem;
+        }
+
+        /* ===== SCROLL TOP ===== */
+        #scrolltop {
+            position: fixed; bottom: 2rem; right: 2rem;
+            width: 40px; height: 40px; border-radius: 50%;
+            background: var(--accent); color: #000; border: none;
+            cursor: pointer; font-size: 1.2rem;
+            display: none; align-items: center; justify-content: center;
+            box-shadow: 0 4px 16px rgba(0,212,255,0.3);
+            transition: all 0.2s; z-index: 99;
+        }
+        #scrolltop:hover { transform: scale(1.1); }
+        #scrolltop.show { display: flex; }
+
+        @media (max-width: 900px) {
+            .sidebar { display: none; }
+            .layout { padding: 0 1rem; }
+        }
+        @media (max-width: 600px) {
+            .hero h1 { font-size: 1.8rem; }
+            .gesture-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <a class="nav-logo" href="#">🚁 X500 V2</a>
+    <div class="nav-links">
+        <a href="#arch">架構</a>
+        <a href="#env">環境</a>
+        <a href="#reinstall">WSL重裝</a>
+        <a href="#code">程式碼</a>
+        <a href="#gesture">手勢</a>
+        <a href="#next">下一步</a>
+    </div>
+    <button class="theme-btn" onclick="toggleTheme()" id="themeBtn">☀️ 淺色</button>
+</nav>
+
+<div class="hero">
+    <h1>🚁 X500 V2 手勢控制系統</h1>
+    <p>研發技術手冊 &mdash; SITL Loop &mdash; 最新版本</p>
+    <div class="badges">
+        <span class="badge badge-green">✅ SITL 模擬驗證成功</span>
+        <span class="badge badge-blue">v1.1 UDP Bridge & Vision</span>
+        <span class="badge badge-purple">👤 Marlon</span>
+    </div>
+</div>
+
+<div class="layout">
+    <aside class="sidebar">
+        <h4>目錄</h4>
+        <a href="#info">專案資訊</a>
+        <a href="#arch">系統架構</a>
+        <a href="#flow">數據流</a>
+        <a href="#env">環境配置</a>
+        <a href="#reinstall">WSL 重裝指南</a>
+        <a href="#code">核心程式碼</a>
+        <a href="#gesture">手勢對照</a>
+        <a href="#next">下一步計畫</a>
+    </aside>
+
+    <main class="content">
+
+        <section class="section" id="info">
+            <div class="section-header">
+                <div class="section-icon icon-blue">📋</div>
+                <h2>專案資訊</h2>
+            </div>
+            <div class="info-grid">
+                <div class="info-card">
+                    <div class="info-label">專案名稱</div>
+                    <div class="info-value">AIoT Gesture Drone Control</div>
+                </div>
+                <div class="info-card">
+                    <div class="info-label">開發者</div>
+                    <div class="info-value">👤 Marlon</div>
+                </div>
+                <div class="info-card">
+                    <div class="info-label">更新日期</div>
+                    <div class="info-value">2026-02-19</div>
+                </div>
+                <div class="info-card">
+                    <div class="info-label">狀態</div>
+                    <div class="info-value" style="color:var(--green)">✅ 全系統除錯整合完成</div>
+                </div>
+                <div class="info-card">
+                    <div class="info-label">版本</div>
+                    <div class="info-value">v1.1 (UDP Bridge + 智慧解碼)</div>
+                </div>
+                <div class="info-card">
+                    <div class="info-label">目標機體</div>
+                    <div class="info-value">X500 V2 + Pixhawk 6C</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="arch">
+            <div class="section-header">
+                <div class="section-icon icon-blue">🏗️</div>
+                <h2>系統架構 (System Architecture)</h2>
+            </div>
+            <p style="color:var(--text2); margin-bottom:1rem;">
+                本階段採用 <strong style="color:var(--accent)">UDP 橋接 (UDP Bridge)</strong> 技術，
+                突破 WSL2 網路隔離限制，實現 RPI5 邊緣運算裝置對 PC 模擬器的遠端控制。
+            </p>
+            <div class="mermaid-wrap">
+                <div class="mermaid" id="mermaid-arch">
+graph LR
+    User["👤 使用者手勢"] -->|Camera 30fps| RPI5["🍓 Raspberry Pi 5"]
+    RPI5 -->|AI Inference| MP["🤖 MediaPipe Hands"]
+    MP -->|Logic| PyMav["📡 PyMavlink"]
+
+    subgraph Edge["Edge Device · RPI5"]
+        RPI5
+        MP
+        PyMav
+    end
+
+    PyMav -->|"UDP:14540"| WinIP["🖥️ Windows IP
+192.168.x.x"]
+
+    subgraph PC["PC Host · Windows 11"]
+        WinIP
+        Bridge["🌉 UDP Bridge
+windows_udp_bridge.py"]
+    end
+
+    Bridge -->|"Forward UDP"| WSLIP["WSL2 IP
+172.x.x.x"]
+
+    subgraph Sim["Simulation · WSL2"]
+        WSLIP
+        PX4["⚙️ PX4 Autopilot
+SITL"]
+        Gazebo["🌐 Gazebo Classic"]
+    end
+
+    Bridge --> PX4
+    PX4 -->|Physics| Gazebo
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="flow">
+            <div class="section-header">
+                <div class="section-icon icon-green">🔄</div>
+                <h2>關鍵數據流</h2>
+            </div>
+            <div class="flow-steps">
+                <div class="flow-step">
+                    <div class="step-num">1</div>
+                    <div>
+                        <div class="step-label">輸入</div>
+                        <div class="step-desc">RPI5 透過 USB Webcam 擷取影像 <strong>(30fps)</strong></div>
+                    </div>
+                </div>
+                <div class="flow-step">
+                    <div class="step-num">2</div>
+                    <div>
+                        <div class="step-label">處理</div>
+                        <div class="step-desc">RPI5 執行 <code class="inline">ai_vision_rpi5_fixed.py</code>，偵測手勢並轉換為 <strong>MAVLink v1 封包</strong></div>
+                    </div>
+                </div>
+                <div class="flow-step">
+                    <div class="step-num">3</div>
+                    <div>
+                        <div class="step-label">傳輸</div>
+                        <div class="step-desc">封包發送至 Windows 實體 IP <code class="inline">192.168.x.x:14540</code></div>
+                    </div>
+                </div>
+                <div class="flow-step">
+                    <div class="step-num">4</div>
+                    <div>
+                        <div class="step-label">橋接與解碼</div>
+                        <div class="step-desc">Windows 執行 <code class="inline">windows_udp_bridge.py</code>，自動偵測 WSL IP，進行轉發並即時於控制台解碼指令</div>
+                    </div>
+                </div>
+                <div class="flow-step">
+                    <div class="step-num">5</div>
+                    <div>
+                        <div class="step-label">執行</div>
+                        <div class="step-desc">WSL 內的 <strong>PX4 SITL</strong> 接收指令並驅動 <strong>Gazebo</strong> 模型</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="env">
+            <div class="section-header">
+                <div class="section-icon icon-green">⚙️</div>
+                <h2>開發環境配置 (Environment Setup)</h2>
+            </div>
+            <div class="tab-bar">
+                <button class="tab-btn active" onclick="showTab('rpi5',this)">🍓 RPI5</button>
+                <button class="tab-btn" onclick="showTab('win',this)">🖥️ Windows</button>
+                <button class="tab-btn" onclick="showTab('wsl',this)">🐧 WSL2</button>
+            </div>
+            <div class="tab-panel active" id="tab-rpi5">
+                <ul class="env-list">
+                    <li><span class="env-key">OS</span><span class="env-val">Raspberry Pi OS (Bookworm) 64-bit</span></li>
+                    <li><span class="env-key">Python</span><span class="env-val">3.11+</span></li>
+                    <li><span class="env-key">Dependencies</span>
+                        <span class="env-val"><code class="inline">opencv-python</code> &nbsp;<code class="inline">mediapipe</code> &nbsp;<code class="inline">pymavlink</code></span>
+                    </li>
+                    <li><span class="env-key">重要設定</span><span class="env-val">確認 Windows Host 的區域網路 IP (192.168.x.x)</span></li>
+                </ul>
+                <div class="code-wrap">
+                    <div class="code-header">
+                        <span class="code-lang">bash</span>
+                        <button class="copy-btn" onclick="copyCode(this)">📋 複製</button>
+                    </div>
+                    <pre><code class="language-bash">pip install opencv-python mediapipe pymavlink</code></pre>
+                </div>
+            </div>
+            <div class="tab-panel" id="tab-win">
+                <ul class="env-list">
+                    <li><span class="env-key">OS</span><span class="env-val">Windows 11</span></li>
+                    <li><span class="env-key">Python</span><span class="env-val">3.x (標準庫即可)</span></li>
+                    <li><span class="env-key">Dependencies</span><span class="env-val"><code class="inline">socket</code> &nbsp;<code class="inline">threading</code> &nbsp;<code class="inline">subprocess</code> &nbsp;<code class="inline">re</code> &nbsp;<code class="inline">struct</code></span></li>
+                    <li><span class="env-key">防火牆</span><span class="env-val">⚠️ 允許 <code class="inline">python.exe</code> 通過 UDP Port <strong>14540</strong> (私人 / 公用網路)</span></li>
+                </ul>
+            </div>
+            <div class="tab-panel" id="tab-wsl">
+                <ul class="env-list">
+                    <li><span class="env-key">OS</span><span class="env-val">WSL2 Ubuntu 22.04 LTS (Jammy)</span></li>
+                    <li><span class="env-key">Software</span><span class="env-val">PX4-Autopilot (v1.14.3 branch), Gazebo Classic</span></li>
+                    <li><span class="env-key">啟動指令</span><span class="env-val"><code class="inline">make px4_sitl gazebo-classic</code></span></li>
+                </ul>
+                <div class="code-wrap">
+                    <div class="code-header">
+                        <span class="code-lang">bash</span>
+                        <button class="copy-btn" onclick="copyCode(this)">📋 複製</button>
+                    </div>
+                    <pre><code class="language-bash">cd ~/PX4-Autopilot
+make px4_sitl gazebo-classic</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="reinstall">
+            <div class="section-header">
+                <div class="section-icon icon-orange">🛠️</div>
+                <h2>WSL2 環境重裝與除錯指南 (PX4 v1.14.3)</h2>
+            </div>
+            <div class="fix-note" style="margin-bottom: 1.5rem;">
+                ✅ 適用情境：Ubuntu 22.04 LTS 系統下，解決 SITL 模擬器無法啟動、無法編譯，或持續跳出 battery warning 等異常行為。
+            </div>
+
+            <div class="flow-steps">
+                <div class="flow-step">
+                    <div class="step-num">1</div>
+                    <div style="flex-grow: 1;">
+                        <div class="step-label">清除舊 PX4 目錄</div>
+                        <div class="code-wrap">
+                            <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">📋 複製</button></div>
+                            <pre><code class="language-bash">cd ~
+rm -rf PX4-Autopilot</code></pre>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flow-step">
+                    <div class="step-num">2</div>
+                    <div style="flex-grow: 1;">
+                        <div class="step-label">清除 Gazebo 殘留與依賴</div>
+                        <div class="code-wrap">
+                            <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">📋 複製</button></div>
+                            <pre><code class="language-bash">sudo apt remove --purge gazebo libgazebo11 libgazebo-dev libgazebo11-* -y 2>/dev/null
+sudo apt remove --purge gz-garden gz-harmonic -y 2>/dev/null
+sudo apt autoremove -y
+sudo apt clean</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flow-step">
+                    <div class="step-num">3</div>
+                    <div style="flex-grow: 1;">
+                        <div class="step-label">重新 clone PX4 v1.14.3 (穩定版)</div>
+                        <p style="color:var(--orange); font-size:0.85rem; margin-top:0.3rem;">⚠️ <code>--recursive</code> 參數不可省略！下載時間約 5~10 分鐘。</p>
+                        <div class="code-wrap">
+                            <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">📋 複製</button></div>
+                            <pre><code class="language-bash">cd ~
+git clone https://github.com/PX4/PX4-Autopilot.git --recursive -b v1.14.3</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flow-step">
+                    <div class="step-num">4</div>
+                    <div style="flex-grow: 1;">
+                        <div class="step-label">執行官方安裝腳本</div>
+                        <p class="step-desc">過程中會詢問是否安裝 Gazebo，請輸入 <code>y</code> 確認。</p>
+                        <div class="code-wrap">
+                            <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">📋 複製</button></div>
+                            <pre><code class="language-bash">cd ~/PX4-Autopilot
+bash ./Tools/setup/ubuntu.sh</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flow-step">
+                    <div class="step-num">5</div>
+                    <div style="flex-grow: 1;">
+                        <div class="step-label">重啟 WSL (必做！)</div>
+                        <p class="step-desc">請在 <strong>Windows PowerShell</strong> 執行以下指令，隨後重新開啟 WSL 終端機。</p>
+                        <div class="code-wrap">
+                            <div class="code-header"><span class="code-lang">powershell</span><button class="copy-btn" onclick="copyCode(this)">📋 複製</button></div>
+                            <pre><code class="language-bash">wsl --shutdown</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flow-step">
+                    <div class="step-num">6</div>
+                    <div style="flex-grow: 1;">
+                        <div class="step-label">首次編譯與啟動</div>
+                        <p class="step-desc">第一次編譯約需 10~15 分鐘。</p>
+                        <div class="code-wrap">
+                            <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">📋 複製</button></div>
+                            <pre><code class="language-bash">cd ~/PX4-Autopilot
+make px4_sitl gazebo-classic</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <h3 style="margin-top: 1.5rem; color:var(--green)">🎯 預期成功結果</h3>
+            <div class="code-wrap" style="background:#000 !important;">
+                <pre><code class="language-bash">INFO  [px4] Startup script returned successfully
+pxh> INFO  [tone_alarm] home set</code></pre>
+            </div>
+            <p style="color:var(--text2); margin-top:0.5rem; font-size:0.95rem;">
+                當 Gazebo 視窗彈出，無人機在地面待命時，直接在 <code>pxh></code> 輸入 <code>commander arm -f</code> 與 <code>commander takeoff</code> 即可確認起飛無誤。
+            </p>
+        </section>
+
+        <section class="section" id="code">
+            <div class="section-header">
+                <div class="section-icon icon-purple">💻</div>
+                <h2>核心程式碼 (V1.1 最新修正版)</h2>
+            </div>
+
+            <h3>4.1 視覺控制端 — ai_vision_rpi5_fixed.py</h3>
+            <div class="fix-note">
+                ✅ 修正紀錄：加入 <code>os</code> 模組與 TF 警告過濾，優化 <code>takeoff</code> 邏輯，確保在非解鎖狀態下先觸發 ARM 指令。
+            </div>
+            <div class="code-wrap">
+                <div class="code-header">
+                    <span class="code-lang">python · ai_vision_rpi5_fixed.py</span>
+                    <button class="copy-btn" onclick="copyCode(this)">📋 複製</button>
+                </div>
+                <pre><code class="language-python">import os
+import cv2
+import mediapipe as mp
+import pymavlink.mavutil as mavutil
+import time
+import threading
+
+# 環境變數與警告忽略
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+
+## === 設定區 ===
+SITL_IP = "192.168.31.220"
+SITL_PORT = 14540 
+DEBOUNCE_TIME = 1.0
+
+class DroneController:
+    def __init__(self):
+        self.conn = mavutil.mavlink_connection(f'udpout:{SITL_IP}:{SITL_PORT}', source_system=255)
+        self.state = 0  # 0:GROUND, 1:ARMED, 2:AIRBORNE, 3:LANDING
+        self.last_action_time = 0
+        
+        # 啟動心跳包線程 (讓 SITL 知道我們在線上)
+        self.heartbeat_thread = threading.Thread(target=self._send_heartbeat, daemon=True)
+        self.heartbeat_thread.start()
+
+    def _send_heartbeat(self):
+        while True:
+            self.conn.mav.heartbeat_send(
+                mavutil.mavlink.MAV_TYPE_GCS,
+                mavutil.mavlink.MAV_AUTOPILOT_INVALID, 0, 0, 0)
+            time.sleep(1)
+
+    def force_arm(self):
+        print(">>> 發送 FORCE ARM (Magic: 21196)")
+        self.conn.mav.command_long_send(
+            self.conn.target_system, self.conn.target_component,
+            mavutil.mavlink.MAV_CMD_COMPONENT_ARM_DISARM, 0,
+            1, 21196, 0, 0, 0, 0, 0)
+        self.state = 1
+
+    def takeoff(self, alt=2.5):
+        if self.state != 1: self.force_arm()
+        time.sleep(0.5)
+        print(f">>> 發送 TAKEOFF 至高度: {alt}m")
+        # 使用 command_long 較為通用於簡單起飛
+        self.conn.mav.command_long_send(
+            self.conn.target_system, self.conn.target_component,
+            mavutil.mavlink.MAV_CMD_NAV_TAKEOFF, 0,
+            0, 0, 0, 0, 0, 0, alt)
+        self.state = 2
+
+    def land(self):
+        print(">>> 發送 LAND")
+        self.conn.mav.command_long_send(
+            self.conn.target_system, self.conn.target_component,
+            mavutil.mavlink.MAV_CMD_NAV_LAND, 0,
+            0, 0, 0, 0, 0, 0, 0)
+        self.state = 3
+
+## === 手勢辨識邏輯 ===
+def get_fingers_count(hand_lms, handedness):
+    fingers = []
+    # 拇指 (根據左右手標籤判定 X 座標)
+    if handedness == "Right":
+        fingers.append(hand_lms.landmark[4].x &lt; hand_lms.landmark[3].x)
+    else:
+        fingers.append(hand_lms.landmark[4].x &gt; hand_lms.landmark[3].x)
+    
+    # 食指至小指 (比較 Y 座標)
+    for tip_id in [8, 12, 16, 20]:
+        fingers.append(hand_lms.landmark[tip_id].y &lt; hand_lms.landmark[tip_id-2].y)
+    return sum(fingers)
+
+## === 主程式 ===
+drone = DroneController()
+mp_hands = mp.solutions.hands
+hands = mp_hands.Hands(model_complexity=0, min_detection_confidence=0.7)
+cap = cv2.VideoCapture(0)
+
+while cap.isOpened():
+    success, frame = cap.read()
+    if not success: break
+    
+    frame = cv2.flip(frame, 1)
+    results = hands.process(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
+    
+    current_time = time.time()
+    display_msg = "IDLE"
+    
+    if results.multi_hand_landmarks:
+        for i, hand_lms in enumerate(results.multi_hand_landmarks):
+            label = results.multi_handedness[i].classification[0].label
+            count = get_fingers_count(hand_lms, label)
+            
+            # 畫圖
+            mp.solutions.drawing_utils.draw_landmarks(frame, hand_lms, mp_hands.HAND_CONNECTIONS)
+            
+            # 指令觸發判斷
+            if current_time - drone.last_action_time &gt; DEBOUNCE_TIME:
+                if count == 2: # YA -&gt; ARM
+                    drone.force_arm()
+                    drone.last_action_time = current_time
+                elif count == 5: # Palm -&gt; Takeoff
+                    drone.takeoff(1)
+                    drone.last_action_time = current_time
+                elif count == 0: # Fist -&gt; Land
+                    drone.land()
+                    drone.last_action_time = current_time
+
+    # UI 顯示
+    status_map = ["GROUND", "ARMED", "AIRBORNE", "LANDING"]
+    cv2.putText(frame, f"STATE: {status_map[drone.state]}", (10, 50), 
+                cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+    
+    cv2.imshow('Marlon AIoT Controller', frame)
+    if cv2.waitKey(1) &amp; 0xFF == ord('q'): break
+
+cap.release()
+cv2.destroyAllWindows()</code></pre>
+            </div>
+
+            <h3>4.2 智慧橋接器 — windows_udp_bridge.py</h3>
+            <div class="fix-note" style="background:rgba(0,212,255,0.06); border-color:rgba(0,212,255,0.25); color:var(--accent);">
+                ℹ️ v1.1 更新：加入 <code>struct</code> 二進制解碼能力，完美捕捉並辨識 MAVLink v1 的 COMMAND_LONG 封包，支援動態抓取 WSL IP。
+            </div>
+            <div class="code-wrap">
+                <div class="code-header">
+                    <span class="code-lang">python · windows_udp_bridge.py</span>
+                    <button class="copy-btn" onclick="copyCode(this)">📋 複製</button>
+                </div>
+                <pre><code class="language-python">import socket
+import threading
+import time
+import subprocess
+import re
+import struct  # 新增：用於解碼二進制數據
+
+# === 設定 ===
+EXTERNAL_PORT = 14540 
+WSL_PORT = 14540
+
+# === MAVLink 指令對照表 ===
+MAV_CMD = {
+    22: "🚁 起飛 (TAKEOFF)",
+    21: "🛬 降落 (LAND)",
+    400: "🔓 解鎖/上鎖 (ARM/DISARM)",
+    511: "ℹ️ 設定模式 (SET_MODE)"
+}
+
+def get_wsl_ip():
+    """自動偵測 WSL 的 IP 地址"""
+    try:
+        # 嘗試 wsl hostname -I (最準確)
+        wsl_ip = subprocess.check_output(["wsl", "hostname", "-I"]).decode().strip().split(' ')[0]
+        return wsl_ip
+    except:
+        try:
+            # 備用方案: ipconfig (較不穩)
+            result = subprocess.check_output("ipconfig", shell=True).decode('big5', errors='ignore')
+            ips = re.findall(r"IPv4 位址[ .]+: (172\.[0-9]+\.[0-9]+\.[0-9]+)", result)
+            return ips[0] if ips else input("請手動輸入 WSL IP: ")
+        except:
+            return input("請手動輸入 WSL IP: ")
+
+def parse_mavlink_packet(data):
+    """解析 MAVLink v1 封包並回傳可讀訊息"""
+    try:
+        if len(data) &lt; 6: return None
+        
+        # MAVLink v1 Header 結構
+        # [0]=Magic(0xFE), [1]=Len, [2]=Seq, [3]=Sys, [4]=Comp, [5]=MsgID
+        magic = data[0]
+        msg_id = data[5]
+
+        # 1. 心跳包 (Msg ID 0)
+        if msg_id == 0:
+            return "💓 心跳包 (HEARTBEAT)"
+
+        # 2. COMMAND_LONG (Msg ID 76) - 這是最重要的指令包
+        elif msg_id == 76:
+            # 在 MAVLink v1 wire format 中，COMMAND_LONG 的 Payload 排列如下：
+            # param1~7 (4bytes*7) | command (2bytes) | target_sys | target_comp | confirm
+            # Payload 從 index 6 開始
+            # Command ID 在 Payload 的第 28 bytes 處 (7個 float 之後)
+            # 所以絕對位置是 6 + 28 = 34
+            if len(data) &gt;= 36:
+                cmd_id = struct.unpack('&lt;H', data[34:36])[0] # Little-endian unsigned short
+                cmd_name = MAV_CMD.get(cmd_id, f"未知指令 ({cmd_id})")
+                
+                # 如果是解鎖指令 (400)，我們可以進一步看 param1
+                if cmd_id == 400:
+                    param1 = struct.unpack('&lt;f', data[6:10])[0]
+                    action = "解鎖" if param1 == 1.0 else "上鎖"
+                    return f"🔓 {action} (ARM/DISARM)"
+                
+                return f"⚡ {cmd_name}"
+            
+        return f"📦 其他封包 (ID: {msg_id})"
+
+    except Exception as e:
+        return f"解析錯誤: {e}"
+
+def bridge():
+    wsl_ip = get_wsl_ip()
+    print("="*50)
+    print(f"🚁 MAVLink 智慧橋接器 (Smart Bridge)")
+    print(f"外部來源 (RPi5): 0.0.0.0:{EXTERNAL_PORT}")
+    print(f"內部目標 (WSL) : {wsl_ip}:{WSL_PORT}")
+    print("="*50)
+
+    sock_ext = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sock_ext.bind(('0.0.0.0', EXTERNAL_PORT))
+    
+    sock_int = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    rpi_client_addr = None
+
+    print(f"✅ 正在監聽並即時解碼指令...")
+    print(f"⚠️  請確保 Windows 防火牆允許 Python 通過！")
+
+    def forward_to_wsl():
+        nonlocal rpi_client_addr
+        while True:
+            try:
+                data, addr = sock_ext.recvfrom(4096)
+                
+                # --- 即時解碼顯示 ---
+                # 只顯示非心跳包，或者每 5 秒顯示一次心跳以免洗版
+                # 這裡設定：只要是 Command (ID 76) 就一定顯示
+                if len(data) &gt; 0:
+                    msg = parse_mavlink_packet(data)
+                    
+                    # 過濾掉心跳包顯示，讓畫面乾淨，只專注看動作指令
+                    if msg and "心跳" not in msg:
+                        print(f"[{time.strftime('%H:%M:%S')}] 🔥 {msg} | 來自: {addr[0]}")
+                    
+                    # 如果你想看心跳包確認連線，可以把下面這行註解打開
+                    # elif msg and "心跳" in msg: print(".", end="", flush=True)
+                # -------------------
+
+                if rpi_client_addr != addr:
+                    print(f"\n[連線] RPi5 已連接: {addr}")
+                    rpi_client_addr = addr
+                
+                sock_int.sendto(data, (wsl_ip, WSL_PORT))
+            except Exception as e:
+                print(f"轉發錯誤: {e}")
+
+    t1 = threading.Thread(target=forward_to_wsl)
+    t1.daemon = True
+    t1.start()
+
+    try:
+        while True:
+            time.sleep(1)
+    except KeyboardInterrupt:
+        print("\n橋接器已關閉")
+
+if __name__ == "__main__":
+    bridge()</code></pre>
+            </div>
+        </section>
+
+        <section class="section" id="gesture">
+            <div class="section-header">
+                <div class="section-icon icon-orange">🤚</div>
+                <h2>手勢指令對照</h2>
+            </div>
+            <div class="gesture-grid">
+                <div class="gesture-card">
+                    <span class="gesture-emoji">✌️</span>
+                    <div class="gesture-name">2 指 (YA)</div>
+                    <div class="gesture-cmd">force_arm()</div>
+                    <div class="gesture-state">GROUND → ARMED</div>
+                </div>
+                <div class="gesture-card">
+                    <span class="gesture-emoji">✋</span>
+                    <div class="gesture-name">5 指 (展掌)</div>
+                    <div class="gesture-cmd">takeoff(alt=1.0m)</div>
+                    <div class="gesture-state">ARMED → AIRBORNE</div>
+                </div>
+                <div class="gesture-card">
+                    <span class="gesture-emoji">✊</span>
+                    <div class="gesture-name">0 指 (拳頭)</div>
+                    <div class="gesture-cmd">land()</div>
+                    <div class="gesture-state">AIRBORNE → LANDING</div>
+                </div>
+                <div class="gesture-card">
+                    <span class="gesture-emoji">⏱️</span>
+                    <div class="gesture-name">防抖延遲</div>
+                    <div class="gesture-cmd">DEBOUNCE = 1.0s</div>
+                    <div class="gesture-state">防止誤觸/抖動</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="next">
+            <div class="section-header">
+                <div class="section-icon icon-purple">🚀</div>
+                <h2>下一步計畫 — 實機部署</h2>
+            </div>
+            <p style="color:var(--text2); margin-bottom:1.2rem;">
+                SITL 驗證完成，下一階段為 <strong style="color:var(--accent2)">Hardware Deployment (實機部署)</strong>，
+                接上真實 Pixhawk 6C。
+            </p>
+            <div class="next-steps">
+                <div class="next-step">
+                    <div class="next-num">1</div>
+                    <div>
+                        <div class="next-title">物理連接</div>
+                        <div class="next-desc">RPI5 USB ↔ Pixhawk 6C TELEM2 (或 USB-C)</div>
+                    </div>
+                </div>
+                <div class="next-step">
+                    <div class="next-num">2</div>
+                    <div>
+                        <div class="next-title">程式修改 — 連線字串</div>
+                        <div class="next-desc">
+                            移除 <code class="inline">udpout</code>，改用：
+                            <code class="inline">mavutil.mavlink_connection('/dev/ttyUSB0', baud=57600)</code>
+                        </div>
+                    </div>
+                </div>
+                <div class="next-step">
+                    <div class="next-num">3</div>
+                    <div>
+                        <div class="next-title">序列埠權限設定</div>
+                        <div class="next-desc"><code class="inline">sudo chmod 666 /dev/ttyUSB0</code>（或將使用者加入 dialout 群組）</div>
+                    </div>
+                </div>
+                <div class="next-step">
+                    <div class="next-num">4</div>
+                    <div>
+                        <div class="next-title">安全測試 <span class="warn">⚠️ 務必拆除螺旋槳</span></div>
+                        <div class="next-desc">先在地面執行解鎖測試，確認 MAVLink 通訊正常，再裝槳進行飛行。</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+</div>
+
+<footer>
+    文件生成時間: 2026-02-19 &nbsp;|&nbsp; AIoT Gesture Drone Control v1.1 &nbsp;|&nbsp; 研發技術手冊
+</footer>
+
+<button id="scrolltop" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="回到頂部">↑</button>
+
+<script>
+    // Mermaid init
+    mermaid.initialize({
+        startOnLoad: true,
+        theme: 'dark',
+        themeVariables: {
+            primaryColor: '#1e2430',
+            primaryTextColor: '#c9d1d9',
+            primaryBorderColor: '#00d4ff',
+            lineColor: '#555',
+            secondaryColor: '#161b22',
+            tertiaryColor: '#0d0d0d',
+            clusterBkg: '#161b22',
+            edgeLabelBackground: '#1e2430'
+        }
+    });
+
+    // Theme toggle
+    function toggleTheme() {
+        const body = document.body;
+        const isLight = body.getAttribute('data-theme') === 'light';
+        const newTheme = isLight ? 'dark' : 'light';
+        body.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+        document.getElementById('themeBtn').textContent = newTheme === 'light' ? '🌙 深色' : '☀️ 淺色';
+    }
+
+    // Load saved theme
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    document.body.setAttribute('data-theme', savedTheme);
+    document.getElementById('themeBtn').textContent = savedTheme === 'light' ? '🌙 深色' : '☀️ 淺色';
+
+    // Tab switching
+    function showTab(id, btn) {
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('tab-' + id).classList.add('active');
+        btn.classList.add('active');
+    }
+
+    // Copy code
+    function copyCode(btn) {
+        const codeEl = btn.closest('.code-wrap').querySelector('code');
+        navigator.clipboard.writeText(codeEl.innerText).then(() => {
+            btn.textContent = '✅ 已複製';
+            setTimeout(() => btn.textContent = '📋 複製', 2000);
+        });
+    }
+
+    // Scroll top button
+    const scrollBtn = document.getElementById('scrolltop');
+    window.addEventListener('scroll', () => {
+        scrollBtn.classList.toggle('show', window.scrollY > 400);
+    });
+
+    // Active sidebar link on scroll
+    const sections = document.querySelectorAll('section[id], div.section[id]');
+    const sideLinks = document.querySelectorAll('.sidebar a');
+    window.addEventListener('scroll', () => {
+        let current = '';
+        sections.forEach(s => {
+            if (window.scrollY >= s.offsetTop - 100) current = s.id;
+        });
+        sideLinks.forEach(a => {
+            a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+        });
+    });
+</script>
+</body>
+</html>

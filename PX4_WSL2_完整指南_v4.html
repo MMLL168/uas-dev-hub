@@ -1,0 +1,189 @@
+
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIOT 無人機視覺控制 | PX4 SITL + WSL2 終極指南 v4.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        /* 原有樣式保持一致 */
+        :root {
+            --bg-color: #0d1117;
+            --card-bg: #161b22;
+            --accent-primary: #00d4ff;
+            --accent-secondary: #7c3aed;
+            --success: #3fb950;
+            --warning: #f78166;
+            --danger: #ef4444;
+            --border: #30363d;
+        }
+        body { background-color: var(--bg-color); color: #c9d1d9; font-family: 'Inter', sans-serif; }
+        .glass-panel { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4); }
+        .code-font { font-family: 'Fira Code', monospace; }
+        pre { background: #0d0d0d; padding: 1.25rem; border-radius: 8px; font-size: 0.85rem; overflow-x: auto; border: 1px solid var(--border); }
+        .copy-btn { position: absolute; top: 0.5rem; right: 0.5rem; background: rgba(255,255,255,0.05); border: 1px solid var(--border); padding: 4px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; }
+        .copy-btn:hover { background: var(--accent-primary); color: #000; border-color: var(--accent-primary); }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+    <div class="max-w-7xl mx-auto">
+        <header class="text-center mb-12">
+            <h1 class="text-4xl md:text-5xl font-bold bg-gradient-to-r from-sky-400 to-purple-500 bg-clip-text text-transparent mb-4">
+                PX4 SITL + WSL2 + Bridge 完整通路
+            </h1>
+            <p class="text-xl text-slate-400">MediaPipe 手勢控制 → Windows Bridge → PX4 SITL → Gazebo → QGC 全鏈路 v4.0</p>
+        </header>
+
+        <!-- WSL2 MAVLink 修復核心區塊 -->
+        <section class="glass-panel p-8 mb-8">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-sky-400 flex items-center gap-3">
+                    <i data-lucide="network" class="w-8 h-8"></i>
+                    WSL2 全通路驗證 (2026-02-20 ✅)
+                </h2>
+                <span class="px-4 py-2 bg-emerald-500/20 text-emerald-400 border border-emerald-500/50 rounded-full text-sm font-bold">
+                    全通已驗證
+                </span>
+            </div>
+
+            <!-- 通路架構圖 -->
+            <div class="mermaid mb-8">
+```mermaid
+graph LR
+    RPI5[🤖 RPI5<br/>MediaPipe 手勢] -->|UDP 14540| Bridge[🌉 Windows Bridge.py]
+    Bridge -->|UDP 14580| PX4[🛩️ PX4 SITL<br/>instance #1]
+    PX4 -->|UDP 14550| QGC[📱 QGC]
+    PX4 -->|gz_bridge| Gazebo[🎮 Gazebo]
+
+    style RPI5 fill:#ef4444
+    style Bridge fill:#f59e0b
+    style PX4 fill:#3b82f6
+    style QGC fill:#10b981
+    style Gazebo fill:#8b5cf6
+```
+            </div>
+
+            <!-- 問題對照表 -->
+            <div class="mb-8">
+                <h3 class="text-lg font-bold text-slate-300 mb-4 flex items-center gap-2">
+                    <i data-lucide="table" class="w-5 h-5"></i>診斷對照表
+                </h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm border-collapse bg-slate-900/50 rounded-lg">
+                        <thead>
+                            <tr class="border-b border-slate-700">
+                                <th class="p-3 text-left text-slate-300 font-bold">症狀</th>
+                                <th class="p-3 text-left text-slate-300 font-bold">確認指令</th>
+                                <th class="p-3 text-left text-slate-300 font-bold">正常結果</th>
+                                <th class="p-3 text-left text-slate-300 font-bold">修復</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="border-b border-slate-800 hover:bg-slate-800/50">
+                                <td class="p-3 font-mono text-rose-400">mavlink status failed</td>
+                                <td class="p-3 font-mono">mavlink status</td>
+                                <td class="p-3 font-mono text-emerald-400">instance #0: UDP 14550</td>
+                                <td class="p-3"><code>mavlink start -x -u 14550 -r 4000000 -f -t 172.30.112.1</code></td>
+                            </tr>
+                            <tr class="border-b border-slate-800 hover:bg-slate-800/50">
+                                <td class="p-3 font-mono text-rose-400">Bridge 無封包</td>
+                                <td class="p-3 font-mono">Bridge 日誌</td>
+                                <td class="p-3 font-mono text-emerald-400">🔥 ARM/TAKEOFF</td>
+                                <td class="p-3">確認 fake_rpi5.py → 14540</td>
+                            </tr>
+                            <tr class="border-b border-slate-800 hover:bg-slate-800/50">
+                                <td class="p-3 font-mono text-rose-400">WSL 未收到</td>
+                                <td class="p-3 font-mono">sudo tcpdump udp port 14580</td>
+                                <td class="p-3 font-mono text-emerald-400">172.30.112.1 → 172.30.119.112</td>
+                                <td class="p-3">Bridge WSL_PORT=14580</td>
+                            </tr>
+                            <tr class="bg-emerald-500/10 border-emerald-500/50">
+                                <td class="p-3 font-mono text-emerald-400">PX4 未執行</td>
+                                <td class="p-3 font-mono">mavlink status</td>
+                                <td class="p-3 font-mono text-emerald-400">rx: 16.9 B/s<br/>msgid: 76 (COMMAND_LONG)</td>
+                                <td class="p-3 font-mono text-emerald-600">mavlink start -u 14580 -m onboard</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 啟動流程 -->
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="glass-panel p-6">
+                    <h4 class="font-bold text-lg text-sky-400 mb-4 flex items-center gap-2">
+                        <i data-lucide="terminal" class="w-5 h-5"></i>1️⃣ PX4 SITL
+                    </h4>
+                    <div class="relative mb-4">
+                        <button onclick="copyCode('sitl')" class="copy-btn">COPY</button>
+                        <pre id="sitl" class="code-font text-sm"><span class="text-emerald-400">make px4_sitl gz_x500</span>
+mavlink start -x -u 14550 -r 4000000 -f -t <span class="text-yellow-400">172.30.112.1</span>
+mavlink start -x -u 14580 -r 4000000 -f</pre>
+                    </div>
+                </div>
+
+                <div class="glass-panel p-6">
+                    <h4 class="font-bold text-lg text-orange-400 mb-4 flex items-center gap-2">
+                        <i data-lucide="zap" class="w-5 h-5"></i>2️⃣ Windows Bridge
+                    </h4>
+                    <div class="relative mb-4">
+                        <button onclick="copyCode('bridge')" class="copy-btn">COPY</button>
+                        <pre id="bridge" class="code-font text-sm"><span class="text-emerald-400">python windows_udp_bridge.py</span>
+<span class="text-yellow-400"># 監控: 🔥 ARM/TAKEOFF 訊息</span></pre>
+                    </div>
+                </div>
+
+                <div class="glass-panel p-6">
+                    <h4 class="font-bold text-lg text-purple-400 mb-4 flex items-center gap-2">
+                        <i data-lucide="play-circle" class="w-5 h-5"></i>3️⃣ Fake RPI5
+                    </h4>
+                    <div class="relative">
+                        <button onclick="copyCode('fake')" class="copy-btn">COPY</button>
+                        <pre id="fake" class="code-font text-sm"><span class="text-emerald-400">python fake_rpi5.py</span>
+<span class="text-yellow-400">>>> a    # ARM
+>>> t    # TAKEOFF</span></pre>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 永久腳本修復 -->
+            <div class="glass-panel p-6 mt-8">
+                <h3 class="text-lg font-bold text-slate-300 mb-4">🔧 永久修復啟動腳本</h3>
+                <div class="relative">
+                    <button onclick="copyCode('fix')" class="copy-btn">COPY</button>
+                    <pre id="fix" class="code-font text-sm"><span class="text-orange-400"># WSL 執行（重啟後自動生效）
+sed -i '/mavlink start/s/-b//' \
+   ~/PX4-Autopilot/build/px4_sitl_default/etc/init.d-posix/px4-rc.mavlink
+
+sed -i '/mavlink start.*14550/s/$/ -t 172.30.112.1/' \
+   ~/PX4-Autopilot/build/px4_sitl_default/etc/init.d-posix/px4-rc.mavlink</span></pre>
+                </div>
+            </div>
+        </section>
+
+        <footer class="mt-16 py-8 text-center text-slate-600 text-xs tracking-wider border-t border-slate-900">
+            PX4 SITL + WSL2 全通路驗證完成 © 2026 MarlonWu AIoT Lab
+        </footer>
+    </div>
+
+    <script>
+        lucide.createIcons();
+        mermaid.initialize({ startOnLoad: true, theme: 'dark' });
+
+        function copyCode(id) {
+            navigator.clipboard.writeText(document.getElementById(id).innerText).then(() => {
+                const btn = event.target;
+                btn.textContent = '已複製!';
+                btn.style.background = '#3fb950';
+                setTimeout(() => {
+                    btn.textContent = 'COPY';
+                    btn.style.background = '';
+                }, 1500);
+            });
+        }
+    </script>
+</body>
+</html>

@@ -14,15 +14,79 @@
             --green: #3fb950; --red: #f85149; --yellow: #d29922;
         }
 
-        body { font-family: 'Noto Sans TC', sans-serif; background-color: var(--bg); color: var(--text); line-height: 1.6; }
-        .container { max-width: 950px; margin: 0 auto; padding: 40px 24px; }
+        html { scroll-behavior: smooth; } /* 平滑滾動效果 */
+        
+        body { font-family: 'Noto Sans TC', sans-serif; background-color: var(--bg); color: var(--text); line-height: 1.6; margin: 0; }
+        
+        /* 雙欄佈局容器 */
+        .layout-wrapper {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 24px;
+            display: flex;
+            gap: 40px;
+            align-items: flex-start;
+        }
+
+        /* 左側固定目錄 */
+        .sidebar {
+            flex: 0 0 260px;
+            position: sticky;
+            top: 40px; /* 距離頂部的固定位置 */
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px 20px;
+        }
+
+        .sidebar-title {
+            color: #fff;
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar-nav {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar-nav li { margin-bottom: 8px; }
+
+        .sidebar-nav a {
+            color: var(--text2);
+            text-decoration: none;
+            font-size: 0.95rem;
+            display: block;
+            padding: 10px 14px;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .sidebar-nav a:hover {
+            background: rgba(56, 189, 248, 0.1);
+            color: var(--accent);
+            transform: translateX(4px);
+        }
+
+        /* 右側主內容區塊 */
+        .main-content {
+            flex: 1;
+            min-width: 0; /* 防止程式碼區塊撐破 flex 容器 */
+        }
         
         header { border-bottom: 1px solid var(--border); padding-bottom: 20px; margin-bottom: 40px; }
-        h1 { font-size: 2rem; color: #fff; margin-bottom: 10px; }
+        h1 { font-size: 2rem; color: #fff; margin-bottom: 10px; line-height: 1.3; }
         .back-link { color: var(--accent); text-decoration: none; font-size: 0.9rem; margin-bottom: 20px; display: inline-block; transition: opacity 0.2s; }
         .back-link:hover { opacity: 0.8; }
         
-        .section { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 28px; margin-bottom: 24px; }
+        .section { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 28px; margin-bottom: 24px; scroll-margin-top: 40px; /* 錨點定位補償 */ }
         h2 { color: var(--accent); font-size: 1.3rem; margin-bottom: 20px; display: flex; align-items: center; gap: 12px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
         h3 { color: #e6edf3; font-size: 1.1rem; margin: 20px 0 10px 0; }
         
@@ -34,36 +98,54 @@
         li strong { color: #e6edf3; }
 
         .warning { border-left: 4px solid var(--red); background: rgba(248, 81, 73, 0.1); padding: 15px 20px; border-radius: 4px; font-size: 0.95rem; color: #ff7b72; margin: 20px 0; display: flex; align-items: flex-start; gap: 12px; }
-        .info { border-left: 4px solid var(--green); background: rgba(63, 185, 80, 0.1); padding: 15px 20px; border-radius: 4px; font-size: 0.95rem; color: #7ee787; margin: 20px 0; }
         
         .troubleshoot-box { background: #0d1117; border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 12px; }
         .troubleshoot-box h4 { color: var(--yellow); margin-bottom: 8px; font-size: 1rem; }
+
+        /* 響應式設計：螢幕小於 900px 時改為上下排列 */
+        @media (max-width: 900px) {
+            .layout-wrapper { flex-direction: column; }
+            .sidebar { position: static; width: 100%; flex: none; padding: 20px; margin-bottom: 20px; box-sizing: border-box; }
+        }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <a href="index.html" class="back-link"><i class="fas fa-arrow-left"></i> 返回文件導覽中心</a>
+<div class="layout-wrapper">
     
-    <header>
-        <h1>RPi5 + Pixhawk 6C 實機通訊與視覺控制整合</h1>
-        <p class="text2">將 RPi 5 視為機載電腦 (Companion Computer) 引導 Pixhawk 的標準開發流程，實現具備可重複性與安全性的 Offboard 模式手勢控制。</p>
-    </header>
-
-    <div class="section">
-        <h2><i class="fas fa-sliders-h"></i> 第一階段：Pixhawk 6C 參數配置 (PX4 韌體)</h2>
-        <p class="text2">在 Offboard 模式下，Pixhawk 需要穩定的座標系參考。請透過 QGroundControl (QGC) 進行以下設定：</p>
-        <ul>
-            <li><strong>通訊速率：</strong> 進入參數列表，設定 <code>SER_TEL2_BAUD</code> 為 <code>921600</code> (若使用 TELEM2 接口)。</li>
-            <li><strong>關閉 RC 檢查：</strong> 若在調試架上測試且不開啟遙控器，請將 <code>COM_RCL_EXCEPT</code> 勾選包含 <code>Offboard</code>，允許在無遙控器訊號下維持模式。</li>
-            <li><strong>確保感測器狀態：</strong> Offboard 需要位置估計。室內測試若無 GPS，Pixhawk 必須處於有 Optical Flow 或 LPS 的狀態；若僅在調試架觀看馬達反應，可將 <code>COM_ARM_WO_GPS</code> 設為 <code>1</code> (允許無 GPS 解鎖)。</li>
+    <aside class="sidebar">
+        <div class="sidebar-title"><i class="fas fa-list-ul text-sky-400"></i> 文件目錄</div>
+        <ul class="sidebar-nav">
+            <li><a href="#phase1"><i class="fas fa-sliders-h mr-2 w-4 text-center"></i> 1. PX4 參數配置</a></li>
+            <li><a href="#phase2"><i class="fas fa-terminal mr-2 w-4 text-center"></i> 2. 軟體環境建置</a></li>
+            <li><a href="#phase3"><i class="fab fa-python mr-2 w-4 text-center"></i> 3. Offboard 核心程式碼</a></li>
+            <li><a href="#phase4"><i class="fas fa-play-circle mr-2 w-4 text-center"></i> 4. 實際執行步驟</a></li>
+            <li><a href="#phase5"><i class="fas fa-tools mr-2 w-4 text-center"></i> 5. 常見問題排查</a></li>
         </ul>
-    </div>
+    </aside>
 
-    <div class="section">
-        <h2><i class="fas fa-terminal"></i> 第二階段：RPi 5 環境建置 (Conda)</h2>
-        <p class="text2">請在 RPi 5 上開啟 Terminal，執行以下命令建置專屬虛擬環境：</p>
-        <pre><span style="color: #8b949e;"># 1. 建立並進入 Conda 環境</span>
+    <main class="main-content">
+        <a href="index.html" class="back-link"><i class="fas fa-arrow-left"></i> 返回文件導覽中心</a>
+        
+        <header>
+            <h1>RPi5 + Pixhawk 6C 實機通訊與視覺控制整合</h1>
+            <p class="text2">將 RPi 5 視為機載電腦 (Companion Computer) 引導 Pixhawk 的標準開發流程，實現具備可重複性與安全性的 Offboard 模式手勢控制。</p>
+        </header>
+
+        <div class="section" id="phase1">
+            <h2><i class="fas fa-sliders-h"></i> 第一階段：Pixhawk 6C 參數配置 (PX4 韌體)</h2>
+            <p class="text2">在 Offboard 模式下，Pixhawk 需要穩定的座標系參考。請透過 QGroundControl (QGC) 進行以下設定：</p>
+            <ul>
+                <li><strong>通訊速率：</strong> 進入參數列表，設定 <code>SER_TEL2_BAUD</code> 為 <code>921600</code> (若使用 TELEM2 接口)。</li>
+                <li><strong>關閉 RC 檢查：</strong> 若在調試架上測試且不開啟遙控器，請將 <code>COM_RCL_EXCEPT</code> 勾選包含 <code>Offboard</code>。</li>
+                <li><strong>確保感測器狀態：</strong> Offboard 需要位置估計。室內測試若無 GPS，Pixhawk 必須處於有 Optical Flow 或 LPS 的狀態；若僅在調試架觀看馬達反應，可將 <code>COM_ARM_WO_GPS</code> 設為 <code>1</code> (允許無 GPS 解鎖)。</li>
+            </ul>
+        </div>
+
+        <div class="section" id="phase2">
+            <h2><i class="fas fa-terminal"></i> 第二階段：RPi 5 環境建置 (Conda)</h2>
+            <p class="text2">請在 RPi 5 上開啟 Terminal，執行以下命令建置專屬虛擬環境：</p>
+            <pre><span style="color: #8b949e;"># 1. 建立並進入 Conda 環境</span>
 conda create -n drone_ai python=3.10 -y
 conda activate drone_ai
 
@@ -75,12 +157,12 @@ pip install mediapipe opencv-python
 
 <span style="color: #8b949e;"># 4. 解決 RPi 5 上的 OpenCV 依賴問題 (若報錯才執行)</span>
 sudo apt update && sudo apt install libgl1-mesa-glx -y</pre>
-    </div>
+        </div>
 
-    <div class="section">
-        <h2><i class="fab fa-python"></i> 第三階段：完整執行程式碼 (Gesture_Offboard.py)</h2>
-        <p class="text2">這份程式碼包含了：非同步 MAVLink 心跳維持、Mediapipe 座標映射、以及即時影像視窗。</p>
-        <pre><span style="color: #ff7b72;">import</span> asyncio
+        <div class="section" id="phase3">
+            <h2><i class="fab fa-python"></i> 第三階段：完整執行程式碼 (Gesture_Offboard.py)</h2>
+            <p class="text2">這份程式碼包含了：非同步 MAVLink 心跳維持、Mediapipe 座標映射、以及即時影像視窗。</p>
+            <pre><span style="color: #ff7b72;">import</span> asyncio
 <span style="color: #ff7b72;">import</span> cv2
 <span style="color: #ff7b72;">import</span> mediapipe <span style="color: #ff7b72;">as</span> mp
 <span style="color: #ff7b72;">from</span> mavsdk <span style="color: #ff7b72;">import</span> System
@@ -90,7 +172,6 @@ sudo apt update && sudo apt install libgl1-mesa-glx -y</pre>
 SERIAL_PORT = <span style="color: #a5d6ff;">"serial:///dev/ttyAMA0:921600"</span> <span style="color: #8b949e;"># RPi 5 預設串口</span>
 
 <span style="color: #ff7b72;">async def</span> <span style="color: #d2a8ff;">run</span>():
-    <span style="color: #8b949e;"># 1. 初始化無人機</span>
     drone = System()
     <span style="color: #ff7b72;">await</span> drone.connect(system_address=SERIAL_PORT)
 
@@ -100,14 +181,12 @@ SERIAL_PORT = <span style="color: #a5d6ff;">"serial:///dev/ttyAMA0:921600"</span
             print(<span style="color: #a5d6ff;">"無人機已連線！"</span>)
             <span style="color: #ff7b72;">break</span>
 
-    <span style="color: #8b949e;"># 2. 初始化 Mediapipe</span>
     mp_hands = mp.solutions.hands
     hands = mp_hands.Hands(min_detection_confidence=0.7, min_tracking_confidence=0.5)
     mp_draw = mp.solutions.drawing_utils
 
     cap = cv2.VideoCapture(0)
 
-    <span style="color: #8b949e;"># 3. Offboard 核心邏輯：必須先發送指令才能啟動模式</span>
     print(<span style="color: #a5d6ff;">"發送初始 Setpoint..."</span>)
     <span style="color: #ff7b72;">await</span> drone.offboard.set_velocity_body(VelocityBodyYawspeed(0.0, 0.0, 0.0, 0.0))
 
@@ -119,7 +198,6 @@ SERIAL_PORT = <span style="color: #a5d6ff;">"serial:///dev/ttyAMA0:921600"</span
             image = cv2.flip(image, 1)
             results = hands.process(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
             
-            <span style="color: #8b949e;"># 預設指令：懸停</span>
             fwd, right, down, yaw = 0.0, 0.0, 0.0, 0.0
             status_text = <span style="color: #a5d6ff;">"IDLE (Hover)"</span>
 
@@ -127,11 +205,8 @@ SERIAL_PORT = <span style="color: #a5d6ff;">"serial:///dev/ttyAMA0:921600"</span
                 <span style="color: #ff7b72;">for</span> hand_landmarks <span style="color: #ff7b72;">in</span> results.multi_hand_landmarks:
                     mp_draw.draw_landmarks(image, hand_landmarks, mp_hands.HAND_CONNECTIONS)
                     
-                    <span style="color: #8b949e;"># 取得食指尖 (Index Tip) 座標</span>
                     idx_tip = hand_landmarks.landmark[8]
                     
-                    <span style="color: #8b949e;"># --- 手勢控制映射 ---</span>
-                    <span style="color: #8b949e;"># 左右控制 (Roll)</span>
                     <span style="color: #ff7b72;">if</span> idx_tip.x < 0.35:
                         right = -0.6
                         status_text = <span style="color: #a5d6ff;">"MOVE LEFT"</span>
@@ -139,15 +214,13 @@ SERIAL_PORT = <span style="color: #a5d6ff;">"serial:///dev/ttyAMA0:921600"</span
                         right = 0.6
                         status_text = <span style="color: #a5d6ff;">"MOVE RIGHT"</span>
 
-                    <span style="color: #8b949e;"># 高度控制 (Throttle)</span>
                     <span style="color: #ff7b72;">if</span> idx_tip.y < 0.3:
-                        down = -0.4 <span style="color: #8b949e;"># 向上爬升</span>
+                        down = -0.4
                         status_text = <span style="color: #a5d6ff;">"CLIMBING"</span>
                     <span style="color: #ff7b72;">elif</span> idx_tip.y > 0.7:
-                        down = 0.4  <span style="color: #8b949e;"># 向下下降</span>
+                        down = 0.4
                         status_text = <span style="color: #a5d6ff;">"DESCENDING"</span>
 
-                    <span style="color: #8b949e;"># 發送控制指令給 Offboard 模組</span>
                     <span style="color: #ff7b72;">try</span>:
                         <span style="color: #ff7b72;">await</span> drone.offboard.set_velocity_body(
                             VelocityBodyYawspeed(fwd, right, down, yaw)
@@ -155,14 +228,12 @@ SERIAL_PORT = <span style="color: #a5d6ff;">"serial:///dev/ttyAMA0:921600"</span
                     <span style="color: #ff7b72;">except</span> Exception <span style="color: #ff7b72;">as</span> e:
                         print(<span style="color: #a5d6ff;">f"Offboard Error: {e}"</span>)
 
-            <span style="color: #8b949e;"># 影像顯示</span>
             cv2.putText(image, <span style="color: #a5d6ff;">f"Status: {status_text}"</span>, (10, 50), 
                         cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
             cv2.imshow(<span style="color: #a5d6ff;">'Marlon Drone Offboard DEMO'</span>, image)
 
-            <span style="color: #8b949e;"># 按鍵互動</span>
             key = cv2.waitKey(1) & 0xFF
-            <span style="color: #ff7b72;">if</span> key == ord(<span style="color: #a5d6ff;">'a'</span>): <span style="color: #8b949e;"># Arm & Start Offboard</span>
+            <span style="color: #ff7b72;">if</span> key == ord(<span style="color: #a5d6ff;">'a'</span>):
                 print(<span style="color: #a5d6ff;">"解鎖並啟動 Offboard..."</span>)
                 <span style="color: #ff7b72;">await</span> drone.action.arm()
                 <span style="color: #ff7b72;">try</span>:
@@ -170,7 +241,7 @@ SERIAL_PORT = <span style="color: #a5d6ff;">"serial:///dev/ttyAMA0:921600"</span
                     print(<span style="color: #a5d6ff;">"Offboard 模式已啟動"</span>)
                 <span style="color: #ff7b72;">except</span> Exception <span style="color: #ff7b72;">as</span> e:
                     print(<span style="color: #a5d6ff;">f"啟動 Offboard 失敗: {e}"</span>)
-            <span style="color: #ff7b72;">elif</span> key == ord(<span style="color: #a5d6ff;">'l'</span>): <span style="color: #8b949e;"># Land</span>
+            <span style="color: #ff7b72;">elif</span> key == ord(<span style="color: #a5d6ff;">'l'</span>):
                 print(<span style="color: #a5d6ff;">"強制降落"</span>)
                 <span style="color: #ff7b72;">await</span> drone.action.land()
             <span style="color: #ff7b72;">elif</span> key == ord(<span style="color: #a5d6ff;">'q'</span>):
@@ -183,62 +254,64 @@ SERIAL_PORT = <span style="color: #a5d6ff;">"serial:///dev/ttyAMA0:921600"</span
 
 <span style="color: #ff7b72;">if</span> __name__ == <span style="color: #a5d6ff;">"__main__"</span>:
     asyncio.run(run())</pre>
-    </div>
-
-    <div class="section">
-        <h2><i class="fas fa-play-circle"></i> 第四階段：實際執行步驟</h2>
-        
-        <div class="warning">
-            <i class="fas fa-exclamation-triangle" style="font-size: 1.5rem; margin-top: 2px;"></i>
-            <div>
-                <strong style="color: #ff7b72; font-size: 1.1rem; display: block; margin-bottom: 5px;">安全警告：無槳測試</strong>
-                進行台架或室內調試前，<strong>必須強制拆除所有螺旋槳！</strong>
-            </div>
         </div>
 
-        <h3>1. 硬體檢查與啟動</h3>
-        <ul>
-            <li>確認 RPi 5 與 Pixhawk 6C 的 TX/RX 交叉連接（TX 接 RX）。</li>
-            <li>開啟終端機，啟動程式：</li>
-        </ul>
-        <pre><span style="color: #8b949e;"># 進入環境並執行程式</span>
+        <div class="section" id="phase4">
+            <h2><i class="fas fa-play-circle"></i> 第四階段：實際執行步驟</h2>
+            
+            <div class="warning">
+                <i class="fas fa-exclamation-triangle" style="font-size: 1.5rem; margin-top: 2px;"></i>
+                <div>
+                    <strong style="color: #ff7b72; font-size: 1.1rem; display: block; margin-bottom: 5px;">安全警告：無槳測試</strong>
+                    進行台架或室內調試前，<strong>必須強制拆除所有螺旋槳！</strong>
+                </div>
+            </div>
+
+            <h3>1. 硬體檢查與啟動</h3>
+            <ul>
+                <li>確認 RPi 5 與 Pixhawk 6C 的 TX/RX 交叉連接（TX 接 RX）。</li>
+                <li>開啟終端機，啟動程式：</li>
+            </ul>
+            <pre><span style="color: #8b949e;"># 進入環境並執行程式</span>
 conda activate drone_ai
 python Gesture_Offboard.py</pre>
 
-        <h3>2. 操作流程</h3>
-        <ol>
-            <li><strong>Step 1:</strong> 觀察視窗，確認手勢辨識正常（能看到綠色骨架追蹤）。</li>
-            <li><strong>Step 2:</strong> 鍵盤按下 <code>a</code>。此時 Pixhawk 應解鎖，馬達將啟動進入低速怠速狀態。</li>
-            <li><strong>Step 3:</strong> 將手移向畫面左側或右側，觀察調適架上的無人機馬達轉速是否產生對應的差速變化。</li>
-            <li><strong>Step 4:</strong> 測試結束，按下 <code>l</code> (Land) 強制降落，或鍵盤 <code>Ctrl+C</code> 中斷程式。</li>
-        </ol>
-    </div>
-
-    <div class="section">
-        <h2><i class="fas fa-tools"></i> 第五階段：常見問題排查 (Troubleshooting)</h2>
-        
-        <div class="troubleshoot-box">
-            <h4><i class="fas fa-times-circle text-red-400 mr-2"></i> 無法啟動 Offboard?</h4>
-            <p class="text2">PX4 要求在啟動 Offboard 模式前，必須<strong>已經在接收 Setpoint 指令</strong>。本範例程式碼在 <code>arm()</code> 之前就先發送了 <code>set_velocity_body</code>，這是成功切換的關鍵。<br>
-            若檢查 QGC 儀表板顯示 <em>"Offboard rejected"</em>，通常是因為沒有位置資訊（需 GPS 或 EKF2 模擬支援）。</p>
+            <h3>2. 操作流程</h3>
+            <ol>
+                <li><strong>Step 1:</strong> 觀察視窗，確認手勢辨識正常（能看到綠色骨架追蹤）。</li>
+                <li><strong>Step 2:</strong> 鍵盤按下 <code>a</code>。此時 Pixhawk 應解鎖，馬達將啟動進入低速怠速狀態。</li>
+                <li><strong>Step 3:</strong> 將手移向畫面左側或右側，觀察調適架上的無人機馬達轉速是否產生對應的差速變化。</li>
+                <li><strong>Step 4:</strong> 測試結束，按下 <code>l</code> (Land) 強制降落，或鍵盤 <code>Ctrl+C</code> 中斷程式。</li>
+            </ol>
         </div>
 
-        <div class="troubleshoot-box">
-            <h4><i class="fas fa-plug text-red-400 mr-2"></i> 串口權限問題?</h4>
-            <p class="text2">若終端機提示 Permission Denied，請執行 <code>sudo chmod 666 /dev/ttyAMA0</code> 給予 RPi 5 串口讀寫權限，或確認已將使用者加入 dialout 群組。</p>
+        <div class="section" id="phase5">
+            <h2><i class="fas fa-tools"></i> 第五階段：常見問題排查 (Troubleshooting)</h2>
+            
+            <div class="troubleshoot-box">
+                <h4><i class="fas fa-times-circle text-red-400 mr-2"></i> 無法啟動 Offboard?</h4>
+                <p class="text2">PX4 要求在啟動 Offboard 模式前，必須<strong>已經在接收 Setpoint 指令</strong>。本範例程式碼在 <code>arm()</code> 之前就先發送了 <code>set_velocity_body</code>，這是成功切換的關鍵。<br>
+                若檢查 QGC 儀表板顯示 <em>"Offboard rejected"</em>，通常是因為沒有位置資訊（需 GPS 或 EKF2 模擬支援）。</p>
+            </div>
+
+            <div class="troubleshoot-box">
+                <h4><i class="fas fa-plug text-red-400 mr-2"></i> 串口權限問題?</h4>
+                <p class="text2">若終端機提示 Permission Denied，請執行 <code>sudo chmod 666 /dev/ttyAMA0</code> 給予 RPi 5 串口讀寫權限，或確認已將使用者加入 dialout 群組。</p>
+            </div>
+
+            <div class="troubleshoot-box">
+                <h4><i class="fas fa-video text-red-400 mr-2"></i> 影像/控制延遲感明顯?</h4>
+                <p class="text2">在 RPi 5 上若感受到 FPS 瓶頸，可以嘗試在程式碼中將攝影機解析度調低來換取更高的效能：<br>
+                <code>cap.set(cv2.CAP_PROP_FRAME_WIDTH, 320)</code><br>
+                <code>cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 240)</code></p>
+            </div>
         </div>
 
-        <div class="troubleshoot-box">
-            <h4><i class="fas fa-video text-red-400 mr-2"></i> 影像/控制延遲感明顯?</h4>
-            <p class="text2">在 RPi 5 上若感受到 FPS 瓶頸，可以嘗試在程式碼中將攝影機解析度調低來換取更高的效能：<br>
-            <code>cap.set(cv2.CAP_PROP_FRAME_WIDTH, 320)</code><br>
-            <code>cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 240)</code></p>
-        </div>
-    </div>
+        <footer style="text-align: center; color: var(--text2); font-size: 0.8rem; margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border);">
+            Marlon AIoT Engineering Hub &nbsp;·&nbsp; UAS R&D Documentation 2026
+        </footer>
 
-    <footer style="text-align: center; color: var(--text2); font-size: 0.8rem; margin-top: 40px;">
-        Marlon AIoT Engineering Hub &nbsp;·&nbsp; UAS R&D Documentation 2026
-    </footer>
+    </main>
 </div>
 
 </body>

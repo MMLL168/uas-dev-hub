@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RPi5 x Pixhawk 6C 實機整合指南</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background-color: #0f172a; color: #f8fafc; font-family: 'Inter', sans-serif; }
+        .section-card { background: rgba(30, 41, 59, 0.5); border: 1px solid #334155; border-radius: 12px; }
+        .code-bg { background-color: #020617; border-radius: 8px; border: 1px solid #1e293b; }
+        .step-number { background: linear-gradient(135deg, #38bdf8 0%, #3b82f6 100%); width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-weight: bold; font-size: 14px; }
+    </style>
+</head>
+<body class="p-6 md:p-12">
+    <div class="max-w-4xl mx-auto">
+        <a href="index.html" class="text-sky-400 hover:text-sky-300 mb-8 inline-block transition-colors">
+            <i class="fas fa-arrow-left mr-2"></i> 返回文件導覽中心
+        </a>
+
+        <header class="mb-12">
+            <h1 class="text-4xl font-extrabold text-white mb-4">RPi5 + Pixhawk 6C 實機通訊整合</h1>
+            <p class="text-slate-400 text-lg">工程級 Offboard 模式配置與 Mediapipe 手勢控制實作</p>
+        </header>
+
+        <div class="section-card p-8 mb-8">
+            <div class="flex items-center gap-4 mb-6">
+                <div class="step-number text-white">1</div>
+                <h2 class="text-2xl font-bold text-sky-400">硬體層級連線 (Physical Link)</h2>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-slate-900/80 p-5 rounded-lg border border-slate-700">
+                    <h3 class="text-white font-semibold mb-3">RPi 5 GPIO</h3>
+                    <ul class="text-slate-400 text-sm space-y-2">
+                        <li><span class="text-orange-400">Pin 8 (TXD0)</span> → Pixhawk RX</li>
+                        <li><span class="text-orange-400">Pin 10 (RXD0)</span> → Pixhawk TX</li>
+                        <li><span class="text-orange-400">Pin 6 (GND)</span> → Common Ground</li>
+                    </ul>
+                </div>
+                <div class="bg-slate-900/80 p-5 rounded-lg border border-slate-700">
+                    <h3 class="text-white font-semibold mb-3">Pixhawk 6C (TELEM2)</h3>
+                    <ul class="text-slate-400 text-sm space-y-2">
+                        <li>Baudrate: <span class="text-sky-400">921600</span></li>
+                        <li>Protocol: <span class="text-sky-400">MAVLink 2.0</span></li>
+                        <li>Logic Level: <span class="text-sky-400">3.3V TTL</span></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-card p-8 mb-8">
+            <div class="flex items-center gap-4 mb-6">
+                <div class="step-number text-white">2</div>
+                <h2 class="text-2xl font-bold text-sky-400">Offboard 模式代碼實作</h2>
+            </div>
+            <div class="code-bg p-6">
+                <pre class="text-sm font-mono leading-relaxed"><span class="text-purple-400">async def</span> <span class="text-sky-400">run_offboard</span>():
+    drone = System()
+    <span class="text-slate-500"># RPi5 串口路徑</span>
+    <span class="text-purple-400">await</span> drone.connect(system_address=<span class="text-emerald-400">"serial:///dev/ttyAMA0:921600"</span>)
+    
+    <span class="text-slate-500"># 必須先發送 Setpoint 指令才能切換模式</span>
+    <span class="text-purple-400">await</span> drone.offboard.set_velocity_body(VelocityBodyYawspeed(0,0,0,0))
+    <span class="text-purple-400">await</span> drone.offboard.start()</pre>
+            </div>
+        </div>
+
+        <footer class="text-center text-slate-600 text-xs mt-12">
+            &copy; 2026 Marlon AIoT Engineering Hub
+        </footer>
+    </div>
+</body>
+</html>

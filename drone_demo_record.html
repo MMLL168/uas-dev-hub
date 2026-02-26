@@ -13,163 +13,198 @@
             --accent-color: #a6e3a1;
             --code-bg: #181825;
             --border-color: #313244;
-            --sidebar-width: 260px;
+            --sidebar-width: 280px; /* 固定左側欄寬度 */
         }
+        
         html {
             scroll-behavior: smooth;
         }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
             line-height: 1.6;
             margin: 0;
-            padding: 20px 40px;
-            /* 預留左側固定導覽列的空間 */
-            padding-left: calc(var(--sidebar-width) + 60px); 
+            padding: 0;
+            display: flex; /* 使用 Flexbox 切割左右區塊 */
         }
         
-        /* --- 左側固定章節導覽 (Sidebar) --- */
+        /* --- 左側固定導覽列 (Sidebar) --- */
         .sidebar {
             position: fixed;
-            top: 40px;
-            left: 20px;
+            top: 0;
+            left: 0;
             width: var(--sidebar-width);
+            height: 100vh; /* 佔滿全螢幕高度 */
             background-color: var(--code-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 4px 4px 15px rgba(0,0,0,0.3);
+            border-right: 1px solid var(--border-color);
+            padding: 30px 20px;
+            box-sizing: border-box;
+            overflow-y: auto;
             z-index: 1000;
         }
+
         .sidebar h3 {
             margin-top: 0;
             color: var(--primary-color);
-            font-size: 1.1em;
-            border-bottom: 1px solid var(--border-color);
+            font-size: 1.2em;
+            border-bottom: 2px solid var(--border-color);
             padding-bottom: 10px;
+            margin-bottom: 20px;
         }
+
         .sidebar ul {
             list-style: none;
             padding: 0;
             margin: 0;
         }
+
         .sidebar li {
-            margin-bottom: 12px;
+            margin-bottom: 15px;
         }
+
         .sidebar a {
             color: var(--text-color);
             text-decoration: none;
-            font-size: 0.95em;
-            transition: color 0.2s;
+            font-size: 1em;
+            transition: all 0.2s ease;
             display: block;
-        }
-        .sidebar a:hover {
-            color: var(--accent-color);
-            padding-left: 5px;
-            transition: all 0.2s;
+            padding: 8px 10px;
+            border-radius: 6px;
         }
 
-        /* --- 內容排版 --- */
+        .sidebar a:hover {
+            color: var(--code-bg);
+            background-color: var(--accent-color);
+            padding-left: 15px;
+            font-weight: bold;
+        }
+
+        /* --- 右側主要內容區 (Main Content) --- */
+        .content {
+            margin-left: var(--sidebar-width); /* 閃避左側欄 */
+            padding: 40px 5%;
+            width: calc(100% - var(--sidebar-width));
+            box-sizing: border-box;
+        }
+
+        /* --- 內容排版樣式 --- */
         h1, h2, h3 { color: var(--primary-color); }
-        h1 { border-bottom: 2px solid var(--primary-color); padding-bottom: 10px; }
-        h2 { margin-top: 50px; border-bottom: 1px solid var(--border-color); padding-bottom: 5px; scroll-margin-top: 20px; }
+        h1 { border-bottom: 2px solid var(--primary-color); padding-bottom: 10px; margin-top: 0; }
+        h2 { 
+            margin-top: 60px; 
+            border-bottom: 1px solid var(--border-color); 
+            padding-bottom: 5px; 
+            scroll-margin-top: 30px; /* 點擊錨點時預留頂部空間 */
+        }
         .highlight { color: var(--secondary-color); font-weight: bold; }
         .success { color: var(--accent-color); font-weight: bold; }
+        
         code {
             background-color: var(--code-bg);
-            padding: 2px 6px;
+            padding: 3px 6px;
             border-radius: 4px;
             font-family: 'Courier New', Courier, monospace;
             color: #fab387;
         }
+        
         pre {
             background-color: var(--code-bg);
-            padding: 15px;
+            padding: 20px;
             border-radius: 8px;
             overflow-x: auto;
             border: 1px solid var(--border-color);
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
         }
+        
         pre code { background-color: transparent; padding: 0; color: #cdd6f4; }
+        
         table {
             width: 100%;
             border-collapse: collapse;
             margin: 20px 0;
             background-color: var(--code-bg);
+            border-radius: 8px;
+            overflow: hidden;
         }
+        
         th, td {
-            padding: 12px;
+            padding: 15px;
             border: 1px solid var(--border-color);
             text-align: left;
         }
+        
         th { background-color: #313244; color: var(--primary-color); }
-        ul { padding-left: 20px; }
-        li { margin-bottom: 8px; }
+        ul.content-list { padding-left: 20px; }
+        ul.content-list li { margin-bottom: 8px; }
     </style>
 </head>
 <body>
 
     <nav class="sidebar">
-        <h3>章節導覽</h3>
+        <h3>章節捷徑</h3>
         <ul>
-            <li><a href="#wiring">一、 RPi 5 與飛控接線 (UART)</a></li>
-            <li><a href="#env">二、 環境建置與依賴安裝</a></li>
-            <li><a href="#debug">三、 連線解鎖除錯 SOP</a></li>
-            <li><a href="#code">四、 手勢控制代碼 (推力版)</a></li>
+            <li><a href="#wiring">一、 RPi 5 實體接線對應</a></li>
+            <li><a href="#uart-config">二、 UART 與 921600 鮑率設定</a></li>
+            <li><a href="#env">三、 環境建置與依賴安裝</a></li>
+            <li><a href="#debug">四、 FW 1.16 連線除錯 SOP</a></li>
+            <li><a href="#code">五、 手勢控制代碼 (推力版)</a></li>
         </ul>
     </nav>
 
-    <h1>AIoT 手勢無人機控制系統 - 核心開發文件</h1>
-    <p><strong>系統架構：</strong> Raspberry Pi 5 (Companion Computer) + Pixhawk 6C (PX4 v1.16) + MediaPipe AI 視覺辨識</p>
+    <main class="content">
+        <h1>AIoT 手勢無人機控制系統 - 核心開發文件</h1>
+        <p><strong>系統架構：</strong> Raspberry Pi 5 (Companion Computer) + Pixhawk 6C (PX4 v1.16) + MediaPipe AI 視覺辨識</p>
 
-    <h2 id="wiring">一、 RPi 5 與飛控接線與 UART 設定 (RPi 5 專屬)</h2>
-    <p>Raspberry Pi 5 採用全新的 RP1 晶片處理 I/O，UART 架構與舊版完全不同。為了實現影像控制的低延遲，我們必須使用 <strong>921600 波特率 (Baud Rate)</strong>。</p>
-    
-    <h3>1. 實體接線對應 (兩種方案)</h3>
-    <p>在 RPi 5 上，你使用的接孔決定了 Linux 系統中的設備代號：</p>
-    <table>
-        <tr>
-            <th>方案</th>
-            <th>RPi 5 端接孔</th>
-            <th>Pixhawk 6C (TELEM)</th>
-            <th>對應的 Linux 設備名稱</th>
-        </tr>
-        <tr>
-            <td><strong>方案 A</strong> (推薦)</td>
-            <td><strong>專用 3-Pin Debug 接口</strong> (UART)</td>
-            <td>RX / TX / GND</td>
-            <td><code>/dev/ttyAMA0</code></td>
-        </tr>
-        <tr>
-            <td><strong>方案 B</strong></td>
-            <td><strong>40-Pin GPIO 排針</strong> (Pin 8: TX, Pin 10: RX, Pin 6: GND)</td>
-            <td>RX / TX / GND</td>
-            <td><code>/dev/ttyAMA10</code> (或 ttyS0)</td>
-        </tr>
-    </table>
-    <p><span class="highlight">⚠️ 電源警告：</span> 嚴禁直接從 Pixhawk TELEM 埠取電給 RPi 5！RPi 5 運算 AI 耗電極大，必須使用獨立 Type-C 供電，Pixhawk 則由動力電池供電。兩者<strong>必須共地 (GND)</strong> 通訊才會穩定。</p>
+        <h2 id="wiring">一、 RPi 5 實體接線對應 (UART)</h2>
+        <p>Raspberry Pi 5 採用全新的 RP1 晶片處理 I/O。為了實現影像控制的低延遲，我們必須使用 <strong>921600 波特率 (Baud Rate)</strong>。</p>
+        
+        <table>
+            <tr>
+                <th>方案</th>
+                <th>RPi 5 端接孔</th>
+                <th>Pixhawk 6C (TELEM)</th>
+                <th>對應的 Linux 設備名稱</th>
+            </tr>
+            <tr>
+                <td><strong>方案 A</strong> (推薦)</td>
+                <td><strong>專用 3-Pin Debug 接口</strong></td>
+                <td>RX / TX / GND</td>
+                <td><code>/dev/ttyAMA0</code></td>
+            </tr>
+            <tr>
+                <td><strong>方案 B</strong></td>
+                <td><strong>40-Pin GPIO 排針</strong> (Pin 8: TX, Pin 10: RX, Pin 6: GND)</td>
+                <td>RX / TX / GND</td>
+                <td><code>/dev/ttyAMA10</code> (需掛載 overlay)</td>
+            </tr>
+        </table>
+        <p><span class="highlight">⚠️ 電源警告：</span> 嚴禁直接從 Pixhawk TELEM 埠取電給 RPi 5！RPi 5 運算 AI 耗電極大，必須使用獨立 Type-C 供電，Pixhawk 則由動力電池供電。兩者<strong>必須共地 (GND)</strong> 通訊才會穩定。</p>
 
-    <h3>2. RPi 5 系統設定 (啟用 921600 高速 UART)</h3>
-    <p>編輯 boot 參數檔：</p>
-    <pre><code>sudo nano /boot/firmware/config.txt</code></pre>
-    <p><strong>若使用 40-Pin GPIO (方案 B)：</strong></p>
-    <p>加入以下指令以啟用 RP1 晶片上的 UART0，並關閉預設的 Serial Console 避免終端機干擾：</p>
-    <pre><code>enable_uart=1
+        <h2 id="uart-config">二、 UART 與 921600 波特率設定</h2>
+        
+        <h3>1. RPi 5 系統設定</h3>
+        <p>編輯 boot 參數檔：</p>
+        <pre><code>sudo nano /boot/firmware/config.txt</code></pre>
+        <p><strong>若使用 40-Pin GPIO (方案 B)：</strong></p>
+        <p>加入以下指令以啟用 RP1 晶片上的 UART0，並關閉預設的 Serial Console 避免終端機干擾：</p>
+        <pre><code>enable_uart=1
 dtoverlay=uart0-pi5</code></pre>
-    <p><em>(修改後需 Reboot，系統中將出現 <code>/dev/ttyAMA10</code> 供 Python 呼叫)</em></p>
+        <p><em>(修改後需 Reboot，系統中將出現 <code>/dev/ttyAMA10</code> 供 Python 呼叫)</em></p>
 
-    <h3>3. Pixhawk (QGC) 端 921600 設定</h3>
-    <p>為匹配 RPi 5 的高速傳輸，飛控端必須精準設定：</p>
-    <ul>
-        <li>打開 QGC 進入參數設定 (Parameters)。</li>
-        <li>確認接線的 TELEM 埠 (如 TELEM 1)。</li>
-        <li>搜尋 <code>SER_TEL1_BAUD</code>，將其修改為 <strong>921600 8N1</strong>。</li>
-        <li>重啟 Pixhawk。</li>
-    </ul>
+        <h3>2. Pixhawk (QGC) 端 921600 設定</h3>
+        <p>為匹配 RPi 5 的高速傳輸，飛控端必須精準設定：</p>
+        <ul class="content-list">
+            <li>打開 QGC 進入參數設定 (Parameters)。</li>
+            <li>確認接線的 TELEM 埠 (如 TELEM 1)。</li>
+            <li>搜尋 <code>SER_TEL1_BAUD</code>，將其修改為 <strong>921600 8N1</strong>。</li>
+            <li>重啟 Pixhawk。</li>
+        </ul>
 
-    <h2 id="env">二、 環境建置與依賴安裝 (Environment Setup)</h2>
-    <p>在 Raspberry Pi OS (Bookworm, 64-bit) 建議使用虛擬環境：</p>
-    <pre><code># 1. 更新系統並安裝基礎視覺套件依賴
+        <h2 id="env">三、 環境建置與依賴安裝 (Environment Setup)</h2>
+        <p>在 Raspberry Pi OS (Bookworm, 64-bit) 建議使用虛擬環境：</p>
+        <pre><code># 1. 更新系統並安裝基礎視覺套件依賴
 sudo apt update
 sudo apt install -y python3-venv libgl1-mesa-glx libglib2.0-0
 
@@ -177,44 +212,43 @@ sudo apt install -y python3-venv libgl1-mesa-glx libglib2.0-0
 python3 -m venv ~/drone_env
 source ~/drone_env/bin/activate
 
-# 3. 安裝 AIoT 核心套件 (注意 MAVSDK 版本相容性)
+# 3. 安裝 AIoT 核心套件
 pip install mavsdk opencv-python mediapipe numpy
 </code></pre>
 
-    <h2 id="debug">三、 連線解鎖除錯 SOP (PX4 FW 1.16 專用)</h2>
-    <p>PX4 v1.16 的健康檢查極嚴格，若遇到問題請依序排查：</p>
-    <table>
-        <tr>
-            <th>錯誤現象</th>
-            <th>根本原因</th>
-            <th>解決方案 (QGC 參數與設定)</th>
-        </tr>
-        <tr>
-            <td><strong>馬達無反應</strong><br>(已解鎖綠燈但不動)</td>
-            <td>FW 1.16 動態控制分配 (Control Allocation) 未配置。PWM 腳位未映射。</td>
-            <td>進入 Actuators (執行器)。手動將 <code>I/O PWM Out 1~4</code> 綁定至 <code>Motor 1~4</code>，並重啟。</td>
-        </tr>
-        <tr>
-            <td><strong>Offboard 切換被拒</strong><br>(Position missing)</td>
-            <td>室內無 GPS，飛控拒絕進入需位置數據的 <code>Velocity</code> 模式。</td>
-            <td>程式改用 <code>Attitude</code> (推力) 控制。<br>QGC 參數 <code>COM_ARM_WO_GPS</code> 設為 <strong>1</strong>。</td>
-        </tr>
-        <tr>
-            <td><strong>解鎖被拒</strong><br>(Health failures)</td>
-            <td>安全按鈕未按、USB 供電限制或無遙控器訊號。</td>
-            <td><code>CBRK_IO_SAFETY</code> = 22027<br><code>CBRK_USB_CHK</code> = 197848<br><code>COM_RC_IN_MODE</code> = 1</td>
-        </tr>
-        <tr>
-            <td><strong>解鎖後瞬間停轉</strong></td>
-            <td>降落偵測器誤判觸地，瞬間強制切斷推力。</td>
-            <td><code>COM_DISARM_LAND</code> 設為 <strong>-1</strong>，或在程式中給予突破臨界值的大推力。</td>
-        </tr>
-    </table>
+        <h2 id="debug">四、 FW 1.16 連線解鎖除錯 SOP</h2>
+        <p>PX4 v1.16 的健康檢查極嚴格，若遇到問題請依序排查：</p>
+        <table>
+            <tr>
+                <th>錯誤現象</th>
+                <th>根本原因</th>
+                <th>解決方案 (QGC 參數與設定)</th>
+            </tr>
+            <tr>
+                <td><strong>馬達無反應</strong><br>(已解鎖綠燈但不動)</td>
+                <td>FW 1.16 動態控制分配 (Control Allocation) 未配置。PWM 腳位未映射。</td>
+                <td>進入 Actuators (執行器)。手動將 <code>I/O PWM Out 1~4</code> 綁定至 <code>Motor 1~4</code>，並重啟。</td>
+            </tr>
+            <tr>
+                <td><strong>Offboard 切換被拒</strong><br>(Position missing)</td>
+                <td>室內無 GPS，飛控拒絕進入需位置數據的 <code>Velocity</code> 模式。</td>
+                <td>程式改用 <code>Attitude</code> (推力) 控制。<br>QGC 參數 <code>COM_ARM_WO_GPS</code> 設為 <strong>1</strong>。</td>
+            </tr>
+            <tr>
+                <td><strong>解鎖被拒</strong><br>(Health failures)</td>
+                <td>安全按鈕未按、USB 供電限制或無遙控器訊號。</td>
+                <td><code>CBRK_IO_SAFETY</code> = 22027<br><code>CBRK_USB_CHK</code> = 197848<br><code>COM_RC_IN_MODE</code> = 1</td>
+            </tr>
+            <tr>
+                <td><strong>解鎖後瞬間停轉</strong></td>
+                <td>降落偵測器誤判觸地，瞬間強制切斷推力。</td>
+                <td><code>COM_DISARM_LAND</code> 設為 <strong>-1</strong>，或在程式中給予突破臨界值的大推力。</td>
+            </tr>
+        </table>
 
-
-    <h2 id="code">四、 核心手勢控制程式碼 (Attitude 推力最終版)</h2>
-    <p>此代碼繞過 GPS 依賴，直接控制推力，並請確保 <code>system_address</code> 的 tty 設備與你的實體接孔 (AMA0 或 AMA10) 一致。</p>
-    <pre><code>import os
+        <h2 id="code">五、 核心手勢控制程式碼 (Attitude 推力最終版)</h2>
+        <p>此代碼繞過 GPS 依賴，直接控制推力，並請確保 <code>system_address</code> 的 tty 設備與你的實體接孔 (AMA0 或 AMA10) 一致。</p>
+        <pre><code>import os
 import time
 import asyncio
 import threading
@@ -360,6 +394,6 @@ async def run():
 if __name__ == "__main__":
     asyncio.run(run())
 </code></pre>
-
+    </main>
 </body>
 </html>

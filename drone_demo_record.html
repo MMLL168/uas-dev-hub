@@ -45,6 +45,26 @@
             z-index: 1000;
         }
 
+        /* 首頁跳轉按鈕專屬樣式 */
+        .home-btn {
+            display: block;
+            background-color: var(--primary-color);
+            color: var(--bg-color) !important;
+            text-align: center;
+            font-weight: bold;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 25px;
+            text-decoration: none;
+            transition: opacity 0.2s;
+        }
+
+        .home-btn:hover {
+            opacity: 0.85;
+            background-color: var(--primary-color) !important;
+            padding-left: 10px !important; /* 覆蓋下方連結的 hover 動畫 */
+        }
+
         .sidebar h3 {
             margin-top: 0;
             color: var(--primary-color);
@@ -143,6 +163,8 @@
 <body>
 
     <nav class="sidebar">
+        <a href="index.html" class="home-btn">⬅ 回到主目錄</a>
+        
         <h3>章節捷徑</h3>
         <ul>
             <li><a href="#wiring">一、 RPi 5 實體接線對應</a></li>

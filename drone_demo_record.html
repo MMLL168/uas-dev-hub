@@ -149,7 +149,7 @@
             <li><a href="#uart-config">二、 UART 與 921600 鮑率設定</a></li>
             <li><a href="#env">三、 環境建置與依賴安裝</a></li>
             <li><a href="#debug">四、 FW 1.16 連線除錯 SOP</a></li>
-            <li><a href="#code">五、 手勢控制代碼 (推力版)</a></li>
+            <li><a href="#code">五、 核心手勢控制 (多執行緒極速版)</a></li>
         </ul>
     </nav>
 
@@ -253,8 +253,14 @@ pip install "opencv-python==4.10.0.84"
             </tr>
         </table>
 
-        <h2 id="code">五、 核心手勢控制程式碼 (Attitude 推力最終版)</h2>
-        <p>此代碼繞過 GPS 依賴，直接控制推力，並請確保 <code>system_address</code> 的 tty 設備與你的實體接孔 (AMA0 或 AMA10) 一致。</p>
+        <h2 id="code">五、 核心手勢控制程式碼 (多執行緒防誤判極速版)</h2>
+        <p>此架構採用<strong>軟硬體解耦</strong>與<strong>多執行緒 (Threading)</strong>設計，具備以下工業級優化：</p>
+        <ul class="content-list">
+            <li><strong>算力解耦：</strong>將 MediaPipe 移至背景獨立執行，使 UI 畫面更新率 (CAM FPS) 突破 60+，徹底消除畫面卡頓。</li>
+            <li><strong>滑動視窗投票 (Majority Voting)：</strong>取過去 10 幀的 AI 辨識結果，達到 80% 穩定度才觸發控制，有效濾除手部微小晃動與雜訊誤判。</li>
+            <li><strong>EMA 低通濾波：</strong>針對傳輸至 Pixhawk 的推力與姿態數值進行平滑化過渡，避免瞬間高低落差損傷電調 (ESC)。</li>
+            <li><strong>空間死區 (Deadzone)：</strong>畫面中央 30% 設為安全懸停區，需明確跨越輔助線才觸發 Roll 動作。</li>
+        </ul>
         <pre><code>import os
 import time
 import asyncio
@@ -263,17 +269,109 @@ import subprocess
 import cv2
 import numpy as np
 import mediapipe as mp
+from collections import deque, Counter
 from mavsdk import System
 from mavsdk.offboard import Attitude, OffboardError
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
-target_attitude = [0.0, 0.0, 0.0, 0.15] 
+# --- 全域控制與濾波變數 ---
+current_attitude = [0.0, 0.0, 0.0, 0.0] 
 is_offboard_active = False
+is_drone_connected = False  
 
+def get_fingers_count(hand_lms, label):
+    fingers = []
+    if label == "Right": fingers.append(hand_lms.landmark[4].x &lt; hand_lms.landmark[3].x)
+    else: fingers.append(hand_lms.landmark[4].x &gt; hand_lms.landmark[3].x)
+    for tip_id in [8, 12, 16, 20]: fingers.append(hand_lms.landmark[tip_id].y &lt; hand_lms.landmark[tip_id-2].y)
+    return sum(fingers)
+
+# ==========================================
+# 核心優化：AI 獨立執行緒 (加入 AI FPS 計算)
+# ==========================================
+class AIProcessorThread(threading.Thread):
+    def __init__(self):
+        super().__init__(daemon=True)
+        self.mp_hands = mp.solutions.hands
+        self.hands = self.mp_hands.Hands(max_num_hands=1, model_complexity=0, min_detection_confidence=0.6)
+        
+        self.lock = threading.Lock()
+        self.frame_to_process = None
+        self.results = None
+        self.stable_count = 0
+        self.stable_dir = "CENTER"
+        self.ai_fps = 0.0  # 新增：儲存 AI 處理的 FPS
+        
+        self.gesture_buffer = deque(maxlen=10)
+        self.running = True
+
+    def update_frame(self, frame):
+        with self.lock:
+            self.frame_to_process = frame
+
+    def get_latest_data(self):
+        with self.lock:
+            return self.results, self.stable_count, self.stable_dir, self.ai_fps
+
+    def run(self):
+        pTime_ai = time.time()
+        while self.running:
+            frame = None
+            with self.lock:
+                if self.frame_to_process is not None:
+                    frame = self.frame_to_process.copy()
+                    self.frame_to_process = None 
+            
+            if frame is None:
+                time.sleep(0.005)
+                continue
+
+            # --- 執行耗時的 AI 辨識 ---
+            results = self.hands.process(frame)
+            
+            # --- 計算 AI 專屬的 FPS ---
+            cTime_ai = time.time()
+            time_diff = cTime_ai - pTime_ai
+            current_ai_fps = 1.0 / time_diff if time_diff &gt; 0 else 0
+            pTime_ai = cTime_ai
+
+            raw_count = 0
+            raw_dir = "CENTER"
+
+            if results and results.multi_hand_landmarks:
+                for i, hand_lms in enumerate(results.multi_hand_landmarks):
+                    label = results.multi_handedness[i].classification[0].label
+                    raw_count = get_fingers_count(hand_lms, label)
+                    
+                    hand_center_x = hand_lms.landmark[9].x
+                    if hand_center_x &gt; 0.65: raw_dir = "RIGHT"
+                    elif hand_center_x &lt; 0.35: raw_dir = "LEFT"
+                    else: raw_dir = "CENTER"
+            
+            self.gesture_buffer.append((raw_count, raw_dir))
+            
+            # --- 狀態更新與防誤判投票 ---
+            temp_stable_count = self.stable_count
+            temp_stable_dir = self.stable_dir
+            if len(self.gesture_buffer) == self.gesture_buffer.maxlen:
+                most_common = Counter(self.gesture_buffer).most_common(1)[0]
+                if most_common[1] &gt;= 8:
+                    temp_stable_count = most_common[0][0]
+                    temp_stable_dir = most_common[0][1]
+            
+            # --- 將所有結果安全地寫回 Lock 區 ---
+            with self.lock:
+                self.results = results
+                self.stable_count = temp_stable_count
+                self.stable_dir = temp_stable_dir
+                self.ai_fps = (self.ai_fps * 0.9) + (current_ai_fps * 0.1)
+
+# ==========================================
+# 影像擷取與飛控連線
+# ==========================================
 class CameraStream:
-    """RPi 5 硬體加速影像讀取器"""
-    def __init__(self, width=640, height=480, fps=40):
+    def __init__(self, width=640, height=480, fps=60): 
         self.width, self.height = width, height
         self.frame_size = int(width * height * 1.5)
         self.cmd = ["rpicam-vid", "-t", "0", "--width", str(width), "--height", str(height),
@@ -296,45 +394,50 @@ class CameraStream:
         self.running = False
         self.process.terminate()
 
+async def connect_and_monitor(drone):
+    global is_drone_connected, is_offboard_active
+    try:
+        # ⚠️ 需依照硬體接線選擇對應的 tty 接口 (AMA0 為 Debug Port, AMA10 為 GPIO 排針)
+        await drone.connect(system_address="serial:///dev/ttyAMA0:921600") 
+        async for state in drone.core.connection_state():
+            if state.is_connected and not is_drone_connected:
+                print("\n✅ 無人機硬體已連線！")
+                is_drone_connected = True
+            elif not state.is_connected and is_drone_connected:
+                print("\n⚠️ 無人機已斷線！")
+                is_drone_connected = False
+                is_offboard_active = False
+    except: pass
+
 async def drone_control_loop(drone):
-    """維持 20Hz 控制鏈路"""
-    global target_attitude
+    global current_attitude, is_drone_connected
     while True:
-        try:
-            await drone.offboard.set_attitude(
-                Attitude(target_attitude[0], target_attitude[1], target_attitude[2], target_attitude[3])
-            )
-        except: pass
+        if is_drone_connected:
+            try:
+                await drone.offboard.set_attitude(
+                    Attitude(current_attitude[0], current_attitude[1], current_attitude[2], current_attitude[3])
+                )
+            except: pass
         await asyncio.sleep(0.05)
 
-def get_fingers_count(hand_lms, label):
-    fingers = []
-    if label == "Right": fingers.append(hand_lms.landmark[4].x &lt; hand_lms.landmark[3].x)
-    else: fingers.append(hand_lms.landmark[4].x &gt; hand_lms.landmark[3].x)
-    for tip_id in [8, 12, 16, 20]: fingers.append(hand_lms.landmark[tip_id].y &lt; hand_lms.landmark[tip_id-2].y)
-    return sum(fingers)
-
+# ==========================================
+# 主程式 (極速 UI 迴圈)
+# ==========================================
 async def run():
-    global target_attitude, is_offboard_active
+    global current_attitude, is_offboard_active, is_drone_connected
+    
     drone = System()
-    
-    # ⚠️ 需依照硬體接線選擇對應的 tty 接口 (AMA0 為 Debug Port, AMA10 為 GPIO 排針)
-    print("正在連線至 Pixhawk 6C (Baud: 921600)...")
-    await drone.connect(system_address="serial:///dev/ttyAMA0:921600") 
-    
-    async for state in drone.core.connection_state():
-        if state.is_connected:
-            print("✅ 無人機已連線！")
-            break
-
+    asyncio.create_task(connect_and_monitor(drone))
     asyncio.create_task(drone_control_loop(drone))
 
-    mp_hands = mp.solutions.hands
-    hands = mp_hands.Hands(max_num_hands=1, model_complexity=0, min_detection_confidence=0.6)
-    cap = CameraStream(640, 480, 40)
-    pTime, avg_fps, status_text = 0, 0, "STANDBY"
+    ai_thread = AIProcessorThread()
+    ai_thread.start()
+    
+    cap = CameraStream(640, 480, 60)
+    mp_hands_draw = mp.solutions.hands 
+    pTime, cam_fps = 0, 0
 
-    print("\n🚀 系統就緒：請先用 RC 解鎖，按 'a' 鍵 AI 接管")
+    print("\n🚀 雙核效能監控版就緒！(右上角顯示 UI 與 AI 雙重 FPS)")
     
     try:
         while True:
@@ -344,58 +447,67 @@ async def run():
                 continue
 
             frame_rgb = cv2.flip(frame_rgb, 1)
-            results = hands.process(frame_rgb)
+            ai_thread.update_frame(frame_rgb)
+            
+            # --- 讀取 AI 最新狀態與 AI FPS ---
+            results, stable_count, stable_dir, ai_fps = ai_thread.get_latest_data()
+            
             frame_bgr = cv2.cvtColor(frame_rgb, cv2.COLOR_RGB2BGR)
             
-            new_att = [0.0, 0.0, 0.0, 0.15] 
+            target_att = [0.0, 0.0, 0.0, 0.0]
+            target_att[3] = stable_count * 0.10
             
-            if results and results.multi_hand_landmarks:
-                for i, hand_lms in enumerate(results.multi_hand_landmarks):
-                    mp.solutions.drawing_utils.draw_landmarks(frame_bgr, hand_lms, mp_hands.HAND_CONNECTIONS)
-                    label = results.multi_handedness[i].classification[0].label
-                    count = get_fingers_count(hand_lms, label)
+            if stable_dir == "RIGHT": target_att[0] = 15.0  
+            elif stable_dir == "LEFT": target_att[0] = -15.0 
+            else: target_att[0] = 0.0
+            
+            status_text = f"T:{int(target_att[3]*100)}% | R:{stable_dir}"
 
-                    if count == 5: 
-                        new_att[3] = 0.5 
-                        status_text = "CLIMBING (Thrust 50%)"
-                    elif count == 0: 
-                        new_att[3] = 0.05 
-                        status_text = "DESCENDING (Thrust 5%)"
-                    elif count == 1:
-                        new_att[0] = 15.0 
-                        new_att[3] = 0.2  
-                        status_text = "MOVE RIGHT (Roll 15deg)"
-                    else: 
-                        new_att[3] = 0.15
-                        status_text = "HOVERING (Idle)"
-            else: 
-                status_text = "SEARCHING..."
-            
-            target_attitude = new_att
-            
+            alpha = 0.05 
+            for j in range(4):
+                current_attitude[j] = (current_attitude[j] * (1.0 - alpha)) + (target_att[j] * alpha)
+
+            # --- UI FPS 計算 ---
             cTime = time.time()
             if (cTime - pTime) &gt; 0:
-                avg_fps = (avg_fps * 0.9) + ((1 / (cTime - pTime)) * 0.1)
+                cam_fps = (cam_fps * 0.9) + ((1 / (cTime - pTime)) * 0.1)
                 pTime = cTime
+
+            if results and results.multi_hand_landmarks:
+                for hand_lms in results.multi_hand_landmarks:
+                    mp.solutions.drawing_utils.draw_landmarks(frame_bgr, hand_lms, mp_hands_draw.HAND_CONNECTIONS)
             
-            cv2.putText(frame_bgr, f"MODE: {'OFFBOARD (AI)' if is_offboard_active else 'RC MANUAL'}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255) if is_offboard_active else (0, 255, 255), 2)
-            cv2.putText(frame_bgr, f"ACTION: {status_text}", (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
+            h, w, _ = frame_bgr.shape
+            cv2.line(frame_bgr, (int(w*0.35), 0), (int(w*0.35), h), (100, 100, 100), 1)
+            cv2.line(frame_bgr, (int(w*0.65), 0), (int(w*0.65), h), (100, 100, 100), 1)
+
+            # 左側狀態顯示
+            mode_text = "AI ACTIVE" if is_offboard_active else "STANDBY"
+            cv2.putText(frame_bgr, f"MODE: {mode_text}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 255), 2)
+            cv2.putText(frame_bgr, f"CMD: {status_text}", (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 0), 2)
+
+            # 右上角狀態顯示 (連線、CAM FPS、AI FPS)
+            conn_status = "FC CONNECTED" if is_drone_connected else "FC DISCONNECTED"
+            conn_color = (0, 255, 0) if is_drone_connected else (0, 0, 255)
+            cv2.putText(frame_bgr, conn_status, (w - 200, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.6, conn_color, 2)
+            cv2.putText(frame_bgr, f"CAM FPS: {cam_fps:.1f}", (w - 200, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 165, 0), 2)
+            cv2.putText(frame_bgr, f"AI  FPS: {ai_fps:.1f}", (w - 200, 90), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 255), 2)
+
             cv2.imshow('Marlon Drone AI', frame_bgr)
             
             key = cv2.waitKey(1) & 0xFF
             if key == ord('a'):
-                print(">>> 嘗試接管控制權...")
-                try:
-                    await drone.offboard.start()
-                    is_offboard_active = True
-                    print("✅ 接管成功！已切換至 AI 手勢控制。")
-                except OffboardError as e:
-                    print(f"❌ 接管失敗: {e._result.result}")
+                if is_drone_connected:
+                    try:
+                        await drone.offboard.start()
+                        is_offboard_active = True
+                    except: pass
             elif key == ord('q'): break
             await asyncio.sleep(0.001)
 
     finally:
         cap.release()
+        ai_thread.running = False
         cv2.destroyAllWindows()
 
 if __name__ == "__main__":

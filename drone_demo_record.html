@@ -13,6 +13,10 @@
             --accent-color: #a6e3a1;
             --code-bg: #181825;
             --border-color: #313244;
+            --sidebar-width: 260px;
+        }
+        html {
+            scroll-behavior: smooth;
         }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -20,11 +24,56 @@
             color: var(--text-color);
             line-height: 1.6;
             margin: 0;
-            padding: 20px 10%;
+            padding: 20px 40px;
+            /* 預留左側固定導覽列的空間 */
+            padding-left: calc(var(--sidebar-width) + 60px); 
         }
+        
+        /* --- 左側固定章節導覽 (Sidebar) --- */
+        .sidebar {
+            position: fixed;
+            top: 40px;
+            left: 20px;
+            width: var(--sidebar-width);
+            background-color: var(--code-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 4px 4px 15px rgba(0,0,0,0.3);
+            z-index: 1000;
+        }
+        .sidebar h3 {
+            margin-top: 0;
+            color: var(--primary-color);
+            font-size: 1.1em;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .sidebar li {
+            margin-bottom: 12px;
+        }
+        .sidebar a {
+            color: var(--text-color);
+            text-decoration: none;
+            font-size: 0.95em;
+            transition: color 0.2s;
+            display: block;
+        }
+        .sidebar a:hover {
+            color: var(--accent-color);
+            padding-left: 5px;
+            transition: all 0.2s;
+        }
+
+        /* --- 內容排版 --- */
         h1, h2, h3 { color: var(--primary-color); }
         h1 { border-bottom: 2px solid var(--primary-color); padding-bottom: 10px; }
-        h2 { margin-top: 40px; border-bottom: 1px solid var(--border-color); padding-bottom: 5px; }
+        h2 { margin-top: 50px; border-bottom: 1px solid var(--border-color); padding-bottom: 5px; scroll-margin-top: 20px; }
         .highlight { color: var(--secondary-color); font-weight: bold; }
         .success { color: var(--accent-color); font-weight: bold; }
         code {
@@ -60,95 +109,111 @@
 </head>
 <body>
 
+    <nav class="sidebar">
+        <h3>章節導覽</h3>
+        <ul>
+            <li><a href="#wiring">一、 RPi 5 與飛控接線 (UART)</a></li>
+            <li><a href="#env">二、 環境建置與依賴安裝</a></li>
+            <li><a href="#debug">三、 連線解鎖除錯 SOP</a></li>
+            <li><a href="#code">四、 手勢控制代碼 (推力版)</a></li>
+        </ul>
+    </nav>
+
     <h1>AIoT 手勢無人機控制系統 - 核心開發文件</h1>
     <p><strong>系統架構：</strong> Raspberry Pi 5 (Companion Computer) + Pixhawk 6C (PX4 v1.16) + MediaPipe AI 視覺辨識</p>
 
-    <h2>一、 硬體接線指南 (Hardware Wiring)</h2>
-    <p>確保 RPi 5 與 Pixhawk 6C 之間的通訊鏈路穩定，採用 UART 序列埠連接。</p>
+    <h2 id="wiring">一、 RPi 5 與飛控接線與 UART 設定 (RPi 5 專屬)</h2>
+    <p>Raspberry Pi 5 採用全新的 RP1 晶片處理 I/O，UART 架構與舊版完全不同。為了實現影像控制的低延遲，我們必須使用 <strong>921600 波特率 (Baud Rate)</strong>。</p>
+    
+    <h3>1. 實體接線對應 (兩種方案)</h3>
+    <p>在 RPi 5 上，你使用的接孔決定了 Linux 系統中的設備代號：</p>
     <table>
         <tr>
-            <th>Raspberry Pi 5 (GPIO 腳位)</th>
-            <th>Pixhawk 6C (TELEM 1 或 TELEM 2)</th>
-            <th>說明</th>
+            <th>方案</th>
+            <th>RPi 5 端接孔</th>
+            <th>Pixhawk 6C (TELEM)</th>
+            <th>對應的 Linux 設備名稱</th>
         </tr>
         <tr>
-            <td>Pin 6 (GND)</td>
-            <td>GND</td>
-            <td>共地是通訊穩定的絕對前提</td>
+            <td><strong>方案 A</strong> (推薦)</td>
+            <td><strong>專用 3-Pin Debug 接口</strong> (UART)</td>
+            <td>RX / TX / GND</td>
+            <td><code>/dev/ttyAMA0</code></td>
         </tr>
         <tr>
-            <td>Pin 8 (GPIO 14 / TXD)</td>
-            <td>RX</td>
-            <td>資料發送至飛控</td>
-        </tr>
-        <tr>
-            <td>Pin 10 (GPIO 15 / RXD)</td>
-            <td>TX</td>
-            <td>接收飛控資料</td>
-        </tr>
-        <tr>
-            <td>外部 5V / 3A 電源</td>
-            <td>不建議從 Pixhawk 取電</td>
-            <td>RPi 5 運作 AI 耗電量大，請使用獨立 Type-C 供電。Pixhawk 由主動力電池 (LiPo) 透過電源模組供電。</td>
+            <td><strong>方案 B</strong></td>
+            <td><strong>40-Pin GPIO 排針</strong> (Pin 8: TX, Pin 10: RX, Pin 6: GND)</td>
+            <td>RX / TX / GND</td>
+            <td><code>/dev/ttyAMA10</code> (或 ttyS0)</td>
         </tr>
     </table>
-    <p><span class="highlight">⚠️ 注意：</span> 影像串流採用 Raspberry Pi Camera Module 3，排線需正確插入 RPi 5 的 MIPI CSI 接口。</p>
+    <p><span class="highlight">⚠️ 電源警告：</span> 嚴禁直接從 Pixhawk TELEM 埠取電給 RPi 5！RPi 5 運算 AI 耗電極大，必須使用獨立 Type-C 供電，Pixhawk 則由動力電池供電。兩者<strong>必須共地 (GND)</strong> 通訊才會穩定。</p>
 
-    <h2>二、 環境建置與依賴安裝 (Environment Setup)</h2>
-    <p>在 Raspberry Pi OS (Bookworm, 64-bit) 環境下的安裝指令：</p>
-    
-    <h3>1. 啟用 UART 序列埠</h3>
-    <p>編輯 <code>/boot/firmware/config.txt</code> (或使用 <code>sudo raspi-config</code>)：</p>
+    <h3>2. RPi 5 系統設定 (啟用 921600 高速 UART)</h3>
+    <p>編輯 boot 參數檔：</p>
+    <pre><code>sudo nano /boot/firmware/config.txt</code></pre>
+    <p><strong>若使用 40-Pin GPIO (方案 B)：</strong></p>
+    <p>加入以下指令以啟用 RP1 晶片上的 UART0，並關閉預設的 Serial Console 避免終端機干擾：</p>
+    <pre><code>enable_uart=1
+dtoverlay=uart0-pi5</code></pre>
+    <p><em>(修改後需 Reboot，系統中將出現 <code>/dev/ttyAMA10</code> 供 Python 呼叫)</em></p>
+
+    <h3>3. Pixhawk (QGC) 端 921600 設定</h3>
+    <p>為匹配 RPi 5 的高速傳輸，飛控端必須精準設定：</p>
     <ul>
-        <li>關閉 Serial Console：<code>enable_uart=1</code> 且移除 <code>console=serial0,115200</code>。</li>
-        <li>確保 MAVSDK 使用的對應埠口為 <code>/dev/ttyAMA0</code>。</li>
+        <li>打開 QGC 進入參數設定 (Parameters)。</li>
+        <li>確認接線的 TELEM 埠 (如 TELEM 1)。</li>
+        <li>搜尋 <code>SER_TEL1_BAUD</code>，將其修改為 <strong>921600 8N1</strong>。</li>
+        <li>重啟 Pixhawk。</li>
     </ul>
 
-    <h3>2. 安裝 Python 依賴庫</h3>
-    <pre><code># 建立虛擬環境 (推薦)
+    <h2 id="env">二、 環境建置與依賴安裝 (Environment Setup)</h2>
+    <p>在 Raspberry Pi OS (Bookworm, 64-bit) 建議使用虛擬環境：</p>
+    <pre><code># 1. 更新系統並安裝基礎視覺套件依賴
+sudo apt update
+sudo apt install -y python3-venv libgl1-mesa-glx libglib2.0-0
+
+# 2. 建立並進入 Python 虛擬環境
 python3 -m venv ~/drone_env
 source ~/drone_env/bin/activate
 
-# 安裝核心套件
+# 3. 安裝 AIoT 核心套件 (注意 MAVSDK 版本相容性)
 pip install mavsdk opencv-python mediapipe numpy
 </code></pre>
-    <p>※ 註：本專案使用 <code>rpicam-vid</code> 擷取硬體加速影像，此工具為 Raspberry Pi OS 內建。</p>
 
-
-    <h2>三、 常見連線與解鎖失敗原因及 SOP (Debugging SOP)</h2>
-    <p>針對 PX4 v1.16 新版韌體，在室內無 GPS 環境下進行 DEMO 的常見報錯與解法：</p>
-
+    <h2 id="debug">三、 連線解鎖除錯 SOP (PX4 FW 1.16 專用)</h2>
+    <p>PX4 v1.16 的健康檢查極嚴格，若遇到問題請依序排查：</p>
     <table>
         <tr>
-            <th>錯誤現象 (QGC 提示)</th>
+            <th>錯誤現象</th>
             <th>根本原因</th>
-            <th>解決方案 (SOP)</th>
+            <th>解決方案 (QGC 參數與設定)</th>
         </tr>
         <tr>
-            <td><strong>馬達毫無反應</strong><br>(已解鎖綠燈但不動)</td>
-            <td>PX4 v1.16 未配置動態控制分配 (Control Allocation)。PWM 腳位未映射。</td>
-            <td>進入 QGC -> Vehicle Setup -> Actuators。<br>將實體 <code>I/O PWM Out 1~4</code> 手動分配為 <code>Motor 1~4</code>，並重啟飛控。</td>
+            <td><strong>馬達無反應</strong><br>(已解鎖綠燈但不動)</td>
+            <td>FW 1.16 動態控制分配 (Control Allocation) 未配置。PWM 腳位未映射。</td>
+            <td>進入 Actuators (執行器)。手動將 <code>I/O PWM Out 1~4</code> 綁定至 <code>Motor 1~4</code>，並重啟。</td>
         </tr>
         <tr>
-            <td><strong>Offboard 切換失敗</strong><br>(Position is missing)</td>
-            <td>室內無 GPS，無法建立位置與速度估算 (EKF2 異常)。</td>
-            <td>放棄 <code>Velocity</code> 控制，改用 <code>Attitude</code> (姿勢與推力) 控制。<br>將 QGC 參數 <code>COM_ARM_WO_GPS</code> 設為 <strong>1</strong>。</td>
+            <td><strong>Offboard 切換被拒</strong><br>(Position missing)</td>
+            <td>室內無 GPS，飛控拒絕進入需位置數據的 <code>Velocity</code> 模式。</td>
+            <td>程式改用 <code>Attitude</code> (推力) 控制。<br>QGC 參數 <code>COM_ARM_WO_GPS</code> 設為 <strong>1</strong>。</td>
         </tr>
         <tr>
-            <td><strong>解鎖被拒</strong><br>(Health failures first)</td>
-            <td>飛控安全預檢未過 (羅盤干擾、沒接遙控器、硬體按鈕未按)。</td>
-            <td>設定暴力 DEMO 參數：<br><code>CBRK_IO_SAFETY</code> = 22027<br><code>COM_RC_IN_MODE</code> = 1<br><code>SYS_HAS_MAG</code> = 0</td>
+            <td><strong>解鎖被拒</strong><br>(Health failures)</td>
+            <td>安全按鈕未按、USB 供電限制或無遙控器訊號。</td>
+            <td><code>CBRK_IO_SAFETY</code> = 22027<br><code>CBRK_USB_CHK</code> = 197848<br><code>COM_RC_IN_MODE</code> = 1</td>
         </tr>
         <tr>
-            <td><strong>解鎖後瞬間停轉</strong><br>(Takeoff/Landing detected)</td>
-            <td>無人機未實際升空，降落偵測器誤判為「已落地」並強切動力。</td>
-            <td>將 QGC 參數 <code>COM_DISARM_LAND</code> 設為 <strong>-1</strong> (關閉落地上鎖)，或在程式中給予超過 50% 的大推力。</td>
+            <td><strong>解鎖後瞬間停轉</strong></td>
+            <td>降落偵測器誤判觸地，瞬間強制切斷推力。</td>
+            <td><code>COM_DISARM_LAND</code> 設為 <strong>-1</strong>，或在程式中給予突破臨界值的大推力。</td>
         </tr>
     </table>
 
 
-    <h2>四、 核心手勢控制程式碼 (Attitude 推力版)</h2>
-    <p>此版本已完全移除對 GPS 與速度估算的依賴，直接控制馬達推力，適合室內 DEMO。</p>
+    <h2 id="code">四、 核心手勢控制程式碼 (Attitude 推力最終版)</h2>
+    <p>此代碼繞過 GPS 依賴，直接控制推力，並請確保 <code>system_address</code> 的 tty 設備與你的實體接孔 (AMA0 或 AMA10) 一致。</p>
     <pre><code>import os
 import time
 import asyncio
@@ -162,16 +227,14 @@ from mavsdk.offboard import Attitude, OffboardError
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
-# --- 全域控制變數: [Roll, Pitch, Yaw, Thrust] ---
-# Thrust 範圍 0.0 ~ 1.0 (0.15 為怠速)
 target_attitude = [0.0, 0.0, 0.0, 0.15] 
 is_offboard_active = False
 
 class CameraStream:
+    """RPi 5 硬體加速影像讀取器"""
     def __init__(self, width=640, height=480, fps=40):
         self.width, self.height = width, height
         self.frame_size = int(width * height * 1.5)
-        # 呼叫底層 rpicam-vid 取得低延遲 yuv 影像
         self.cmd = ["rpicam-vid", "-t", "0", "--width", str(width), "--height", str(height),
                     "--framerate", str(fps), "--codec", "yuv420", "--nopreview", "-o", "-"]
         self.process = subprocess.Popen(self.cmd, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
@@ -188,13 +251,12 @@ class CameraStream:
                 self.latest_frame_rgb = cv2.cvtColor(yuv, cv2.COLOR_YUV2RGB_I420)
 
     def read(self): return self.latest_frame_rgb
-    
     def release(self):
         self.running = False
         self.process.terminate()
 
 async def drone_control_loop(drone):
-    """背景維持 20Hz 的 Offboard 訊號發送，防止飛控 Failsafe"""
+    """維持 20Hz 控制鏈路"""
     global target_attitude
     while True:
         try:
@@ -205,7 +267,6 @@ async def drone_control_loop(drone):
         await asyncio.sleep(0.05)
 
 def get_fingers_count(hand_lms, label):
-    """計算伸出的手指數量"""
     fingers = []
     if label == "Right": fingers.append(hand_lms.landmark[4].x &lt; hand_lms.landmark[3].x)
     else: fingers.append(hand_lms.landmark[4].x &gt; hand_lms.landmark[3].x)
@@ -215,15 +276,16 @@ def get_fingers_count(hand_lms, label):
 async def run():
     global target_attitude, is_offboard_active
     drone = System()
-    print("正在連線至 Pixhawk 6C (/dev/ttyAMA0:921600)...")
-    await drone.connect(system_address="serial:///dev/ttyAMA0:921600")
+    
+    # ⚠️ 需依照硬體接線選擇對應的 tty 接口 (AMA0 為 Debug Port, AMA10 為 GPIO 排針)
+    print("正在連線至 Pixhawk 6C (Baud: 921600)...")
+    await drone.connect(system_address="serial:///dev/ttyAMA0:921600") 
     
     async for state in drone.core.connection_state():
         if state.is_connected:
             print("✅ 無人機已連線！")
             break
 
-    # 啟動背景控制迴圈
     asyncio.create_task(drone_control_loop(drone))
 
     mp_hands = mp.solutions.hands
@@ -231,7 +293,7 @@ async def run():
     cap = CameraStream(640, 480, 40)
     pTime, avg_fps, status_text = 0, 0, "STANDBY"
 
-    print("\n🚀 DEMO 流程：先用 RC 解鎖，馬達怠速後，按 'a' 鍵 AI 接管。")
+    print("\n🚀 系統就緒：請先用 RC 解鎖，按 'a' 鍵 AI 接管")
     
     try:
         while True:
@@ -244,7 +306,6 @@ async def run():
             results = hands.process(frame_rgb)
             frame_bgr = cv2.cvtColor(frame_rgb, cv2.COLOR_RGB2BGR)
             
-            # 預設維持怠速推力
             new_att = [0.0, 0.0, 0.0, 0.15] 
             
             if results and results.multi_hand_landmarks:
@@ -253,15 +314,14 @@ async def run():
                     label = results.multi_handedness[i].classification[0].label
                     count = get_fingers_count(hand_lms, label)
 
-                    # 手勢對應推力邏輯
                     if count == 5: 
-                        new_att[3] = 0.5  # 推力 50% (馬達高轉)
+                        new_att[3] = 0.5 
                         status_text = "CLIMBING (Thrust 50%)"
                     elif count == 0: 
-                        new_att[3] = 0.05 # 推力 5% (馬達低轉)
+                        new_att[3] = 0.05 
                         status_text = "DESCENDING (Thrust 5%)"
                     elif count == 1:
-                        new_att[0] = 15.0 # Roll 15度 (右傾)
+                        new_att[0] = 15.0 
                         new_att[3] = 0.2  
                         status_text = "MOVE RIGHT (Roll 15deg)"
                     else: 
@@ -272,24 +332,22 @@ async def run():
             
             target_attitude = new_att
             
-            # FPS 計算
             cTime = time.time()
             if (cTime - pTime) &gt; 0:
                 avg_fps = (avg_fps * 0.9) + ((1 / (cTime - pTime)) * 0.1)
                 pTime = cTime
             
-            # UI 繪製
             cv2.putText(frame_bgr, f"MODE: {'OFFBOARD (AI)' if is_offboard_active else 'RC MANUAL'}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255) if is_offboard_active else (0, 255, 255), 2)
             cv2.putText(frame_bgr, f"ACTION: {status_text}", (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
             cv2.imshow('Marlon Drone AI', frame_bgr)
             
             key = cv2.waitKey(1) & 0xFF
             if key == ord('a'):
-                print(">>> 嘗試接管控制權 (Attitude 模式)...")
+                print(">>> 嘗試接管控制權...")
                 try:
                     await drone.offboard.start()
                     is_offboard_active = True
-                    print("✅ 接管成功！")
+                    print("✅ 接管成功！已切換至 AI 手勢控制。")
                 except OffboardError as e:
                     print(f"❌ 接管失敗: {e._result.result}")
             elif key == ord('q'): break

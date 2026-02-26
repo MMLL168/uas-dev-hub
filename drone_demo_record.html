@@ -203,17 +203,24 @@ dtoverlay=uart0-pi5</code></pre>
         </ul>
 
         <h2 id="env">三、 環境建置與依賴安裝 (Environment Setup)</h2>
-        <p>在 Raspberry Pi OS (Bookworm, 64-bit) 建議使用虛擬環境：</p>
-        <pre><code># 1. 更新系統並安裝基礎視覺套件依賴
+        <p>在 Raspberry Pi OS (Bookworm, 64-bit) 下，為避免 Numpy 2.0 大改版導致 OpenCV/MediaPipe 底層 C API 崩潰，必須嚴格鎖定黃金相容版本：</p>
+        <pre><code># 1. 更新系統並安裝基礎視覺套件依賴 (處理 OpenCV 在 Wayland 下的顯示依賴)
 sudo apt update
-sudo apt install -y python3-venv libgl1-mesa-glx libglib2.0-0
+sudo apt install -y python3-venv libgl1-mesa-glx libglib2.0-0 libqt5gui5
 
 # 2. 建立並進入 Python 虛擬環境
 python3 -m venv ~/drone_env
 source ~/drone_env/bin/activate
 
-# 3. 安裝 AIoT 核心套件
-pip install mavsdk opencv-python mediapipe numpy
+# 3. 升級 pip (避免舊版 pip 無法抓取最新的 arm64 wheel)
+pip install --upgrade pip
+
+# 4. 安裝黃金相容版本的 AIoT 核心套件
+# ⚠️ 極度重要：強制鎖定 numpy < 2.0，否則 OpenCV 與 MediaPipe 會崩潰
+pip install "numpy==1.26.4"
+pip install "mavsdk&gt;=2.5.0"
+pip install "mediapipe==0.10.14"
+pip install "opencv-python==4.10.0.84"
 </code></pre>
 
         <h2 id="debug">四、 FW 1.16 連線解鎖除錯 SOP</h2>
